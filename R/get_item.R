@@ -1,38 +1,54 @@
 #' @title Get item
-#' @param qid QID
+#' @param qid A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)
 #' @param language descr
+#' @param url Defaults to \code{"https://www.wikidata.org/w/api.php"}.
+#' @param creator Author
+#' @param title Title
 #' @importFrom dplyr left_join mutate relocate everything
 #' @importFrom httr POST content
+#' @importFrom utils person
+#' @importFrom dataset as_dataset
 #' @export
 #' @examples
 #' qid = "Q42"
 #'
 
-get_item <- function(qid, languages) {
+get_item <- function(qid,
+                     language,
+                     url = "https://www.wikidata.org/w/api.php",
+                     creator = person("Jane", "Doe"),
+                     title = "Dataset title") {
 
   if (!all(is_qid (qid))) { stop("Jaj") }
 
   if (length(qid)>1) {
-
+    for (i in seq_along(qid)) {
+      if (i==1) {
+        return_df <- get_singe_item(qid=qid[i], language=language)
+      } else {
+        tmp <- get_singe_item(qid=qid[i], language=language)
+        return_df <- rbind(return_df, tmp)
+      }
+    }
   } else {
-    get_singe_item(qid=qid, languages=languages)
+    return_df <- get_singe_item(qid=qid, language=language)
   }
+  return_df %>% as_dataset( author=creator, title = title)
 }
 
 #' @keywords internal
 get_singe_item <- function(qid,
-                     languages = c("en", "nl", 'hu')) {
+                     language = c("en", "nl", 'hu'),
+                     url = "https://www.wikidata.org/w/api.php") {
 
   default_label  <- ""
   claim_body <- list(
     action = "wbgetentities",
     ids   = qid,
-    #languages = "en|nl|hu",
-    #props = "labels",
     format = "json")
 
   get_claim <- httr::POST(
-    "https://www.wikidata.org/w/api.php",
+    url,
     body = claim_body,
     encode = "form"
   )
@@ -50,11 +66,11 @@ get_singe_item <- function(qid,
 
   message("Downloaded ", response$entities[[1]]$id )
 
-  labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
-  labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
+  labels_present <- language[which(language %in% names(response$entities[[1]]$labels))]
+  labels_missing <- language[which(!language %in% names(response$entities[[1]]$labels))]
 
-  descriptions_present <- languages[which(languages %in% names(response$entities[[1]]$descriptions))]
-  descriptions_missing <- languages[which(!languages %in% names(response$entities[[1]]$descriptions))]
+  descriptions_present <- language[which(language %in% names(response$entities[[1]]$descriptions))]
+  descriptions_missing <- language[which(!language %in% names(response$entities[[1]]$descriptions))]
 
   labels_missing
 
@@ -83,8 +99,8 @@ get_singe_item <- function(qid,
   }
 
   descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
-  a <- lapply(labels_list , unlist)
-  b <- lapply(labels_list , unlist)
+  a <- lapply(labels_list, unlist)
+  b <- lapply(descriptions_list, unlist)
   label_df <- as.data.frame(do.call(rbind, a))
   description_df <- as.data.frame(do.call(rbind, b))
 
@@ -98,9 +114,11 @@ get_singe_item <- function(qid,
     names(description_df) <- c("language", "description")
   }
 
-  left_join(label_df, description_df, by = "language") %>%
+  left_join(label_df,
+            description_df,
+            by = "language") %>%
     mutate (qid = qid) %>%
-    relocate ( qid, .before=everything(),
-               language, .after=everything())
+    relocate ( qid, .before=everything()) %>%
+    relocate (language, .after=everything())
 
 }

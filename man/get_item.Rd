@@ -4,12 +4,24 @@
 \alias{get_item}
 \title{Get item}
 \usage{
-get_item(qid, languages)
+get_item(
+  qid,
+  language,
+  url = "https://www.wikidata.org/w/api.php",
+  creator = person("Jane", "Doe"),
+  title = "Dataset title"
+)
 }
 \arguments{
-\item{qid}{QID}
+\item{qid}{A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)}
 
 \item{language}{descr}
+
+\item{url}{Defaults to \code{"https://www.wikidata.org/w/api.php"}.}
+
+\item{creator}{Author}
+
+\item{title}{Title}
 }
 \description{
 Get item
