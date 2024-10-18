@@ -7,6 +7,7 @@ Authors@R:
 Description: Create tidy datasets from Wikidata or a Wikibase instance.
 License: MIT + file LICENSE
 Suggests: 
+    spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
@@ -18,3 +19,4 @@ Imports:
     httr,
     magrittr,
     utils
+Language: en-US

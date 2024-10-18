@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_item.R
 \name{get_item}
 \alias{get_item}
-\title{Get item}
+\title{Get items}
 \usage{
 get_item(
   qid,
@@ -15,18 +15,23 @@ get_item(
 \arguments{
 \item{qid}{A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)}
 
-\item{language}{descr}
+\item{language}{A character vector of language codes, for example,
+\code{c("en", "nl", "hu")}.}
 
 \item{url}{Defaults to \code{"https://www.wikidata.org/w/api.php"}.}
 
-\item{creator}{Author}
+\item{creator}{The creator (author) of the dataset.}
 
-\item{title}{Title}
+\item{title}{The title of the dataset.}
+}
+\value{
+A dataset with the QIDs, labels, description, and the language codes
+of the labels and descriptions.
 }
 \description{
-Get item
+Get item definitions by QID from a Wikibase instance or Wikidata.
 }
 \examples{
-qid = "Q42"
+get_item("Q42", language=c("en", "nl"))
 
 }

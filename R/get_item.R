@@ -1,16 +1,20 @@
-#' @title Get item
+#' @title Get items
+#' @description Get item definitions by QID from a Wikibase instance or Wikidata.
 #' @param qid A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)
-#' @param language descr
+#' @param language A character vector of language codes, for example,
+#' \code{c("en", "nl", "hu")}.
 #' @param url Defaults to \code{"https://www.wikidata.org/w/api.php"}.
-#' @param creator Author
-#' @param title Title
+#' @param creator The creator (author) of the dataset.
+#' @param title The title of the dataset.
 #' @importFrom dplyr left_join mutate relocate everything
 #' @importFrom httr POST content
 #' @importFrom utils person
 #' @importFrom dataset as_dataset
+#' @return A dataset with the QIDs, labels, description, and the language codes
+#' of the labels and descriptions.
 #' @export
 #' @examples
-#' qid = "Q42"
+#' get_item("Q42", language=c("en", "nl"))
 #'
 
 get_item <- function(qid,
