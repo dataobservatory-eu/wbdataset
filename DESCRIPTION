@@ -1,0 +1,18 @@
+Package: wbdataset
+Title: Create Tidy Datasets From Wikidata or a Wikibase Instance
+Version: 0.0.0.9000
+Authors@R: 
+    person("Daniel", "Antal", , "daniel.antal@dataobservatory.eu", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Create tidy datasets from Wikidata or a Wikibase instance.
+License: MIT + file LICENSE
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    httr,
+    magrittr
