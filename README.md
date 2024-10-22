@@ -9,6 +9,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/wbdataset)](https://CRAN.R-project.org/package=wbdataset)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13972192.svg)](https://zenodo.org/record/13972192)
 <!-- badges: end -->
 
 The goal of wbdataset is to create tidy datasets from Wikidata or a

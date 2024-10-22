@@ -9,7 +9,7 @@
 #' @importFrom dplyr left_join mutate relocate everything
 #' @importFrom httr POST content
 #' @importFrom utils person
-#' @importFrom dataset as_dataset
+#' @importFrom dataset as_dataset creator
 #' @return A dataset with the QIDs, labels, description, and the language codes
 #' of the labels and descriptions.
 #' @export
@@ -19,11 +19,14 @@
 
 get_item <- function(qid,
                      language,
+                     prefix = "http://www.wikidata.org/entity/",
                      url = "https://www.wikidata.org/w/api.php",
                      creator = person("Jane", "Doe"),
                      title = "Dataset title") {
 
-  if (!all(is_qid (qid))) { stop("Jaj") }
+  qid <- gsub(prefix, "", as.character(qid))
+
+  if (!all(is_qid(qid))) { stop("The QIDs do not appear to look like QIDs.") }
 
   if (length(qid)>1) {
     for (i in seq_along(qid)) {
@@ -37,7 +40,13 @@ get_item <- function(qid,
   } else {
     return_df <- get_singe_item(qid=qid, language=language)
   }
-  return_df %>% as_dataset( author=creator, title = title)
+  return_ds <- return_df %>% as_dataset( author=creator, title = title)
+
+  wikibase_type <- c(qid = "QID")
+  attr(return_ds, "wikibase_type") <- wikibase_type
+  attr(return_ds, "class") <- c("wbdataset", attr(return_ds, "class"))
+  return_ds
+
 }
 
 #' @keywords internal
@@ -60,10 +69,15 @@ get_singe_item <- function(qid,
   response <- httr::content(get_claim, as = "parsed", type = "application/json")
 
   if (!is_response_success(response)) {
-    message("Could not access ", qid_on_wikidata)
-    return(  data.frame ( qid_on_wikidata  = qid_on_wikidata,
-                          qid_on_wikibase =  NA_character_,
-                          success = FALSE) )
+    message("Could not access ", qid)
+
+
+    return(
+      data.frame ( data.frame (qid=qid,
+                               language = NA_character_,
+                               label = NA_character_ ,
+                               description = NA_character_))
+    )
   }
 
   claims <- response$entities[[1]]$claims
@@ -108,14 +122,18 @@ get_singe_item <- function(qid,
   label_df <- as.data.frame(do.call(rbind, a))
   description_df <- as.data.frame(do.call(rbind, b))
 
-  if (nrow(label_df) >1 ) {
+  if ( is_df_not_empty(label_df) ) {
     row.names(label_df) <- 1:dim(label_df)[1]
     names(label_df) <- c("language", "label")
+  } else {
+    label_df <- data.frame (language = NA_character_, label = NA_character_ )
   }
 
-  if (nrow(description_df) >1 ) {
+  if ( is_df_not_empty(description_df) ) {
     row.names(description_df) <- 1:dim(description_df)[1]
     names(description_df) <- c("language", "description")
+  } else {
+    description_df <- data.frame (language = NA_character_, description = NA_character_ )
   }
 
   left_join(label_df,
@@ -126,3 +144,6 @@ get_singe_item <- function(qid,
     relocate (language, .after=everything())
 
 }
+
+
+

@@ -1,0 +1,60 @@
+---
+title: "wikidata-import"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wikidata-import}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+Let us initialize a dataset from Wikidata.
+
+```{r setup}
+library(wbdataset)
+wikidata_countries <- c(
+  "http://www.wikidata.org/entity/Q756617", "http://www.wikidata.org/entity/Q347",   
+  "http://www.wikidata.org/entity/Q3908",   "http://www.wikidata.org/entity/Q1246")
+ds <- get_item(qid=wikidata_countries, 
+               language="en", 
+               title = "European countries", 
+               creator = person("Daniel", "Antal")) 
+
+print(ds)
+```
+
+The provenance and the definition of the key `qid` column is well described in the attributes. Now let us add further columns, making sure that we include the precise definition of each of the varibles. 
+
+```{r addcols}
+ds <- ds%>%
+  left_join_column( 
+    # ISO 3166-1 alpha-2 code, if exists
+    property = "P297" ) %>%
+  left_join_column( 
+    # EU Knowledge Graph item ID
+    property = "P11012") %>%
+  left_join_column( 
+    # different from 
+    property = "P1889")
+```
+
+
+```{r shownewcols}
+print(ds)
+```
+```{r datasetmetadata}
+print(dataset::dataset_bibentry(ds), style = "bibtex")
+```
+Some provenance is recorded:
+
+```{r prov}
+dataset::provenance(ds)
+```
+

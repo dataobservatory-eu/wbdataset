@@ -7,6 +7,7 @@
 get_item(
   qid,
   language,
+  prefix = "http://www.wikidata.org/entity/",
   url = "https://www.wikidata.org/w/api.php",
   creator = person("Jane", "Doe"),
   title = "Dataset title"
