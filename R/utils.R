@@ -12,6 +12,6 @@ is_response_success <- function(response) {
 #' @keywords internal
 is_df_not_empty <- function(df) {
   if (inherits(df, "data.frame") ) {
-    if (nrow(df)>0) { TRUE }
+    if (nrow(df)>0) { TRUE } else { FALSE }
   } else FALSE
 }
