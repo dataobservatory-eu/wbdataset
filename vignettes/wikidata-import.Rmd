@@ -1,0 +1,71 @@
+---
+title: "wikidata-import"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wikidata-import}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Let us initialize a dataset from Wikidata.
+
+```{r setup}
+library(dataset)
+library(wbdataset)
+data("wikidata_countries_df")
+```
+```{r get-data, eval=FALSE}
+wikidata_countries <- c(
+  "http://www.wikidata.org/entity/Q756617", "http://www.wikidata.org/entity/Q347",
+  "http://www.wikidata.org/entity/Q3908",   "http://www.wikidata.org/entity/Q1246")
+wikidata_countries_df <- get_item(qid=wikidata_countries,
+                                  language="en",
+                                  title = "European countries",
+                                  creator = person("Daniel", "Antal"))
+```
+
+```{r print}
+print(wikidata_countries_df)
+```
+
+The provenance and the definition of the key `qid` column is well described in the attributes. Now let us add further columns, making sure that we include the precise definition of each of the varibles. 
+
+```{r addcols}
+ds <- wikidata_countries_df %>%
+  left_join_column( 
+    label = "ISO 3166-1 alpha-2 code", 
+    property = "P297" ) %>%
+  left_join_column( 
+    property = "P1566", 
+    label = "Geonames ID",
+    namespace = "https://www.geonames.org/") %>%
+  left_join_column( 
+    label = "different from Wikipedia item",
+    property = "P1889")
+```
+
+
+```{r shownewcols}
+print(ds)
+```
+```{r}
+attributes(ds$P1566)
+```
+This resolves the third cell in the `P1566` column (Geonames ID of Galicia) to <https://www.geonames.org/3336902>. Galicia is not a sovereign state, therefore it has no `P297` value, i.e., it  has no ISO country code.
+
+```{r datasetmetadata}
+print(dataset::get_bibentry(ds), style = "bibtex")
+```
+Some provenance is recorded:
+
+```{r prov}
+dataset::provenance(ds)
+```
+

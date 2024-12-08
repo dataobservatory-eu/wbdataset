@@ -1,0 +1,14 @@
+^wbdataset\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.Rmd$
+^cran-comments\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^not_included$
+^doc$
+^Meta$
+^data-raw$
+^\.github$
+^codecov\.yml$

@@ -1,0 +1,33 @@
+Package: wbdataset
+Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
+Version: 0.1.0002
+Authors@R: 
+    person(given="Daniel", family="Antal", 
+           email= "daniel.antal@dataobservatory.eu", 
+            role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-1689-0557"))
+Description: Create tidy datasets from Wikidata or a Wikibase instance and add them
+   to a tidy R dataset object, or prepare R native datasets in a way that they can be added to 
+   a Wikibase semantic database.
+License: MIT + file LICENSE
+Suggests: 
+    knitr,
+    rmarkdown,
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dataset (>= 0.3.3002),
+    dplyr,
+    here,
+    httr,
+    magrittr,
+    purrr,
+    utils
+Language: en-US
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
