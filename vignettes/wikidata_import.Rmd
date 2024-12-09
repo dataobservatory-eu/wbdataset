@@ -1,0 +1,131 @@
+---
+title: "Importing from Wikidata or Wikibase"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Importing from Wikidata or Wikibase}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The wbdataset package is an extension of the dataset, which in turn is an R package that helps to exchange, publish and combine datasets more easily by improving their semantics. The wbdataset extends the usability of dataset by connecting the Wikibase API with the R statistical environment.
+
+Let us initialize a dataset from Wikidata.
+
+```{r setup}
+library(dataset)
+library(wbdataset)
+data("wikidata_countries_df")
+```
+
+You do not need to use the login functions `get_csrf` and `get_csrf_token` to work with Wikidata, however, you need to provide login credentials with those functions to a privately managed Wikibase instance. In this example, we retrieve data from Wikidata without password protection. The same scripts would retrieve data from a private Wikibase with providing the optional CSRF token to the functions.
+
+## Retrieving items
+
+Items will serve as your observations or data subjects.  We will collect their attributes (usually constants, like the area size of a country) and variables (like their population.)
+
+We will start with four countries, of course, you could read in a longer list from a file:
+
+```{r country-select}
+# Select the following country profiles from Wikidata:
+wikidata_countries <- c(
+  "http://www.wikidata.org/entity/Q756617", "http://www.wikidata.org/entity/Q347",
+  "http://www.wikidata.org/entity/Q3908",   "http://www.wikidata.org/entity/Q1246")
+```
+
+And download the main identifiers of these data subject, i.e., the countries:
+
+- `QID`:
+- `label`:
+- `description`:
+
+```{r get-data, eval=FALSE}
+# Retrieve their labels into a dataset called 'European countries':
+wikidata_countries_df <- get_item(qid=wikidata_countries,
+                                  language="en",
+                                  title = "European countries",
+                                  creator = person("Daniel", "Antal"))
+```
+
+The resulting dataset:
+
+```{r print}
+print(wikidata_countries_df)
+```
+
+The provenance and the definition of the key `qid` column is well described in the attributes. 
+
+### Adding attributes and variables
+
+Now let us add further columns, making sure that we include the precise definition of each of the variables.
+
+We add properties of these countries, or attributes/variables of these countries by reading statements about those variables or attributes. Our `left_join_column` tries to retrieve the attribute, for example, `ISO 3166-1 alpha-2 code (P297)` for every country identified by a QID, starting with `Q756617` as defined above.
+
+```{r addcols}
+ds <- wikidata_countries_df %>%
+  left_join_column( 
+    label = "ISO 3166-1 alpha-2 code", 
+    property = "P297" ) %>%
+  left_join_column( 
+    property = "P1566", 
+    label = "Geonames ID",
+    namespace = "https://www.geonames.org/") %>%
+  left_join_column( 
+    label = "different from Wikipedia item",
+    property = "P1889")
+```
+
+You can set the workflow to SILENT to avoid the progress report above, i.e.,  
+`Left join claims: m/n: Qxxx Pyyy`.
+
+```{r addcols-silent, eval=FALSE}
+ds <- wikidata_countries_df %>%
+  left_join_column( 
+    label = "ISO 3166-1 alpha-2 code", 
+    property = "P297", silent = TRUE ) %>%
+  left_join_column( 
+    property = "P1566", 
+    label = "Geonames ID",
+    namespace = "https://www.geonames.org/", silent = TRUE) %>%
+  left_join_column( 
+    label = "different from Wikipedia item",
+    property = "P1889", silent = TRUE)
+```
+Let us see the results:
+
+```{r shownewcols}
+print(ds)
+```
+
+The metadata added to these columns (attributes):
+
+```{r}
+attributes(ds$P1566)
+```
+
+This resolves the third cell in the `P1566` column (Geonames ID of Galicia) to <https://www.geonames.org/3336902>. Galicia is not a sovereign state, therefore it has no `P297` value, i.e., it  has no ISO country code.
+
+```{r datasetmetadata}
+print(dataset::get_bibentry(ds), style = "bibtex")
+```
+
+Some provenance is recorded:
+
+```{r prov}
+dataset::provenance(ds)
+```
+
+### Saving the data 
+
+Saving the data in rds or rda files will retain the rich metadata:
+
+```{r save, eval=FALSE}
+saveRDS(ds, file=tempfile())
+```
+

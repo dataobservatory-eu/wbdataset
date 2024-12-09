@@ -1,0 +1,13 @@
+## R package reference generated from DESCRIPTION metadata
+citation(auto = meta)
+
+bibentry(bibtype = "Misc",
+         title = "wbdataset R Package",
+         author = c(person(given ="Daniel", family = "Antal", role = "aut")),
+         year = "2024",
+         month = "12",
+         day = "09",
+         publisher = "Reprex",
+         url = "https://wbdataset.dataobservatory.eu/index.html",
+         doi = "10.5281/zenodo.14335287")
+
