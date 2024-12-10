@@ -29,6 +29,7 @@ articles:
          analysis.
     contents:
       - wikidata_import
+      - Wikibase_API
 
 reference:
   - title: "Importing"

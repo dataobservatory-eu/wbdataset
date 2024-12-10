@@ -12,6 +12,8 @@ Description: Create tidy datasets from Wikidata or a Wikibase instance and add t
    a Wikibase semantic database.
 License: MIT + file LICENSE
 DOI: 10.5281/zenodo.14335287
+URL: https://wbdataset.dataobservatory.eu/
+BugReports: https://github.com/dataobservatory-eu/wbdataset/issues
 Suggests: 
     keyring,
     knitr,

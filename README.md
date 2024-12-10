@@ -14,8 +14,12 @@ status](https://www.r-pkg.org/badges/version/wbdataset)](https://CRAN.R-project.
 coverage](https://codecov.io/gh/dataobservatory-eu/wbdataset/graph/badge.svg)](https://app.codecov.io/gh/dataobservatory-eu/wbdataset)
 <!-- badges: end -->
 
-The goal of wbdataset is to create tidy datasets from Wikidata or a
-Wikibase instance.
+The goal of `wbdataset` is to create tidy datasets from Wikidata or a
+Wikibase instance. The `wbdataset` package is an extension of the
+`dataset`, which in turn is an R package that helps to exchange, publish
+and combine datasets more easily by improving their semantics. The
+`wbdataset` extends the usability of dataset by connecting the Wikibase
+API with the R statistical environment.
 
 ## Installation
 
@@ -24,6 +28,7 @@ You can install the development version of wbdataset from
 
 ``` r
 # install.packages("devtools")
+devtools::install_github("antaldaniel/dataset")
 devtools::install_github("dataobservatory-eu/wbdataset")
 ```
 
@@ -51,9 +56,3 @@ get_item(qid=c("Q228", "Q347"),
 #> 3 Q347       Liechtenstein country in Central Europe                    en      
 #> 4 Q347       Liechtenstein land in Europa                               nl
 ```
-
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
-
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
