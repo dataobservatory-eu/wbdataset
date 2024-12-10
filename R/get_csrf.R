@@ -64,18 +64,21 @@ get_csrf <- function( username, password, wikibase_api_url) {
                            body = login_params)
 
   response_2_data <- httr::content(response_2, as = "parsed", type = "application/json")
-  response_2_data$login
+
+  if ( response_2_data$login$result == "Failed") {
+    stop(response_2_data$login$reason)
+  }
 
 
   message("Post login data to ", wikibase_api_url)
 
-  response_csrf <- httr::GET(wikibase_api_url, query = csrf_params)
+  csrf <- httr::GET(wikibase_api_url, query = csrf_params)
 
-  response_csrf$url
+  csrf$url
 
-  stopifnot(response_csrf$status_code==200)
+  stopifnot(csrf$status_code==200)
 
-  response_csrf
+  csrf
 }
 
 #' @rdname get_csrf
@@ -84,8 +87,9 @@ get_csrf <- function( username, password, wikibase_api_url) {
 #' @importFrom httr handle GET POST content
 #' @export
 get_csrf_token <- function (csrf) {
-  csrf_data    <- httr::content(response_csrf, as = "parsed", type = "application/json")
+  csrf_data    <- httr::content(csrf, as = "parsed", type = "application/json")
   csrf_data
   csrf_token   <- csrf_data$query$tokens$csrftoken
+  if ( nchar(csrf_token)<10) stop("Error: get_csrf_token(csrf): Did not receive a valid token.")
   csrf_token
 }
