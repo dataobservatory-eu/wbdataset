@@ -9,8 +9,10 @@
 #' @param definition A character string of length one containing a
 #' linked definition or `NULL`.
 #' @param namespace A namespace for individual observations or categories or `NULL`.
+#' @param silent If the function should send messages about individual requests to
+#' the API or not. Defaults to \code{FALSE}.
 #' @param wikibase_api_url The URL of the Wikibase API.
-#' @param csrf A response csrf
+#' @param csrf A
 #' @importFrom dplyr left_join select
 #' @importFrom dataset dataset_df as_dataset_df defined creator dataset_title
 #' @importFrom purrr safely
@@ -23,7 +25,8 @@ left_join_column <- function(ds,
                              definition = NULL,
                              namespace = NULL,
                              wikibase_api_url="https://www.wikidata.org/w/api.php",
-                             silent=FALSE) {
+                             silent = FALSE,
+                             csrf = NULL) {
 
   new_column <- data.frame(qid=vector("character"),
                            property=vector("character"),
@@ -39,7 +42,7 @@ left_join_column <- function(ds,
 
   for ( q in items ) {
     if (!silent)   message("Left join claims: ",  q, "/", max_item, ": ",  ds$qid[q], " ", property)
-    these_claims <- safely_get_claims(ds$qid[q], property = property)
+    these_claims <- safely_get_claims(ds$qid[q], property = property, csrf=csrf)
 
     if (is.null(these_claims$error)) {
       these_claims <- these_claims$result

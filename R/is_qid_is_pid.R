@@ -1,6 +1,6 @@
 #' @title Check if a string looks like a PID
 #' @param x A string
-#' @return A logical vector, \code{TRUE} where the string has a "P[:digits:]" structure,
+#' @return A logical vector, \code{TRUE} where the string has a \code{"P[:digits:]"} structure,
 #' FALSE otherwise.
 #' @export
 
@@ -33,7 +33,7 @@ is_pid <- function(x) {
 
 #' @title Check if a string looks like a QID
 #' @param x A string
-#' @return A logical vector, \code{TRUE} where the string has a "P[:digits:]" structure,
+#' @return A logical vector, \code{TRUE} where the string has a \code{"P[:digits:]"} structure,
 #' FALSE otherwise.
 #' @export
 is_qid <- function(x) {

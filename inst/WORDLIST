@@ -1,3 +1,9 @@
+CSRF
+Codecov
+DOI
+Galicia
+Geonames
+Interoperable
 Lifecycle
 MediaWiki
 PID
@@ -5,4 +11,9 @@ QID
 QIDs
 Wikibase
 Wikidata
+csrf
+keyring
 magrittr
+rda
+rds
+synchronizer

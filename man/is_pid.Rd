@@ -10,7 +10,7 @@ is_pid(x)
 \item{x}{A string}
 }
 \value{
-A logical vector, \code{TRUE} where the string has a "P\link{:digits:}" structure,
+A logical vector, \code{TRUE} where the string has a \code{"P[:digits:]"} structure,
 FALSE otherwise.
 }
 \description{

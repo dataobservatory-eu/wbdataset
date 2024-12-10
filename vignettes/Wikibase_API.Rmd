@@ -1,0 +1,65 @@
+---
+title: "Authenticated MediaWiki API Access"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Authenticated MediaWiki API Access}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+You get reading API access to Wikidata (GET) without a password. But if you want API access to a privately managed Wikibase instance, you need to get a "bot" username and password and authenticate your scripted session.
+
+You must never store those username-password pairs in your code to prevent it from accidentally getting to GitHub and it will be permanently revealed to everybody.  (There is no delete button on GitHub!)
+
+A convenient and elegant solution to keep your login credentials R is the use of the keyring package. At first time use, you set up your credentials with `key_set_with_value`.
+
+```{r setup}
+library(wbdataset)
+```
+```{r keyring, eval=FALSE}
+library(keyring)
+key_set_with_value(service = "https://reprexbase.eu/demo/api.php", 
+                   username = "Demo@adminbot",
+                   password = "8******************************b")
+```
+
+
+```{r keyget, eval=FALSE}
+key_get(service = "https://reprexbase.eu/demo/api.php", username = "Demo2@adminbot" )
+```
+To work with your API access, you need to get a CSRF token, which is a secure random token (e.g., synchronizer token or challenge token) that is used to prevent CSRF attacks.
+
+
+```{r csrftoken, eval=FALSE}
+your_csrf <- get_csrf(username="Demo@adminbot",
+                      password = key_get(service = "https://reprexbase.eu/demo/api.php",
+                                         username = "Demo@adminbot" ),
+                      wikibase_api_url =  "https://reprexbase.eu/demo/api.php")
+
+`Received a `handle`: https://reprexbase.eu/demo/api.php`
+response: Establish session with https://reprexbase.eu/demo/api.php: 200
+response: login to https://reprexbase.eu/demo/api.php: 200
+Login token: e2d4a59bc6***********
+Post login data to https://reprexbase.eu/demo/api.php
+```
+
+To interact with the Wikibase Instance, you will have to provide the API address of the instance and this CSRF object. In fact, under the hood, from the CSRF object `get_csrf_token(csrf)` function will return your token itself, the CSRF object holds the data of your session.
+
+Now you are ready to send API requests to the MediaWiki API.
+
+```{r, eval=FALSE}
+get_claims(
+  qid = "Q528626",
+  property = "P625",
+  wikibase_api_url = "https://reprexbase.eu/demo/api.php",
+  csrf = your_csrf
+)
+```
+

@@ -12,7 +12,8 @@ left_join_column(
   definition = NULL,
   namespace = NULL,
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
-  silent = FALSE
+  silent = FALSE,
+  csrf = NULL
 )
 }
 \arguments{
@@ -32,7 +33,10 @@ linked definition or \code{NULL}.}
 
 \item{wikibase_api_url}{The URL of the Wikibase API.}
 
-\item{csrf}{A response csrf}
+\item{silent}{If the function should send messages about individual requests to
+the API or not. Defaults to \code{FALSE}.}
+
+\item{csrf}{A}
 }
 \description{
 Get the claims (statements) related to an item.

@@ -1,7 +1,7 @@
 Package: wbdataset
 Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
-Version: 0.1.1
-Date: 2024-12-09
+Version: 0.1.1001
+Date: 2024-12-10
 Authors@R: 
     person(given="Daniel", family="Antal", 
            email= "daniel.antal@dataobservatory.eu", 
@@ -13,6 +13,7 @@ Description: Create tidy datasets from Wikidata or a Wikibase instance and add t
 License: MIT + file LICENSE
 DOI: 10.5281/zenodo.14335287
 Suggests: 
+    keyring,
     knitr,
     rmarkdown,
     spelling,
