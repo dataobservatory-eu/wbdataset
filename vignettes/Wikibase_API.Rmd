@@ -58,7 +58,7 @@ Now you are ready to send API requests to the MediaWiki API.
 get_claims(
   qid = "Q528626",
   property = "P625",
-  wikibase_api_url = "https://reprexbase.eu/demo/api.php",
+  wikibase_api_url = "wikibase_api_url",
   csrf = your_csrf
 )
 ```

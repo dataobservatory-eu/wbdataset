@@ -27,8 +27,7 @@ get_claims <- function(qid="Q528626",
   #)
   #token = get_csrf_token(csrf),
   get_claim2 <- httr::POST(
-    #wikibase_api_url
-    "https://www.wikidata.org/w/api.php",
+    wikibase_api_url,
     body = list(
       action    = "wbgetclaims",
       entity    = qid,
