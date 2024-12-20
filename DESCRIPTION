@@ -3,15 +3,14 @@ Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
 Version: 0.1.1003
 Date: 2024-12-20
 Authors@R: 
-    person(given="Daniel", family="Antal", 
+    c(person(given="Daniel", family="Antal", 
            email= "daniel.antal@dataobservatory.eu", 
             role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0001-7513-6760"))
+           comment = c(ORCID = "0000-0001-7513-6760")),
     person(given = "Ana Márta", family =  "Mester", 
            role = c("rev"), 
            comment = c(ORCID = "0009-0008-2274-8163"))
       )
-
 Description: Create tidy datasets from Wikidata or a Wikibase instance and add them
    to a tidy R dataset object, or prepare R native datasets in a way that they can be added to 
    a Wikibase semantic database.
@@ -30,7 +29,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    dataset (>= 0.3.4),
+    dataset,
     dplyr,
     here,
     httr,
