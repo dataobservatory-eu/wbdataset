@@ -1,7 +1,7 @@
 Package: wbdataset
 Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
-Version: 0.1.1002
-Date: 2024-12-10
+Version: 0.1.1003
+Date: 2024-12-20
 Authors@R: 
     person(given="Daniel", family="Antal", 
            email= "daniel.antal@dataobservatory.eu", 
@@ -25,7 +25,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    dataset (>= 0.3.3002),
+    dataset (>= 0.3.4),
     dplyr,
     here,
     httr,
