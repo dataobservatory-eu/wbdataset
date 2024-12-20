@@ -7,6 +7,11 @@ Authors@R:
            email= "daniel.antal@dataobservatory.eu", 
             role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1689-0557"))
+    person(given = "Ana Márta", family =  "Mester", 
+           role = c("rev"), 
+           comment = c(ORCID = "0009-0008-2274-8163"))
+      )
+
 Description: Create tidy datasets from Wikidata or a Wikibase instance and add them
    to a tidy R dataset object, or prepare R native datasets in a way that they can be added to 
    a Wikibase semantic database.
