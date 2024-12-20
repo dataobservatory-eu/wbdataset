@@ -11,7 +11,7 @@
 #' @importFrom dplyr left_join mutate relocate everything
 #' @importFrom httr POST content
 #' @importFrom utils person
-#' @importFrom dataset dataset_df defined
+#' @importFrom dataset dataset_df defined dublincore
 #' @return A dataset with the QIDs, labels, description, and the language codes
 #' of the labels and descriptions.
 #' @export
@@ -47,7 +47,7 @@ get_item <- function(qid,
                           label = defined(return_df$label, label = "Label of item"),
                           description = defined(return_df$description, label = "Description of item"),
                           language = defined(return_df$language, label = "Language of label and description"),
-                          reference=list(title = title, author=creator))
+                          dataset_bibentry = dublincore(title = title, creator=creator))
 
   wikibase_type <- c(qid = "QID")
   attr(return_ds, "wikibase_type") <- wikibase_type
