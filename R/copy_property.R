@@ -1,5 +1,5 @@
 #' @title Copy an property
-#' @param pid_on_wikidata The PID of the property to be copied to your Wikibase.
+#' @param pid_on_wikidata The PID of the property on Wikidata to be copied to your Wikibase.
 #' @param wikidata_pid_property The PID in Wikibase that records the equivalent Wikidata
 #' PID as an external ID.
 #' @param language A vector of languages codes, for example, \code{c("en", "et")}.
