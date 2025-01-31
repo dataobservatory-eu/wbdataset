@@ -4,8 +4,6 @@
 #' @importFrom httr POST content
 #' @importFrom glue glue
 #' @export
-
-
 add_id_statement <- function(qid, pid, o,
                              wikibase_type = "external-id",
                              wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",

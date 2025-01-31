@@ -39,6 +39,12 @@ reference:
       - get_item
       - get_claims
       - left_join_column
+  - title: "Copying"
+    desc: >
+     Copying from a Wikibase to another
+      - add_statement
+      - add_id_statement
+      - copy_property
   - title: "Replication Dataset"
     desc: >
       Pre-downloaded data for tutorials and examples.

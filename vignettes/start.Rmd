@@ -19,8 +19,8 @@ library(wbdataset)
 library(keyring)
 ```
 
-```{r}
-copy_property(pid_on_wikidata = "P1630",
+```{r copyproperty}
+copy_property(pid_on_wikidata = "P21",
               wikidata_pid_property = "P2",
               languages = c("en", "hu"),
               wikibase_api_url = 'https://reprexbase.eu/jekyll/api.php',
