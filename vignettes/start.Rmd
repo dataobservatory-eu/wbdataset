@@ -1,0 +1,25 @@
+---
+title: "start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(wbdataset)
+library(keyring)
+```
+
+```{r}
+pid_on_wikidata <- "P2047"
+```
+

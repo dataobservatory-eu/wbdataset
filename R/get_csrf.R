@@ -10,6 +10,8 @@
 
 get_csrf <- function( username, password, wikibase_api_url) {
 
+  check_api_url(wikibase_api_url = wikibase_api_url) # check if ends with api.php
+
   ## 1. handle
   handle <- httr::handle(wikibase_api_url)
   message ("Received a `", class(handle), "`: ", handle$url)
@@ -18,6 +20,8 @@ get_csrf <- function( username, password, wikibase_api_url) {
   ## 2. session ------------
   session <- httr::GET(wikibase_api_url)
   message (class(session), ": Establish session with ", wikibase_api_url, ": ", session$status_code)
+
+  if ( session$status_code == 200 ) message( "Session: OK(200)")
 
   query_token_params <- list(
     action = "query",
@@ -30,13 +34,20 @@ get_csrf <- function( username, password, wikibase_api_url) {
   response_1 <- httr::GET(wikibase_api_url, query = query_token_params)
   message ( class(response_1), ": login to ", wikibase_api_url, ": ", response_1$status_code)
 
-  stopifnot(class(response_1)=="response")
+  assertthat::assert_that(
+    class(response_1)=="response",
+    msg="Login did not result in a response")
+
+  if ( response_1$status_code == 200 ) message( "Login: OK(200)")
 
   ## Create a new login token -------
-  login_token <- NULL
-  data        <- httr::content(response_1, as = "parsed", type = "application/json")
-  login_token <- data$query$tokens$logintoken
-  stopifnot(nchar(login_token)==42)
+  login_token    <- NULL
+  response_data  <- httr::content(response_1, as = "parsed", type = "application/json")
+  login_token    <- response_data$query$tokens$logintoken
+
+  assertthat::assert_that(
+    nchar(login_token)==42,
+    msg="Token is not 42 character long")
 
   message("Login token: ", substr(login_token, 1, 10), "***********")
 
@@ -92,4 +103,15 @@ get_csrf_token <- function (csrf) {
   csrf_token   <- csrf_data$query$tokens$csrftoken
   if ( nchar(csrf_token)<10) stop("Error: get_csrf_token(csrf): Did not receive a valid token.")
   csrf_token
+}
+
+
+#' @keywords internal
+#' @importFrom assertthat assert_that
+check_api_url <- function(wikibase_api_url) {
+  n_char <- nchar(wikibase_api_url)
+  assertthat::assert_that(
+    substr(wikibase_api_url, n_char-6 ,n_char)=="api.php",
+    msg = "wikibase_api_url must end with api.php"
+    )
 }
