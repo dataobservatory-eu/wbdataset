@@ -1,13 +1,13 @@
 Package: wbdataset
 Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
-Version: 0.1.1004
+Version: 0.1.1005
 Date: 2024-01-21
 Authors@R: 
     c(person(given="Daniel", family="Antal", 
            email= "daniel.antal@dataobservatory.eu", 
             role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7513-6760")),
-    person(given = "Ana Márta", family =  "Mester", 
+    person(given = "Anna Márta", family =  "Mester", 
            role = c("rev"), 
            comment = c(ORCID = "0009-0008-2274-8163"))
       )
