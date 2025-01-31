@@ -24,7 +24,7 @@ add_id_statement <- function(qid, pid, o,
     value =  datavalue,
     #datatype = "external-id",
     # '"datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}}',
-    token = csrf_token,
+    token = this_csrf_token,
     format = "json")
 
   new_claim <- httr::POST(

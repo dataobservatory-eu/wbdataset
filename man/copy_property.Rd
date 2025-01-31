@@ -13,7 +13,7 @@ copy_property(
 )
 }
 \arguments{
-\item{pid_on_wikidata}{The PID of the property to be copied to your Wikibase.}
+\item{pid_on_wikidata}{The PID of the property on Wikidata to be copied to your Wikibase.}
 
 \item{wikidata_pid_property}{The PID in Wikibase that records the equivalent Wikidata
 PID as an external ID.}
