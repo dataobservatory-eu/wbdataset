@@ -9,7 +9,10 @@ Authors@R:
            comment = c(ORCID = "0000-0001-7513-6760")),
     person(given = "Anna Márta", family =  "Mester", 
            role = c("rev"), 
-           comment = c(ORCID = "0009-0008-2274-8163"))
+           comment = c(ORCID = "0009-0008-2274-8163")),
+    person(given = "Mihály", family =  "Nagy", 
+           role = c("rev"), 
+           comment = c(ORCID = "0000-0002-0577-8706")
       )
 Description: Create tidy datasets from Wikidata or a Wikibase instance and add them
    to a tidy R dataset object, or prepare R native datasets in a way that they can be added to 
