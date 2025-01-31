@@ -19,6 +19,8 @@ get_csrf <- function( username, password, wikibase_api_url) {
   session <- httr::GET(wikibase_api_url)
   message (class(session), ": Establish session with ", wikibase_api_url, ": ", session$status_code)
 
+  if ( session$status_code == 200 ) message( "Session: OK(200)")
+
   query_token_params <- list(
     action = "query",
     meta = "tokens",
@@ -30,12 +32,13 @@ get_csrf <- function( username, password, wikibase_api_url) {
   response_1 <- httr::GET(wikibase_api_url, query = query_token_params)
   message ( class(response_1), ": login to ", wikibase_api_url, ": ", response_1$status_code)
 
+  if ( response_1$status_code == 200 ) message( "Login: OK(200)")
   stopifnot(class(response_1)=="response")
 
   ## Create a new login token -------
-  login_token <- NULL
-  data        <- httr::content(response_1, as = "parsed", type = "application/json")
-  login_token <- data$query$tokens$logintoken
+  login_token    <- NULL
+  response_data  <- httr::content(response_1, as = "parsed", type = "application/json")
+  login_token    <- response_data$query$tokens$logintoken
   stopifnot(nchar(login_token)==42)
 
   message("Login token: ", substr(login_token, 1, 10), "***********")
