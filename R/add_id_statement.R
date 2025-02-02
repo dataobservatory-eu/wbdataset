@@ -8,33 +8,34 @@ add_id_statement <- function(qid, pid, o,
                              wikibase_type = "external-id",
                              wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
                              csrf) {
-
-  datavalue <- paste0('"',o, '"')
+  datavalue <- paste0('"', o, '"')
   datavalue
 
   this_csrf_token <- get_csrf_token(csrf = csrf)
 
   claim_body <- list(
     action = "wbcreateclaim",
-    entity   = qid,
+    entity = qid,
     property = pid,
     snaktype = "value",
-    value =  datavalue,
-    #datatype = "external-id",
+    value = datavalue,
+    # datatype = "external-id",
     # '"datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}}',
     token = this_csrf_token,
-    format = "json")
+    format = "json"
+  )
 
   new_claim <- httr::POST(
     wikibase_api_url,
     body = list(
       action = "wbcreateclaim",
-      entity    = qid,
-      property  = pid,
-      snaktype  = "value",
-      value =  datavalue,
+      entity = qid,
+      property = pid,
+      snaktype = "value",
+      value = datavalue,
       token = this_csrf_token,
-      format = "json"),
+      format = "json"
+    ),
     encode = "form",
     handle = csrf
   )
@@ -58,9 +59,10 @@ add_id_statement <- function(qid, pid, o,
       s = qid,
       o = pid,
       p = response$claim$mainsnak$datavalue$value
-    ) }
+    )
+  }
 }
 
 
-#'datavalue\":{\"value\":\"https://www.wikidata.org/wiki/Q43878\",\"type\":\"string\"},\"datatype\":\"external-id\"}'
+#' datavalue\":{\"value\":\"https://www.wikidata.org/wiki/Q43878\",\"type\":\"string\"},\"datatype\":\"external-id\"}'
 # api.php?action=wbcreateclaim&entity=Q4115189&property=P9003&snaktype=value&value={"entity-type":"item","numeric-id":1}

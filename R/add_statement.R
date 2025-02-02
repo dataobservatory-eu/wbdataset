@@ -17,19 +17,22 @@ add_statement <- function(qid, pid, o,
                           wikibase_type,
                           wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
                           csrf) {
-
   if (wikibase_type == "string") {
-    add_item_statement(qid = qid, pid = pid, o = o,
-                       wikibase_type == "string",
-                       wikibase_api_url = wikibase_api_url, csrf_token = csrf_token)
+    add_item_statement(
+      qid = qid, pid = pid, o = o,
+      wikibase_type == "string",
+      wikibase_api_url = wikibase_api_url, csrf_token = csrf_token
+    )
   } else if (wikibase_type == "item") {
-    add_item_statement(qid = qid, pid = pid, o = o,
-                       wikibase_type == "item",
-                       wikibase_api_url = wikibase_api_url, csrf_token = csrf_token)
-  } else  if (wikibase_type == "numeric") {
+    add_item_statement(
+      qid = qid, pid = pid, o = o,
+      wikibase_type == "item",
+      wikibase_api_url = wikibase_api_url, csrf_token = csrf_token
+    )
+  } else if (wikibase_type == "numeric") {
 
   } else {
-    stop ("Error in add_statement(..., wikibase_type): '", wikibase_type, "' is not recognised (yet).")
+    stop("Error in add_statement(..., wikibase_type): '", wikibase_type, "' is not recognised (yet).")
   }
 }
 
@@ -43,9 +46,10 @@ add_wikibase_url_statement <- function(qid,
                                        wikibase_url,
                                        wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
                                        csrf_token) {
-
-  datavalue <- gsub("changeuri", wikibase_url,
-                    '{"claims":[{"mainsnak":{"snaktype":"value","property":"pid","datavalue":{"value":"changeuri","type":"string"}},"type":"statement","rank":"normal"}]}')
+  datavalue <- gsub(
+    "changeuri", wikibase_url,
+    '{"claims":[{"mainsnak":{"snaktype":"value","property":"pid","datavalue":{"value":"changeuri","type":"string"}},"type":"statement","rank":"normal"}]}'
+  )
 
   datavalue
   datavalue <- gsub("pid", pid, datavalue)
@@ -55,9 +59,10 @@ add_wikibase_url_statement <- function(qid,
     id = qid, # in the new wikibase
     property = pid, # in the wikibase where you write
     data = datavalue,
-    #data = '{"claims":[{"mainsnak":{"snaktype":"value","property":"P1","datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}},"type":"statement","rank":"normal"}]}',
+    # data = '{"claims":[{"mainsnak":{"snaktype":"value","property":"P1","datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}},"type":"statement","rank":"normal"}]}',
     token = csrf_token,
-    format = "json")
+    format = "json"
+  )
 
   new_claim <- httr::POST(
     wikibase_api_url,
@@ -83,5 +88,6 @@ add_wikibase_url_statement <- function(qid,
       wikibase_qid = response$entity$id,
       pid          = pid,
       url          = l[[1]]$mainsnak$datavalue$value
-    ) }
+    )
+  }
 }

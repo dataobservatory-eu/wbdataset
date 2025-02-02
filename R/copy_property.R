@@ -10,28 +10,27 @@
 copy_property <- function(pid_on_wikidata,
                           wikidata_pid_property = "P2",
                           languages = c("en", "hu"),
-                          wikibase_api_url = 'https://reprexbase.eu/jekyll/api.php',
+                          wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
                           csrf) {
-
   pid_on_wikidata <- as.character(pid_on_wikidata)
 
   claim_body <- list(
     action = "wbgetentities",
-    ids   = pid_on_wikidata,
-    format = "json")
+    ids = pid_on_wikidata,
+    format = "json"
+  )
 
   safely_post <- purrr::safely(httr::POST, NULL)
 
-  get_claim <-safely_post(
+  get_claim <- safely_post(
     "https://www.wikidata.org/w/api.php",
     body = claim_body,
     encode = "form"
   )
 
-  if( !is.null(get_claim$error)) {
+  if (!is.null(get_claim$error)) {
     # there was an error
-
-  } else{
+  } else {
     # there was no error
     response <- httr::content(get_claim$result, as = "parsed", type = "application/json")
   }
@@ -41,10 +40,12 @@ copy_property <- function(pid_on_wikidata,
     # get an explicit error before.
     message("Could not access ", pid_on_wikidata)
     message(response$error$messages[[1]])
-    return(  data.frame ( default_label = default_label,
-                          pid_on_wikidata  = pid_on_wikidata,
-                          pid_on_wikibase =  NA_character_,
-                          success = FALSE) )
+    return(data.frame(
+      default_label = default_label,
+      pid_on_wikidata = pid_on_wikidata,
+      pid_on_wikibase = NA_character_,
+      success = FALSE
+    ))
   }
 
   response$entities[[1]]$aliases
@@ -62,25 +63,27 @@ copy_property <- function(pid_on_wikidata,
 
   ## Set a default later, this is now hard coded to English but could be a parameter.
 
-  if ( "en" %in% names(response$entities[[1]]$labels) ) {
-    default_label <-  response$entities[[1]]$labels$en$value
+  if ("en" %in% names(response$entities[[1]]$labels)) {
+    default_label <- response$entities[[1]]$labels$en$value
   } else {
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
   }
 
-  message("Default label for ",   pid_on_wikidata,  ": ", default_label)
+  message("Default label for ", pid_on_wikidata, ": ", default_label)
   labels_missing_list <- list()
 
 
   # The missing labels (i.e., translations that are missing for a label)
   # are replaced with the missing label, so we always have a label.
 
-  for  ( l in labels_missing ) {
+  for  (l in labels_missing) {
     # The missing labels will received the default (en) label, because they
     # should not be empty
-    labels_missing_list  <- c(labels_missing_list, tmp = list(list(language = l,
-                                                                   value =default_label)))
-    names(labels_missing_list)[which(names(labels_missing_list)=="tmp")] <- l
+    labels_missing_list <- c(labels_missing_list, tmp = list(list(
+      language = l,
+      value = default_label
+    )))
+    names(labels_missing_list)[which(names(labels_missing_list) == "tmp")] <- l
   }
 
   labels_list <- c(response$entities[[1]]$labels[labels_present], labels_missing_list)
@@ -89,28 +92,35 @@ copy_property <- function(pid_on_wikidata,
   # are replaced with an empty string.
 
   descriptions_missing_list <- list()
-  for  ( d in descriptions_missing ) {
+  for  (d in descriptions_missing) {
     descriptions_missing_list <- c(descriptions_missing_list,
-                                   tmp = list(list(language = d, value = "")))
-    names(descriptions_missing_list)[which(names(descriptions_missing_list)=="tmp")] <- d
+      tmp = list(list(language = d, value = ""))
+    )
+    names(descriptions_missing_list)[which(names(descriptions_missing_list) == "tmp")] <- d
   }
 
   descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
 
   datastring <- jsonlite::toJSON(
-    list(labels = labels_list,
-         descriptions = descriptions_list,
-         datatype = response$entities[[1]]$datatype), auto_unbox = T )
+    list(
+      labels = labels_list,
+      descriptions = descriptions_list,
+      datatype = response$entities[[1]]$datatype
+    ),
+    auto_unbox = T
+  )
 
   datastring
 
   csrf_token <- get_csrf_token(csrf)
 
   assertthat::assert_that(!is.null(csrf_token),
-                          msg = "You do not have a CSRF token")
+    msg = "You do not have a CSRF token"
+  )
 
-  assertthat::assert_that(nchar(csrf_token)==42,
-                          msg = "Your CSRF token should have 42 characters.")
+  assertthat::assert_that(nchar(csrf_token) == 42,
+    msg = "Your CSRF token should have 42 characters."
+  )
 
   new_item <- httr::POST(
     wikibase_api_url,
@@ -119,7 +129,8 @@ copy_property <- function(pid_on_wikidata,
       new    = "property",
       data   = datastring,
       token  = csrf_token,
-      format = "json"),
+      format = "json"
+    ),
     encode = "form",
     handle = csrf
   )
@@ -127,44 +138,48 @@ copy_property <- function(pid_on_wikidata,
   created_item_response <- httr::content(new_item, as = "parsed", type = "application/json")
   created_item_response
 
-  if ( is_response_success(created_item_response) ) {
+  if (is_response_success(created_item_response)) {
     # Successfully created the property
-    message ("Successfully created item ", created_item_response$entity$id, " (", created_item_response$entity$labels$en$value, ")")
+    message("Successfully created item ", created_item_response$entity$id, " (", created_item_response$entity$labels$en$value, ")")
 
     if (is_pid(wikidata_pid_property)) {
-      wikidata_pid_df <- add_id_statement(qid = created_item_response$entity$id,
-                                          pid = wikidata_pid_property,
-                                          o =  pid_on_wikidata,
-                                          wikibase_api_url = wikibase_api_url,
-                                          csrf =  csrf)
+      wikidata_pid_df <- add_id_statement(
+        qid = created_item_response$entity$id,
+        pid = wikidata_pid_property,
+        o = pid_on_wikidata,
+        wikibase_api_url = wikibase_api_url,
+        csrf = csrf
+      )
     }
 
-    data.frame ( default_label = default_label,
-                 pid_on_wikidata  = pid_on_wikidata,
-                 pid_on_wikibase  = created_item_response$entity$id,
-                 success = TRUE)
-
-  } else if ( "wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages) ) {
+    data.frame(
+      default_label = default_label,
+      pid_on_wikidata = pid_on_wikidata,
+      pid_on_wikibase = created_item_response$entity$id,
+      success = TRUE
+    )
+  } else if ("wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)) {
     ## Special
-    message_strings <- unlist( created_item_response$error$messages)
+    message_strings <- unlist(created_item_response$error$messages)
     message(message_strings)
     message_strings <- message_strings[which(grepl("Property:", message_strings))]
     pattern <- "\\[\\[Property:*(.*?)\\|"
     result <- regmatches(message_strings, regexec(pattern, message_strings))
     old_pid <- result[[1]][2]
-    data.frame ( default_label    = default_label,
-                 pid_on_wikidata  = pid_on_wikidata,
-                 pid_on_wikibase =  old_pid ,
-                 success = FALSE)
+    data.frame(
+      default_label = default_label,
+      pid_on_wikidata = pid_on_wikidata,
+      pid_on_wikibase = old_pid,
+      success = FALSE
+    )
   } else {
     ## Return an empty data.frame if there was some error
     message(created_item_response$error)
-    data.frame ( default_label = default_label ,
-                 pid_on_wikidata  = pid_on_wikidata,
-                 pid_on_wikibase =  NA_character_,
-                 success = FALSE)
+    data.frame(
+      default_label = default_label,
+      pid_on_wikidata = pid_on_wikidata,
+      pid_on_wikibase = NA_character_,
+      success = FALSE
+    )
   }
-
 }
-
-
