@@ -72,12 +72,13 @@ get_csrf <- function(username, password, wikibase_api_url) {
   )
 
 
-  login_params
   response_2 <- httr::POST(wikibase_api_url,
     body = login_params
   )
 
-  response_2_data <- httr::content(response_2, as = "parsed", type = "application/json")
+  response_2_data <- httr::content(response_2,
+                                   as = "parsed",
+                                   type = "application/json")
 
   if (response_2_data$login$result == "Failed") {
     stop(response_2_data$login$reason)
@@ -88,9 +89,10 @@ get_csrf <- function(username, password, wikibase_api_url) {
 
   csrf <- httr::GET(wikibase_api_url, query = csrf_params)
 
-  csrf$url
-
-  stopifnot(csrf$status_code == 200)
+  assertthat::assert_that(
+    csrf$status_code == 200,
+    msg = "The status code of the returned CSRF is not OK (200)."
+  )
 
   csrf
 }

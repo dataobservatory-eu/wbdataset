@@ -42,17 +42,19 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(wbdataset)
-get_item(qid=c("Q228", "Q347"), 
-         language=c("en", "nl"), 
-         creator=person("Jane Doe"), 
-         title="Small Countries")
+get_item(
+  qid = c("Q228", "Q347"),
+  language = c("en", "nl"),
+  creator = person("Jane Doe"),
+  title = "Small Countries"
+)
 #> Downloaded Q228
 #> Downloaded Q347
-#> Jane Doe (2024). "Small Countries."
-#>   qid        label         description                                  language
-#>   <hvn_lbl_> <hvn_lbl_>    <hvn_lbl_>                                   <hvn_lb>
-#> 1 Q228       Andorra       sovereign microstate between France and Spa… en      
-#> 2 Q228       Andorra       land in Europa                               nl      
-#> 3 Q347       Liechtenstein country in Central Europe                    en      
-#> 4 Q347       Liechtenstein land in Europa                               nl
+#> Jane Doe (????). "Small Countries."
+#>   rowid      qid        label         description                       language
+#>   <hvn_lbl_> <hvn_lbl_> <hvn_lbl_>    <hvn_lbl_>                        <hvn_lb>
+#> 1 eg:1       Q228       Andorra       sovereign microstate between Fra… en      
+#> 2 eg:2       Q228       Andorra       land in Europa                    nl      
+#> 3 eg:3       Q347       Liechtenstein country in Central Europe         en      
+#> 4 eg:4       Q347       Liechtenstein land in Europa                    nl
 ```
