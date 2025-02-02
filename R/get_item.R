@@ -16,38 +16,40 @@
 #' of the labels and descriptions.
 #' @export
 #' @examples
-#' get_item("Q42", language=c("en", "nl"))
+#' get_item("Q42", language = c("en", "nl"))
 #'
-
 get_item <- function(qid,
                      language,
                      prefix = "http://www.wikidata.org/entity/",
                      wikibase_api_url = "https://www.wikidata.org/w/api.php",
                      creator = person("Jane", "Doe"),
                      title = "Dataset title") {
-
   qid <- gsub(prefix, "", as.character(qid))
 
-  if (!all(is_qid(qid))) { stop("The QIDs do not appear to look like QIDs.") }
+  if (!all(is_qid(qid))) {
+    stop("The QIDs do not appear to look like QIDs.")
+  }
 
-  if (length(qid)>1) {
+  if (length(qid) > 1) {
     for (i in seq_along(qid)) {
-      if (i==1) {
-        return_df <- get_singe_item(qid=qid[i], language=language, wikibase_api_url=wikibase_api_url)
+      if (i == 1) {
+        return_df <- get_singe_item(qid = qid[i], language = language, wikibase_api_url = wikibase_api_url)
       } else {
-        tmp <- get_singe_item(qid=qid[i], language=language, wikibase_api_url=wikibase_api_url)
+        tmp <- get_singe_item(qid = qid[i], language = language, wikibase_api_url = wikibase_api_url)
         return_df <- rbind(return_df, tmp)
       }
     }
   } else {
-    return_df <- get_singe_item(qid=qid, language=language, wikibase_api_url=wikibase_api_url)
+    return_df <- get_singe_item(qid = qid, language = language, wikibase_api_url = wikibase_api_url)
   }
 
-  return_ds <- dataset_df(qid = defined(return_df$qid, label = paste0("QID on ", wikibase_api_url), namespace=wikibase_api_url),
-                          label = defined(return_df$label, label = "Label of item"),
-                          description = defined(return_df$description, label = "Description of item"),
-                          language = defined(return_df$language, label = "Language of label and description"),
-                          dataset_bibentry = dublincore(title = title, creator=creator))
+  return_ds <- dataset_df(
+    qid = defined(return_df$qid, label = paste0("QID on ", wikibase_api_url), namespace = wikibase_api_url),
+    label = defined(return_df$label, label = "Label of item"),
+    description = defined(return_df$description, label = "Description of item"),
+    language = defined(return_df$language, label = "Language of label and description"),
+    dataset_bibentry = dublincore(title = title, creator = creator)
+  )
 
   wikibase_type <- c(qid = "QID")
   attr(return_ds, "wikibase_type") <- wikibase_type
@@ -57,14 +59,14 @@ get_item <- function(qid,
 
 #' @keywords internal
 get_singe_item <- function(qid,
-                     language = c("en", "nl", 'hu'),
-                     wikibase_api_url = "https://www.wikidata.org/w/api.php") {
-
-  default_label  <- ""
+                           language = c("en", "nl", "hu"),
+                           wikibase_api_url = "https://www.wikidata.org/w/api.php") {
+  default_label <- ""
   claim_body <- list(
     action = "wbgetentities",
-    ids   = qid,
-    format = "json")
+    ids = qid,
+    format = "json"
+  )
 
   get_claim <- httr::POST(
     url = wikibase_api_url,
@@ -79,16 +81,18 @@ get_singe_item <- function(qid,
 
 
     return(
-      dataset_df(qid=defined(qid, label = "QID", namespace=wikibase_api_url),
-                language = NA_character_,
-                label = NA_character_ ,
-                description = NA_character_)
+      dataset_df(
+        qid = defined(qid, label = "QID", namespace = wikibase_api_url),
+        language = NA_character_,
+        label = NA_character_,
+        description = NA_character_
+      )
     )
   }
 
   claims <- response$entities[[1]]$claims
 
-  message("Downloaded ", response$entities[[1]]$id )
+  message("Downloaded ", response$entities[[1]]$id)
 
   labels_present <- language[which(language %in% names(response$entities[[1]]$labels))]
   labels_missing <- language[which(!language %in% names(response$entities[[1]]$labels))]
@@ -98,28 +102,30 @@ get_singe_item <- function(qid,
 
   labels_missing
 
-  if ( "en" %in% names(response$entities[[1]]$labels) ) {
-    default_label <-  response$entities[[1]]$labels$en$value
+  if ("en" %in% names(response$entities[[1]]$labels)) {
+    default_label <- response$entities[[1]]$labels$en$value
   } else {
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
   }
 
   labels_missing_list <- list()
 
-  for  ( l in labels_missing ) {
-
-    labels_missing_list  <- c(labels_missing_list, tmp = list(list(language = l,
-                                                                   value =default_label)))
-    names(labels_missing_list)[which(names(labels_missing_list)=="tmp")] <- l
+  for  (l in labels_missing) {
+    labels_missing_list <- c(labels_missing_list, tmp = list(list(
+      language = l,
+      value = default_label
+    )))
+    names(labels_missing_list)[which(names(labels_missing_list) == "tmp")] <- l
   }
 
   labels_list <- c(response$entities[[1]]$labels[labels_present], labels_missing_list)
   labels_list
   descriptions_missing_list <- list()
-  for  ( d in descriptions_missing ) {
+  for  (d in descriptions_missing) {
     descriptions_missing_list <- c(descriptions_missing_list,
-                                   tmp = list(list(language = d, value = "")))
-    names(descriptions_missing_list)[which(names(descriptions_missing_list)=="tmp")] <- d
+      tmp = list(list(language = d, value = ""))
+    )
+    names(descriptions_missing_list)[which(names(descriptions_missing_list) == "tmp")] <- d
   }
 
   descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
@@ -128,32 +134,30 @@ get_singe_item <- function(qid,
   label_df <- as.data.frame(do.call(rbind, a))
   description_df <- as.data.frame(do.call(rbind, b))
 
-  if ( ! "value" %in% names(label_df) ) label_df$value <- NA_character_
-  if ( ! "value" %in% names(description_df) ) description_df$value <- NA_character_
+  if (!"value" %in% names(label_df)) label_df$value <- NA_character_
+  if (!"value" %in% names(description_df)) description_df$value <- NA_character_
 
-  if ( is_df_not_empty(label_df) ) {
+  if (is_df_not_empty(label_df)) {
     row.names(label_df) <- 1:dim(label_df)[1]
     names(label_df) <- c("language", "label")
   } else {
-    label_df <- data.frame (language = NA_character_, label = NA_character_ )
+    label_df <- data.frame(language = NA_character_, label = NA_character_)
   }
 
-  if ( is_df_not_empty(description_df) ) {
+  if (is_df_not_empty(description_df)) {
     row.names(description_df) <- 1:dim(description_df)[1]
     names(description_df) <- c("language", "description")
   } else {
-    description_df <- data.frame (language = NA_character_, description = NA_character_ )
+    description_df <- data.frame(language = NA_character_, description = NA_character_)
   }
 
   return_df <- left_join(label_df,
-                         description_df,
-                         by = "language") %>%
-    mutate (qid = qid) %>%
-    relocate ( qid, .before=everything()) %>%
-    relocate (language, .after=everything())
+    description_df,
+    by = "language"
+  ) %>%
+    mutate(qid = qid) %>%
+    relocate(qid, .before = everything()) %>%
+    relocate(language, .after = everything())
 
   return_df
 }
-
-
-
