@@ -36,7 +36,8 @@ We will start with four countries, of course, you could read in a longer list fr
 # Select the following country profiles from Wikidata:
 wikidata_countries <- c(
   "http://www.wikidata.org/entity/Q756617", "http://www.wikidata.org/entity/Q347",
-  "http://www.wikidata.org/entity/Q3908",   "http://www.wikidata.org/entity/Q1246")
+  "http://www.wikidata.org/entity/Q3908",   "http://www.wikidata.org/entity/Q1246"
+)
 ```
 
 And download the main identifiers of these data subject, i.e., the countries:
@@ -47,10 +48,12 @@ And download the main identifiers of these data subject, i.e., the countries:
 
 ```{r get-data, eval=FALSE}
 # Retrieve their labels into a dataset called 'European countries':
-wikidata_countries_df <- get_item(qid=wikidata_countries,
-                                  language="en",
-                                  title = "European countries",
-                                  creator = person("Daniel", "Antal"))
+wikidata_countries_df <- get_item(
+  qid = wikidata_countries,
+  language = "en",
+  title = "European countries",
+  creator = person("Daniel", "Antal")
+)
 ```
 
 The resulting dataset:
@@ -69,16 +72,19 @@ We add properties of these countries, or attributes/variables of these countries
 
 ```{r addcols}
 ds <- wikidata_countries_df %>%
-  left_join_column( 
-    label = "ISO 3166-1 alpha-2 code", 
-    property = "P297" ) %>%
-  left_join_column( 
-    property = "P1566", 
+  left_join_column(
+    label = "ISO 3166-1 alpha-2 code",
+    property = "P297"
+  ) %>%
+  left_join_column(
+    property = "P1566",
     label = "Geonames ID",
-    namespace = "https://www.geonames.org/") %>%
-  left_join_column( 
+    namespace = "https://www.geonames.org/"
+  ) %>%
+  left_join_column(
     label = "different from Wikipedia item",
-    property = "P1889")
+    property = "P1889"
+  )
 ```
 
 You can set the workflow to SILENT to avoid the progress report above, i.e.,  
@@ -86,16 +92,19 @@ You can set the workflow to SILENT to avoid the progress report above, i.e.,
 
 ```{r addcols-silent, eval=FALSE}
 ds <- wikidata_countries_df %>%
-  left_join_column( 
-    label = "ISO 3166-1 alpha-2 code", 
-    property = "P297", silent = TRUE ) %>%
-  left_join_column( 
-    property = "P1566", 
+  left_join_column(
+    label = "ISO 3166-1 alpha-2 code",
+    property = "P297", silent = TRUE
+  ) %>%
+  left_join_column(
+    property = "P1566",
     label = "Geonames ID",
-    namespace = "https://www.geonames.org/", silent = TRUE) %>%
-  left_join_column( 
+    namespace = "https://www.geonames.org/", silent = TRUE
+  ) %>%
+  left_join_column(
     label = "different from Wikipedia item",
-    property = "P1889", silent = TRUE)
+    property = "P1889", silent = TRUE
+  )
 ```
 Let us see the results:
 
@@ -126,6 +135,6 @@ dataset::provenance(ds)
 Saving the data in rds or rda files will retain the rich metadata:
 
 ```{r save, eval=FALSE}
-saveRDS(ds, file=tempfile())
+saveRDS(ds, file = tempfile())
 ```
 

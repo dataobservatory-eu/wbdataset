@@ -44,10 +44,12 @@ This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
 library(wbdataset)
-get_item(qid=c("Q228", "Q347"), 
-         language=c("en", "nl"), 
-         creator=person("Jane Doe"), 
-         title="Small Countries")
+get_item(
+  qid = c("Q228", "Q347"),
+  language = c("en", "nl"),
+  creator = person("Jane Doe"),
+  title = "Small Countries"
+)
 ```
 
 
