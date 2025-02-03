@@ -36,6 +36,6 @@ of the labels and descriptions.
 Get item definitions by QID from a Wikibase instance or Wikidata.
 }
 \examples{
-get_item("Q42", language=c("en", "nl"))
+get_item("Q42", language = c("en", "nl"))
 
 }
