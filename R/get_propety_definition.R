@@ -27,9 +27,14 @@
 #' @importFrom purrr safely
 #' @importFrom httr content
 #' @importFrom jsonlite toJSON
+#' @examples
+#' # Recieve JSON for copying with wbeditidentiy
+#' get_property_definition(pid="P2047", languages=c("en", "hu))
 #'
+#' # Receive a data.frame for further use
+#' get_property_definition(pid="P2047", return_type = "data.frame")
 
-get_property_defintion <- function(
+get_property_definition <- function(
     pid,
     languages = c("en", "nl", "hu"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
@@ -96,7 +101,7 @@ get_property_defintion <- function(
   if (!is_response_success(response)) {  # internal assertion for susccessful response
     # Exception: retrieval of the property was not successful, even though we
     # did not get an explicit error before.
-    message("Could not access ", pid_on_wikidata)
+    message("Could not access ", pid)
     message(response$error$messages[[1]]) #print the error message for debugging
     if (return_type == "data.frame") { # if the user needs a data.frame
       return(error_data_frame)
@@ -126,7 +131,7 @@ get_property_defintion <- function(
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
   }
 
-  message("Default label for ", pid_on_wikidata, ": ", default_label)
+  # message("Default label for ", pid, ": ", default_label)
 
   # The missing labels (i.e., translations that are missing for a label)
   # are replaced with the missing label, so we always have a label.
@@ -156,7 +161,6 @@ get_property_defintion <- function(
   }
 
   descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
-
 
   # Returning the requested data which is stored in lists;
   # if needed, in the future it can be returned as a nested list, too.
