@@ -1,5 +1,5 @@
 ---
-title: "start"
+title: "Start (do not use yet)"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{start}
@@ -19,7 +19,7 @@ library(wbdataset)
 library(keyring)
 ```
 
-```{r copyproperty}
+```{r copyproperty, eval=FALSE}
 copy_property(
   pid_on_wikidata = "P21",
   wikidata_pid_property = "P2",
