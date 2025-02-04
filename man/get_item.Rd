@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_item.R
 \name{get_item}
 \alias{get_item}
-\title{Get items}
+\title{Get item definitions}
 \usage{
 get_item(
   qid,
@@ -36,6 +36,6 @@ of the labels and descriptions.
 Get item definitions by QID from a Wikibase instance or Wikidata.
 }
 \examples{
-get_item("Q42", language=c("en", "nl"))
+get_item("Q42", language = c("en", "nl"))
 
 }

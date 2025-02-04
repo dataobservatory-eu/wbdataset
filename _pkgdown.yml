@@ -30,6 +30,7 @@ articles:
     contents:
       - wikidata_import
       - Wikibase_API
+      - start
 
 reference:
   - title: "Importing"
@@ -37,14 +38,16 @@ reference:
       Work with DataSet objects that resemble the [W3C](https://www.w3.org/TR/vocab-data-cube/) and SDMX datacube model.
     contents:
       - get_item
+      - get_property_definition
       - get_claims
       - left_join_column
   - title: "Copying"
     desc: >
      Copying from a Wikibase to another
-      - add_statement
-      - add_id_statement
-      - copy_property
+    contents:
+     - add_statement
+     - add_id_statement
+     - copy_property
   - title: "Replication Dataset"
     desc: >
       Pre-downloaded data for tutorials and examples.

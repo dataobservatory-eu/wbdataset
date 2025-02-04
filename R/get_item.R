@@ -1,4 +1,4 @@
-#' @title Get items
+#' @title Get item definitions
 #' @description Get item definitions by QID from a Wikibase instance or Wikidata.
 #' @param qid A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)
 #' @param prefix The prefix to use before the QID, for example, defaults to
