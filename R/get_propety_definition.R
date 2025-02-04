@@ -29,9 +29,9 @@
 #' @importFrom jsonlite toJSON
 #' @examples
 #' # Receive a data.frame for further use
-#' get_property_definition(pid="P2047", return_type = "data.frame")
+#' get_property_definition(pid = "P2047", return_type = "data.frame")
 #' # Receive JSON for copying with wbeditidentiy
-#'  get_property_definition(pid="P2047", languages=c("en", "hu"))
+#' get_property_definition(pid = "P2047", languages = c("en", "hu"))
 #' @export
 
 get_property_definition <- function(
@@ -39,7 +39,6 @@ get_property_definition <- function(
     languages = c("en", "nl", "hu"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     return_type = "JSON") {
-
   ## Ensure that the pid is a character string starting with P followed by
   ## numbers.
   pid <- as.character(pid)
@@ -85,7 +84,7 @@ get_property_definition <- function(
     ## Not successful: the Wikibase API error itself sends and error message
     ## Give an error message and send back an empty result.
     message(recevied_claim$error)
-    if (return_type == "data.frame") {  # if the user needs a data.frame
+    if (return_type == "data.frame") { # if the user needs a data.frame
       return(error_data_frame)
     }
     if (return_type != "data.frame") { # in any other case send JSON
@@ -95,14 +94,15 @@ get_property_definition <- function(
     # No error message: parse the received response. The response may
     # not be usable, so further exception handling is needed.
     response <- httr::content(recevied_claim$result,
-                              as = "parsed", type = "application/json")
+      as = "parsed", type = "application/json"
+    )
   }
 
-  if (!is_response_success(response)) {  # internal assertion for susccessful response
+  if (!is_response_success(response)) { # internal assertion for susccessful response
     # Exception: retrieval of the property was not successful, even though we
     # did not get an explicit error before.
     message("Could not access ", pid)
-    message(response$error$messages[[1]]) #print the error message for debugging
+    message(response$error$messages[[1]]) # print the error message for debugging
     if (return_type == "data.frame") { # if the user needs a data.frame
       return(error_data_frame)
     }
@@ -194,4 +194,3 @@ get_property_definition <- function(
     )
   }
 }
-
