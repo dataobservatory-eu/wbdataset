@@ -5,7 +5,7 @@
 \title{Copy an property}
 \usage{
 copy_property(
-  pid_on_wikidata,
+  pid_on_source,
   wikidata_pid_property = "P2",
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
@@ -13,7 +13,9 @@ copy_property(
 )
 }
 \arguments{
-\item{pid_on_wikidata}{The PID of the property on Wikidata to be copied to your Wikibase.}
+\item{pid_on_source}{The PID of the property on Wikidata to be copied to
+your Wikibase. (Only works with non-authenticated sources, this should be
+changed.)}
 
 \item{wikidata_pid_property}{The PID in Wikibase that records the equivalent Wikidata
 PID as an external ID.}
@@ -24,6 +26,16 @@ PID as an external ID.}
 
 \item{language}{A vector of languages codes, for example, \code{c("en", "et")}.}
 }
+\value{
+Currently returns a data.frame, this should be a dataset. It has four
+columns, \code{default_label},
+\code{pid_on_source} containing the PID of the property on the source instance,
+\code{pid_on_target} containing the new PID on the target Wikibase instance,
+\code{success}, a logical value if the copying was
+successful.
+}
 \description{
-Copy an property
+This code will copy a property label and description from Wikidata to a
+new instance. It should work between instances, but the authentication to
+copy from a password protected instance is not yet coded.
 }

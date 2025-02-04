@@ -44,3 +44,9 @@ but does not return them; the format of aliases needs to be decided in view
 of how other functions will use them, as aliases themselves can break the
 tidiness of the returned data.
 }
+\examples{
+# Receive a data.frame for further use
+get_property_definition(pid="P2047", return_type = "data.frame")
+# Receive JSON for copying with wbeditidentiy
+ get_property_definition(pid="P2047", languages=c("en", "hu"))
+}

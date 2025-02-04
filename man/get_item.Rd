@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_item.R
 \name{get_item}
 \alias{get_item}
-\title{Get items}
+\title{Get item definitions}
 \usage{
 get_item(
   qid,

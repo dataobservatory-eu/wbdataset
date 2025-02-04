@@ -28,11 +28,11 @@
 #' @importFrom httr content
 #' @importFrom jsonlite toJSON
 #' @examples
-#' # Recieve JSON for copying with wbeditidentiy
-#' get_property_definition(pid="P2047", languages=c("en", "hu))
-#'
 #' # Receive a data.frame for further use
 #' get_property_definition(pid="P2047", return_type = "data.frame")
+#' # Receive JSON for copying with wbeditidentiy
+#'  get_property_definition(pid="P2047", languages=c("en", "hu"))
+#' @export
 
 get_property_definition <- function(
     pid,

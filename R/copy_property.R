@@ -1,22 +1,35 @@
 #' @title Copy an property
-#' @param pid_on_wikidata The PID of the property on Wikidata to be copied to your Wikibase.
+#' @description
+#' This code will copy a property label and description from Wikidata to a
+#' new instance. It should work between instances, but the authentication to
+#' copy from a password protected instance is not yet coded.
+#' @param pid_on_source The PID of the property on Wikidata to be copied to
+#' your Wikibase. (Only works with non-authenticated sources, this should be
+#' changed.)
 #' @param wikidata_pid_property The PID in Wikibase that records the equivalent Wikidata
 #' PID as an external ID.
 #' @param language A vector of languages codes, for example, \code{c("en", "et")}.
 #' @param wikibase_api_url For example, \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param csrf The CSRF token of your session, received with \code{\link{get_csrf}}.
 #' @export
+#' @return
+#' Currently returns a data.frame, this should be a dataset. It has four
+#' columns, \code{default_label},
+#' \code{pid_on_source} containing the PID of the property on the source instance,
+#' \code{pid_on_target} containing the new PID on the target Wikibase instance,
+#'  \code{success}, a logical value if the copying was
+#' successful.
 
-copy_property <- function(pid_on_wikidata,
+copy_property <- function(pid_on_source,
                           wikidata_pid_property = "P2",
                           languages = c("en", "hu"),
                           wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
                           csrf) {
-  pid_on_wikidata <- as.character(pid_on_wikidata)
+  pid_on_source <- as.character(pid_on_source)
 
   claim_body <- list(
     action = "wbgetentities",
-    ids = pid_on_wikidata,
+    ids = pid_on_source,
     format = "json"
   )
 
@@ -38,12 +51,12 @@ copy_property <- function(pid_on_wikidata,
   if (!is_response_success(response)) {
     # Exception: retrieval of the property was not successful, even though we did not
     # get an explicit error before.
-    message("Could not access ", pid_on_wikidata)
+    message("Could not access ", pid_on_source)
     message(response$error$messages[[1]])
     return(data.frame(
       default_label = default_label,
-      pid_on_wikidata = pid_on_wikidata,
-      pid_on_wikibase = NA_character_,
+      pid_on_source = pid_on_source,
+      pid_on_target = NA_character_,
       success = FALSE
     ))
   }
@@ -69,7 +82,7 @@ copy_property <- function(pid_on_wikidata,
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
   }
 
-  message("Default label for ", pid_on_wikidata, ": ", default_label)
+  message("Default label for ", pid_on_source, ": ", default_label)
   labels_missing_list <- list()
 
 
@@ -146,7 +159,7 @@ copy_property <- function(pid_on_wikidata,
       wikidata_pid_df <- add_id_statement(
         qid = created_item_response$entity$id,
         pid = wikidata_pid_property,
-        o = pid_on_wikidata,
+        o = pid_on_source,
         wikibase_api_url = wikibase_api_url,
         csrf = csrf
       )
@@ -154,8 +167,8 @@ copy_property <- function(pid_on_wikidata,
 
     data.frame(
       default_label = default_label,
-      pid_on_wikidata = pid_on_wikidata,
-      pid_on_wikibase = created_item_response$entity$id,
+      pid_on_source = pid_on_source,
+      pid_on_target = created_item_response$entity$id,
       success = TRUE
     )
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)) {
@@ -168,8 +181,8 @@ copy_property <- function(pid_on_wikidata,
     old_pid <- result[[1]][2]
     data.frame(
       default_label = default_label,
-      pid_on_wikidata = pid_on_wikidata,
-      pid_on_wikibase = old_pid,
+      pid_on_source = pid_on_source,
+      pid_on_target = old_pid,
       success = FALSE
     )
   } else {
@@ -177,9 +190,11 @@ copy_property <- function(pid_on_wikidata,
     message(created_item_response$error)
     data.frame(
       default_label = default_label,
-      pid_on_wikidata = pid_on_wikidata,
-      pid_on_wikibase = NA_character_,
+      pid_on_source = pid_on_source,
+      pid_on_target = NA_character_,
       success = FALSE
     )
   }
 }
+
+
