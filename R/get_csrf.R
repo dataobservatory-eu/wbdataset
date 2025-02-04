@@ -77,8 +77,9 @@ get_csrf <- function(username, password, wikibase_api_url) {
   )
 
   response_2_data <- httr::content(response_2,
-                                   as = "parsed",
-                                   type = "application/json")
+    as = "parsed",
+    type = "application/json"
+  )
 
   if (response_2_data$login$result == "Failed") {
     stop(response_2_data$login$reason)

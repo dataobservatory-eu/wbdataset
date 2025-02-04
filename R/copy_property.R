@@ -196,5 +196,3 @@ copy_property <- function(pid_on_source,
     )
   }
 }
-
-
