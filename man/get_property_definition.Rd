@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_propety_definition.R
 \name{get_property_definition}
 \alias{get_property_definition}
-\title{Get property defintion}
+\title{Get property definition}
 \usage{
 get_property_definition(
   pid,
@@ -46,7 +46,7 @@ tidiness of the returned data.
 }
 \examples{
 # Receive a data.frame for further use
-get_property_definition(pid="P2047", return_type = "data.frame")
+get_property_definition(pid = "P2047", return_type = "data.frame")
 # Receive JSON for copying with wbeditidentiy
- get_property_definition(pid="P2047", languages=c("en", "hu"))
+get_property_definition(pid = "P2047", languages = c("en", "hu"))
 }

@@ -41,12 +41,17 @@ reference:
       - get_property_definition
       - get_claims
       - left_join_column
+  - title: "Writing"
+    desc: >
+     Write to a Wikibase instance
+    contents:
+     - create_property
+     - add_statement
+     - add_id_statement
   - title: "Copying"
     desc: >
      Copying from a Wikibase to another
     contents:
-     - add_statement
-     - add_id_statement
      - copy_property
   - title: "Replication Dataset"
     desc: >

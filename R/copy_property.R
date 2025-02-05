@@ -25,7 +25,12 @@ copy_property <- function(pid_on_source,
                           languages = c("en", "hu"),
                           wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
                           csrf) {
+
+  # Assert that PID makes sense
   pid_on_source <- as.character(pid_on_source)
+  assertthat::assert_that(is_pid(pid_on_source),
+                          msg= "pid_on_source must start with P followed by digits.")
+
 
   claim_body <- list(
     action = "wbgetentities",
@@ -61,9 +66,12 @@ copy_property <- function(pid_on_source,
     ))
   }
 
-  response$entities[[1]]$aliases
+  # aliases: response$entities[[1]]$aliases
 
   ## We must determine which labels, descriptions, aliases actually exists
+  ## If the user wants to copy non-existing descriptions, we will replace them
+  ## with an empty string.
+
   labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
   labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
 
@@ -84,7 +92,6 @@ copy_property <- function(pid_on_source,
 
   message("Default label for ", pid_on_source, ": ", default_label)
   labels_missing_list <- list()
-
 
   # The missing labels (i.e., translations that are missing for a label)
   # are replaced with the missing label, so we always have a label.
@@ -112,19 +119,22 @@ copy_property <- function(pid_on_source,
     names(descriptions_missing_list)[which(names(descriptions_missing_list) == "tmp")] <- d
   }
 
-  descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
+  descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present],
+                         descriptions_missing_list)
 
-  datastring <- jsonlite::toJSON(
-    list(
-      labels = labels_list,
-      descriptions = descriptions_list,
-      datatype = response$entities[[1]]$datatype
-    ),
-    auto_unbox = T
+  datastring <- property_identity_datastring_create(
+    # Internal function that converts the lists to the JSON format
+    # required by the wbeditidentity API call.
+    labels_list = labels_list,
+    descriptions_list = descriptions_list,
+    datatype = response$entities[[1]]$datatype
   )
 
   datastring
 
+
+  ## Getting the user's CSRF token for writing.
+  ## See get_csrf, get_csrf_token.
   csrf_token <- get_csrf_token(csrf)
 
   assertthat::assert_that(!is.null(csrf_token),
@@ -135,7 +145,8 @@ copy_property <- function(pid_on_source,
     msg = "Your CSRF token should have 42 characters."
   )
 
-  new_item <- httr::POST(
+  # Posting the new property ----------------------------------------------
+  new_property <- httr::POST(
     wikibase_api_url,
     body = list(
       action = "wbeditentity",
@@ -148,16 +159,19 @@ copy_property <- function(pid_on_source,
     handle = csrf
   )
 
-  created_item_response <- httr::content(new_item, as = "parsed", type = "application/json")
-  created_item_response
+  # See if the created POST via wbeditentity was successful
+  created_property_response <- httr::content(new_property,
+                                             as = "parsed",
+                                             type = "application/json")
+  created_property_response
 
-  if (is_response_success(created_item_response)) {
+  if (is_response_success(created_property_response)) {
     # Successfully created the property
-    message("Successfully created item ", created_item_response$entity$id, " (", created_item_response$entity$labels$en$value, ")")
+    message("Successfully created item ", created_property_response$entity$id, " (", created_property_response$entity$labels$en$value, ")")
 
     if (is_pid(wikidata_pid_property)) {
       wikidata_pid_df <- add_id_statement(
-        qid = created_item_response$entity$id,
+        qid = created_property_response$entity$id,
         pid = wikidata_pid_property,
         o = pid_on_source,
         wikibase_api_url = wikibase_api_url,
@@ -168,12 +182,12 @@ copy_property <- function(pid_on_source,
     data.frame(
       default_label = default_label,
       pid_on_source = pid_on_source,
-      pid_on_target = created_item_response$entity$id,
+      pid_on_target = created_property_response$entity$id,
       success = TRUE
     )
-  } else if ("wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)) {
+  } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     ## Special
-    message_strings <- unlist(created_item_response$error$messages)
+    message_strings <- unlist(created_property_response$error$messages)
     message(message_strings)
     message_strings <- message_strings[which(grepl("Property:", message_strings))]
     pattern <- "\\[\\[Property:*(.*?)\\|"
@@ -187,7 +201,7 @@ copy_property <- function(pid_on_source,
     )
   } else {
     ## Return an empty data.frame if there was some error
-    message(created_item_response$error)
+    message(created_property_response$error)
     data.frame(
       default_label = default_label,
       pid_on_source = pid_on_source,
