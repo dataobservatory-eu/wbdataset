@@ -1,3 +1,7 @@
+# CSV files created for testing
+
+*.csv
+
 # History files
 .Rhistory
 .Rapp.history
