@@ -1,4 +1,4 @@
-#' @title Get property defintion
+#' @title Get property definition
 #' @description
 #' Receive the label and description of a property on the basis of its PID from
 #' a Wikibase instance. It will not add further statements about the property.
