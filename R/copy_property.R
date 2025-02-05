@@ -25,11 +25,11 @@ copy_property <- function(pid_on_source,
                           languages = c("en", "hu"),
                           wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
                           csrf) {
-
   # Assert that PID makes sense
   pid_on_source <- as.character(pid_on_source)
   assertthat::assert_that(is_pid(pid_on_source),
-                          msg= "pid_on_source must start with P followed by digits.")
+    msg = "pid_on_source must start with P followed by digits."
+  )
 
 
   claim_body <- list(
@@ -119,8 +119,10 @@ copy_property <- function(pid_on_source,
     names(descriptions_missing_list)[which(names(descriptions_missing_list) == "tmp")] <- d
   }
 
-  descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present],
-                         descriptions_missing_list)
+  descriptions_list <- c(
+    response$entities[[1]]$descriptions[descriptions_present],
+    descriptions_missing_list
+  )
 
   datastring <- property_identity_datastring_create(
     # Internal function that converts the lists to the JSON format
@@ -161,8 +163,9 @@ copy_property <- function(pid_on_source,
 
   # See if the created POST via wbeditentity was successful
   created_property_response <- httr::content(new_property,
-                                             as = "parsed",
-                                             type = "application/json")
+    as = "parsed",
+    type = "application/json"
+  )
   created_property_response
 
   if (is_response_success(created_property_response)) {

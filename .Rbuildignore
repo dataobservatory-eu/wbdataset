@@ -12,3 +12,4 @@
 ^data-raw$
 ^\.github$
 ^codecov\.yml$
+^*\.csv$

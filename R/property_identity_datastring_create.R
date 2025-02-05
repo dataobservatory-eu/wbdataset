@@ -10,20 +10,25 @@
 #' @importFrom jsonlite toJSON
 #' @return A JSON string for the wbeditentity API call
 #' @keywords internal
-property_identity_datastring_create <- function(labels_list, descriptions_list, datatype) {
 
+property_identity_datastring_create <- function(labels_list,
+                                                descriptions_list,
+                                                datatype) {
   # Assert that the inputs are of correct types
   assertthat::assert_that(
     inherits(labels_list, "list"),
-    msg = "property_datastring_create(labels_list, ...) must be a list.")
+    msg = "property_datastring_create(labels_list, ...) must be a list."
+  )
 
   assertthat::assert_that(
     inherits(descriptions_list, "list"),
-    msg = "property_datastring_create(descriptions_list, ...) must be a list.")
+    msg = "property_datastring_create(descriptions_list, ...) must be a list."
+  )
 
   assertthat::assert_that(
     inherits(datatype, "character"),
-    msg = "property_datastring_create(datatype, ...) must a character vector of length 1.")
+    msg = "property_datastring_create(datatype, ...) must a character vector of length 1."
+  )
 
 
   jsonlite::toJSON(

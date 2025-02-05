@@ -9,9 +9,10 @@ create_property(
   description,
   language,
   datatype,
-  equivalence_property,
-  equivalaence_id,
+  equivalence_property = NULL,
+  equivalence_id = NULL,
   wikibase_api_url,
+  log_path,
   csrf
 )
 }
@@ -27,15 +28,33 @@ property, for example, \code{"quantity".}}
 the same Wikibase instance that records the equivalence of this new property
 with a property defined elsewhere, for example, on Wikidata or CIDOC-CRM.}
 
-\item{wikibase_api_url}{For example, \code{'https://reprexbase.eu/demowiki/api.php'}.}
-
-\item{csrf}{The CSRF token of your session, received with \code{\link{get_csrf}}.}
-
 \item{equivalence_id}{An optional PID or other identifier in Wikibase
 that records the equivalence of the property. An external ID.}
+
+\item{wikibase_api_url}{For example, \code{'https://reprexbase.eu/demowiki/api.php'}.}
+
+\item{log_path}{A path to save the log file.}
+
+\item{csrf}{The CSRF token of your session, received with \code{\link{get_csrf}}.}
 }
 \value{
-Currently returns a data.frame, this should be a dataset. It has four
+Currently returns a data.frame, this should be a dataset.
+The columns are:
+\itemize{
+\item{"action"}{ create_property}
+\item{"pid_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
+\item{"label"}{ The propery label}
+\item{"description"}{ The description label}
+\item{"language"}{ The language code of the label.}
+\item{"datatype"}{ The datatype of the property, for example, \code{string}}
+\item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
+\item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
+\item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+\item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
+\item{"time"}{ The time when the action started.}
+\item{"logfile"}{ The name of the CSV logfile.}
+}
+It has four
 columns, \code{default_label},
 \code{pid_on_source} containing the PID of the property on the source instance,
 \code{pid_on_target} containing the new PID on the target Wikibase instance,
@@ -45,7 +64,8 @@ successful.
 \description{
 Creates a property entity on a Wikibase instance with a single language
 labelling and description. New labels and descriptions can be added
-in further languages later.
+in further languages later. This is a wrapper for
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbeditentity}{MediaWiki action=wbeditentity}
 }
 \details{
 Optionally, the function adds an equivalent property to this newly created
