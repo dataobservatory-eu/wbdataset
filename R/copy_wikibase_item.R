@@ -50,7 +50,7 @@ copy_wikibase_item <- function(
     csrf) {
 
   # Save the time of running the code
-  action_time <- action_timestamp_create()
+  action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv")
 
   # Assert that qid_on_wikidata looks like a QID

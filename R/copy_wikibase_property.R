@@ -51,8 +51,9 @@ copy_wikibase_property <- function(
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     log_path = tempdir(),
     csrf) {
+
   # Save the time of running the code
-  action_time <- action_timestamp_create()
+  action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_property_", action_timestamp, ".csv")
 
   # Assert that pid_on_source makes sense
@@ -108,7 +109,7 @@ copy_wikibase_property <- function(
       equivalence_id = equivalence_id,
       success = FALSE,
       comment = error_comments,
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
@@ -260,7 +261,7 @@ copy_wikibase_property <- function(
       equivalence_id = pid_on_source,
       success = TRUE,
       comment = "",
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
@@ -325,7 +326,7 @@ copy_wikibase_property <- function(
       equivalence_id = pid_on_source,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
@@ -361,7 +362,7 @@ copy_wikibase_property <- function(
       equivalence_id = pid_on_source,
       success = FALSE,
       comment = error_comments,
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
