@@ -9,10 +9,10 @@ create_property(
   description,
   language,
   datatype,
-  equivalence_property = NULL,
-  equivalence_id = NULL,
+  equivalence_property = NA_character_,
+  equivalence_id = NA_character_,
   wikibase_api_url,
-  log_path,
+  log_path = tempdir(),
   csrf
 )
 }
@@ -26,14 +26,20 @@ property, for example, \code{"quantity".}}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new property
-with a property defined elsewhere, for example, on Wikidata or CIDOC-CRM.}
+with a property defined elsewhere, for example, on Wikidata or CIDOC-CRM.
+Defaults to
+\code{NA_character_}; if left missing, no equivalence relations is will be
+claimed.}
 
 \item{equivalence_id}{An optional PID or other identifier in Wikibase
-that records the equivalence of the property. An external ID.}
+that records the equivalence of the property. An external ID. Defaults to
+\code{NA_character_}; if left missing, no equivalence relations is will be
+claimed.}
 
 \item{wikibase_api_url}{For example, \code{'https://reprexbase.eu/demowiki/api.php'}.}
 
-\item{log_path}{A path to save the log file.}
+\item{log_path}{A path to save the log file. Defaults to the return value
+of \code{\link{tempdir()}}.}
 
 \item{csrf}{The CSRF token of your session, received with \code{\link{get_csrf}}.}
 }
@@ -42,7 +48,7 @@ Currently returns a data.frame, this should be a dataset.
 The columns are:
 \itemize{
 \item{"action"}{ create_property}
-\item{"pid_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
+\item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
 \item{"label"}{ The propery label}
 \item{"description"}{ The description label}
 \item{"language"}{ The language code of the label.}
@@ -51,15 +57,10 @@ The columns are:
 \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
 \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
+\item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 \item{"time"}{ The time when the action started.}
 \item{"logfile"}{ The name of the CSV logfile.}
 }
-It has four
-columns, \code{default_label},
-\code{pid_on_source} containing the PID of the property on the source instance,
-\code{pid_on_target} containing the new PID on the target Wikibase instance,
-\code{success}, a logical value if the copying was
-successful.
 }
 \description{
 Creates a property entity on a Wikibase instance with a single language

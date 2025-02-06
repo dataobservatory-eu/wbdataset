@@ -50,9 +50,10 @@ reference:
      - add_id_statement
   - title: "Copying"
     desc: >
-     Copying from a Wikibase to another
+     Copying from a Wikibase instance to another one.
     contents:
-     - copy_property
+     - copy_wikibase_property
+     - copy_wikibase_item
   - title: "Replication Dataset"
     desc: >
       Pre-downloaded data for tutorials and examples.
@@ -60,7 +61,7 @@ reference:
        - wikidata_countries_df
   - title: "Utilities"
     desc: >
-      Some popular namespace prefix abbreviations for the linking of datasets.
+      Log in to a Wikibase instance, get CSRF tokens, basic exception handling.
     contents:
        - get_csrf
        - get_csrf_token
