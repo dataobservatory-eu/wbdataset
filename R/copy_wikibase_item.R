@@ -42,7 +42,7 @@
 #' }
 #' @export
 
-copy_wikibase_item <- function(
+copy_wikidata_item <- function(
     qid_on_source = "Q4",
     qid_equivalence_property = "P377",
     languages = c("en", "nl", "de", "ru", "hu", "lv", "sk", "et", "fr", "es", "pt", "lt"),

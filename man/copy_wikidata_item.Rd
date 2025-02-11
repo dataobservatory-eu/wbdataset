@@ -2,7 +2,7 @@
 % Please edit documentation in R/copy_wikibase_item.R
 \name{copy_wikidata_item}
 \alias{copy_wikidata_item}
-\title{Copy a Wikidata item}
+\title{Copy a Wikibase item}
 \usage{
 copy_wikidata_item(
   qid_on_source = "Q4",

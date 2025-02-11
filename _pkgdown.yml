@@ -50,10 +50,11 @@ reference:
      - add_id_statement
   - title: "Copying"
     desc: >
-     Copying from a Wikibase instance to another one.
+     Copying from a Wikibase instance to another one. Currently only copying from
+     Wikidata works, which is a special instance that does not require authentication.
     contents:
-     - copy_wikibase_property
-     - copy_wikibase_item
+     - copy_wikidata_property
+     - copy_wikidata_item
   - title: "Replication Dataset"
     desc: >
       Pre-downloaded data for tutorials and examples.

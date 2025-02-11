@@ -1,4 +1,4 @@
-#' @title Copy a Wikibase property
+#' @title Copy a Wikidata property
 #' @description
 #' This code will copy a property label and description from Wikidata to a
 #' new instance. It should work between instances, but the authentication to

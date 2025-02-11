@@ -2,7 +2,7 @@
 % Please edit documentation in R/copy_wikidata_property.R
 \name{copy_wikidata_property}
 \alias{copy_wikidata_property}
-\title{Copy a Wikibase property}
+\title{Copy a Wikidata property}
 \usage{
 copy_wikidata_property(
   pid_on_source,
