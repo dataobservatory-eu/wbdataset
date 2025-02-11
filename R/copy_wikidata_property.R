@@ -1,4 +1,4 @@
-#' @title Copy a Wikibase property
+#' @title Copy a Wikidata property
 #' @description
 #' This code will copy a property label and description from Wikidata to a
 #' new instance. It should work between instances, but the authentication to
@@ -44,7 +44,7 @@
 #'  \item{"logfile"}{ The name of the CSV logfile.}
 #' }
 
-copy_wikibase_property <- function(
+copy_wikidata_property <- function(
     pid_on_source,
     pid_equivalence_property = "P2",
     languages = c("en", "hu"),
