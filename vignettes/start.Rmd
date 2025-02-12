@@ -14,18 +14,122 @@ knitr::opts_chunk$set(
 )
 ```
 
+It is a good idea to start with a fresh R session and empty environment in the memory. You will work with a session in R and an authenticated session on a Wikibase server. It may cause confusion if you have some variables, like passwords, tokens, from a previous session.
+
 ```{r setup}
 library(wbdataset)
-library(keyring)
+# We asume that you store your bot password to a Wikibase instance
+# on keyring.
+library(keyring) 
+
+my_csrf <- get_csrf(username="Reprexba jekyll@AntaldanielBot",
+                    password = key_get(service = "https://reprexbase.eu/jekyll/api.php",
+                                       username = "Reprexba jekyll@AntaldanielBot"), 
+                    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php")
+
 ```
 
+## Define a simple graph
+
+A knowledge graph is a network of knowledge statements, where nodes represent things (like people, places, or objects) and edges (the connections between nodes) represent the relationships between those things. In this picture, properties are like the labels on the roads (edges) that explain how the nodes are connected.
+
+In Wikibase, we work with 3 knowledge graph concepts:
+
+-  [x] items for nodes
+-  [x] properties for edges
+-  [x] statements or claims for relationships
+
+In the extended model, we can add further concepts:
+
+-  [x] forms, which are special statements to relevant combination of grammatical features, such as 2nd person / singular / past tense, for example, to state that `musicians` are equivalent to more than one `musician`.
+-  [x] senses, which disambiguate the homonyms that can confuse the understanding of item labels, for example, in the case of the English noun that can describe a "financial institution" and the "edge of a body of water".
+
+The *wbdataset* package currently works with two functions that add nodes and 
+edges to the graph.
+
+- `create_item()` and `create_property()` create them from the scratch;
+- `copy_wikidata_item()` and `copy_wikidata_property()` create them by equivalence from Wikidata.
+- The planned `copy_wikibase_item()` and `copy_wikibase_property()` will create
+by equivalence between two password protected Wikibase instances.
+
+In the case of frequently used classes and with all properties, creation by equivalence is recommended, particularly if you are not experienced with graph data modelling. Both `create_item()` and `create_property()` offer the optional choice to create an item (node) or a property (edge) by equivalence with a well-defined vocabulary, like CIDOC-CRM, or FOAF.
+
+The statements or claims are created with the `add_statement` function family.
+
+## Create items
+
+```{r create-item, eval=FALSE}
+e20 <- create_item(
+  label = "biological object",
+  description = "This class comprises individual items of a material nature, which live, have lived or are natural products of or from living organisms.",
+  language = "en",
+  equivalence_property = "P37", # The creation of this is in the next section
+  equivalence_id = "E20",
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  log_path = tempdir(),
+  csrf = my_csrf
+)
+```
+You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
+it is saved in `e20`. If the action was successul, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
+
+```{r copy-wikibase-item, eval=FALSE}
+# Not tested yet
+```
+
+
+## Create properties
+
+Create the property by equivalence:
+
 ```{r copyproperty, eval=FALSE}
-copy_property(
+p21 <- copy_wikidata_property(
   pid_on_wikidata = "P21",
-  wikidata_pid_property = "P2",
+  pid_equivalence_property = "P2",
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   csrf = your_csrf
 )
+```
+You have copied the property, identified by PID=21 on Wikidata. In your system, it received the value stored in `p21$id_on_target`. This information is messaged on the screen, returned to your environment (you saved it in this case to the data.frame `p21`), and it can be found in your log_file directory, too, as a .csv file.
+
+
+Create it manually, be defining a new property that will allow you to create later a property on equivalence with *Records in Context*:
+
+
+```{r create-property, eval=FALSE}
+ric_equivalence_pid <- create_property(
+  label = "RiC equivalent property",
+  description = "The equivalent property in Records in Context, an ontology used in archives.",
+  language = "en",
+  datatype = "external-id",
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  log_path = tempdir(),
+  csrf = your_csrf
+)
+```
+The `ric_equivalence_pid$id_on_target` saves the new property identifier in your system. The complete log can be found in your log_file directory, too, as a .csv file.
+
+```{r, echo=FALSE}
+message("Successfully created item P44 (RiC equivalent property)")
+```
+You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
+it is saved in `ric_equivalence_pid`.
+
+```{r create-propery2, eval=FALSE}
+p107 <- create_property(
+  label = "has current or former member (is current or former member of) ",
+  description = "This property relates an E39 Actor to the E74 Group of which that E39 Actor is a member.",
+  language = "en",
+  equivalence_property = "P37", # a property connecting your PIDs to CIDOC
+  equivalence_id = "P107",      # the number of the property definition in CIDOC
+  datatype = "external-id",
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  log_path = tempdir(),
+  csrf = my_csrf
+)
+```
+```{r, echo=FALSE}
+message("Successfully created item P47 (has current or former member (is current or former member of))")
 ```
 
