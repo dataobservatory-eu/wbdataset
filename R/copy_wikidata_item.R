@@ -1,27 +1,27 @@
 #' @title Copy a Wikibase item
-#' @description
-#' This code will copy a property label and description from Wikidata to a
-#' new instance. It should work between instances, but the authentication to
-#' copy from a password protected instance is not yet coded. The function is more
-#' specific than create_item, because this one creates
+#' @description This code will copy a property label and description from
+#' Wikidata to a new instance. It should work between instances, but the
+#' authentication to copy from a password protected instance is not yet coded.
+#' The function is more specific than create_item, because this one creates
 #' items that exist in a similarly structured Wikibase instance, such as
 #' Wikidata.
-#' @details This function is slightly different from create_item.
-#' That function creates a new item that may not have an equivalent item
-#' on another Wikibase instance, but it may well have an equivalent item in
-#' another database. \cr
-#' In this function, we use \code{qid_equivalence_property}
-#' for equivalence. In the more general create function we use
-#' \code{equivalence_item}, because we may use different identifiers.
-#' Similarly, the \code{qid_on_source} replaces the more general
-#' \code{equivalence_id}, because we must use QID for identification in an
-#' other Wikibase instance.
+#' @details This function is slightly different from create_item. That function
+#'   creates a new item that may not have an equivalent item on another Wikibase
+#'   instance, but it may well have an equivalent item in another database. \cr
+#'   In this function, we use \code{qid_equivalence_property} for equivalence.
+#'   In the more general create function we use \code{equivalence_item}, because
+#'   we may use different identifiers. Similarly, the \code{qid_on_source}
+#'   replaces the more general \code{equivalence_id}, because we must use QID
+#'   for identification in an other Wikibase instance.
 #' @param qid_on_wikidata The QID of the item to be copied to your Wikibase.
-#' @param qid_equivalence_property The QID in Wikibase that records the equivalent
-#' Wikidata QID as an external ID.
-#' @param language A vector of languages codes, for example, \code{c("en", "et")}.
-#' @param wikibase_api_url For example, \code{'https://reprexbase.eu/demowiki/api.php'}.
-#' @param csrf The CSRF token of your session, received with \code{\link{get_csrf}}.
+#' @param qid_equivalence_property The QID in Wikibase that records the
+#'   equivalent Wikidata QID as an external ID.
+#' @param language A vector of languages codes, for example, \code{c("en",
+#'   "et")}.
+#' @param wikibase_api_url For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}.
 #' @examples
 #' Currently returns a data.frame, this should be a dataset.
 #' The columns are:
@@ -182,7 +182,9 @@ copy_wikidata_item <- function(
       pid_on_wikibase = created_item_response$entity$id,
       success = TRUE
     )
-  } else if ("wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)) {
+  } else if (
+    "wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)
+    ) {
     message_strings <- unlist(created_item_response$error$messages)
     message(message_strings)
     message_strings <- message_strings[which(grepl("Property:", message_strings))]

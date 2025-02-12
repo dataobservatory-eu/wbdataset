@@ -45,6 +45,7 @@ reference:
     desc: >
      Write to a Wikibase instance
     contents:
+     - create_item
      - create_property
      - add_statement
      - add_id_statement

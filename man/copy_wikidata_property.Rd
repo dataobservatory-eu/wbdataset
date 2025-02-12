@@ -5,7 +5,7 @@
 \title{Copy a Wikidata property}
 \usage{
 copy_wikidata_property(
-  pid_on_source,
+  pid_on_wikidata,
   pid_equivalence_property = "P2",
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
@@ -14,7 +14,7 @@ copy_wikidata_property(
 )
 }
 \arguments{
-\item{pid_on_source}{The PID of the property on Wikidata to be copied to
+\item{pid_on_wikidata}{The PID of the property on Wikidata to be copied to
 your Wikibase. (Only works with non-authenticated sources, this should be
 changed.)}
 
@@ -62,7 +62,7 @@ another graph system. \cr
 In this function, we use \code{pid_equivalence_property}
 for equivalence. In the more general create function we use
 \code{equivalence_property}, because we may use different identifiers.
-Similarly, the \code{pid_on_source} replaces the more general
+Similarly, the \code{pid_on_wikidata} replaces the more general
 \code{equivalence_id}, because we must use PID for identification in an
 other Wikibase instance.
 }

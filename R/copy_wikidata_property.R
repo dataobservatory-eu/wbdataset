@@ -13,10 +13,10 @@
 #' In this function, we use \code{pid_equivalence_property}
 #' for equivalence. In the more general create function we use
 #' \code{equivalence_property}, because we may use different identifiers.
-#' Similarly, the \code{pid_on_source} replaces the more general
+#' Similarly, the \code{pid_on_wikidata} replaces the more general
 #' \code{equivalence_id}, because we must use PID for identification in an
 #' other Wikibase instance.
-#' @param pid_on_source The PID of the property on Wikidata to be copied to
+#' @param pid_on_wikidata The PID of the property on Wikidata to be copied to
 #' your Wikibase. (Only works with non-authenticated sources, this should be
 #' changed.)
 #' @param pid_equivalence_property The PID in Wikibase that records the equivalent Wikidata
@@ -45,26 +45,25 @@
 #' }
 
 copy_wikidata_property <- function(
-    pid_on_source,
+    pid_on_wikidata,
     pid_equivalence_property = "P2",
     languages = c("en", "hu"),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     log_path = tempdir(),
     csrf) {
-
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_property_", action_timestamp, ".csv")
 
-  # Assert that pid_on_source makes sense
-  pid_on_source <- as.character(pid_on_source)
-  assertthat::assert_that(is_pid(pid_on_source),
-    msg = "pid_on_source must start with P followed by digits."
+  # Assert that pid_on_wikidata makes sense
+  pid_on_wikidata <- as.character(pid_on_wikidata)
+  assertthat::assert_that(is_pid(pid_on_wikidata),
+    msg = "pid_on_wikidata must start with P followed by digits."
   )
 
   claim_body <- list(
     action = "wbgetentities",
-    ids = pid_on_source,
+    ids = pid_on_wikidata,
     format = "json"
   )
 
@@ -88,7 +87,7 @@ copy_wikidata_property <- function(
   if (!is_response_success(response)) {
     # Exception: retrieval of the property was not successful, even though we did not
     # get an explicit error before.
-    message("Could not access ", pid_on_source)
+    message("Could not access ", pid_on_wikidata)
 
     error_comments <- paste(
       unlist(
@@ -99,7 +98,7 @@ copy_wikidata_property <- function(
 
     return_dataframe <- data.frame(
       action = "copy_property",
-      id_on_target = pid_on_source,
+      id_on_target = pid_on_wikidata,
       label = "<not retrieved>",
       description = "<not retrieved>",
       language = "<not retrieved>",
@@ -147,7 +146,7 @@ copy_wikidata_property <- function(
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
   }
 
-  message("Default label for ", pid_on_source, ": ", default_label)
+  message("Default label for ", pid_on_wikidata, ": ", default_label)
   labels_missing_list <- list()
 
   # The missing labels (i.e., translations that are missing for a label)
@@ -237,7 +236,7 @@ copy_wikidata_property <- function(
       wikidata_pid_df <- add_id_statement(
         qid = created_property_response$entity$id,
         pid = pid_equivalence_property,
-        o = pid_on_source,
+        o = pid_on_wikidata,
         wikibase_api_url = wikibase_api_url,
         csrf = csrf
       )
@@ -258,7 +257,7 @@ copy_wikidata_property <- function(
       datatype = created_property_response$entity$datatype,
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
-      equivalence_id = pid_on_source,
+      equivalence_id = pid_on_wikidata,
       success = TRUE,
       comment = "",
       time = action_timestamp,
@@ -323,7 +322,7 @@ copy_wikidata_property <- function(
       datatype = "<not retrieved>",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
-      equivalence_id = pid_on_source,
+      equivalence_id = pid_on_wikidata,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
       time = action_timestamp,
@@ -359,7 +358,7 @@ copy_wikidata_property <- function(
       datatype = "<not retrieved>",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
-      equivalence_id = pid_on_source,
+      equivalence_id = pid_on_wikidata,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
