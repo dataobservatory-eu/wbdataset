@@ -44,7 +44,7 @@ To gain access to a MediaWiki API, you need to get a CSRF token, which is a secu
 
 
 ```{r csrftoken, eval=FALSE}
-your_csrf <- get_csrf(username="Demo@adminbot",
+my_csrf <- get_csrf(username="Demo@adminbot",
                       password = key_get(service = "https://reprexbase.eu/demo/api.php",
                                          username = "Demo@adminbot" ),
                       wikibase_api_url =  "https://reprexbase.eu/demo/api.php")
@@ -65,7 +65,7 @@ get_claims(
   qid = "Q528626",
   property = "P625",
   wikibase_api_url = "wikibase_api_url",
-  csrf = your_csrf
+  csrf = my_csrf
 )
 ```
 
