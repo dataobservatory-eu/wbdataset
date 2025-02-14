@@ -16,7 +16,11 @@ knitr::opts_chunk$set(
 
 You get reading API access to Wikidata (GET) without a password. But if you want API access to a privately managed Wikibase instance, you need to get a "bot" username and password and authenticate your scripted session.
 
-You must never store those username-password pairs in your code to prevent it from accidentally getting to GitHub and it will be permanently revealed to everybody.  (There is no delete button on GitHub!)
+CSRF is a way for a malicious website to exploit your logged-in session on another website to perform actions as you without your consent. The MediaWiki API (the API of Wikibase instances) employs CSRF tokens (also often called "edit tokens" in the MediaWiki context) as a crucial defence mechanism against Cross-Site Request Forgery attacks.
+
+To receive such a CSRF security token (connected to your current editing session on a Wikibase instance) you have to run first `get_csrf()` to establish your session and your credentials. As a result, you will receive a csrf object which contains among other data, your CSRF token. Then, now running the `get_csrf_token()` function will unwrap from returned csrf object the token itself, which is often, but not necessarily, a character string of length 42.
+
+The MediaWiki API's CSRF tokens are not designed to be long-lived. Their lifespan is intentionally kept short, typically tied to the user's current editing session or a reasonable timeframe for a single action. This is a crucial security measure, and therefore you may need to log in several times while you are working with *wbdataset*.
 
 A convenient and elegant solution to keep your login credentials R is the use of the keyring package. At first time use, you set up your credentials with `key_set_with_value`.
 
@@ -30,11 +34,13 @@ key_set_with_value(service = "https://reprexbase.eu/demo/api.php",
                    password = "8******************************b")
 ```
 
+You must never store those username-password pairs in your code to prevent it from accidentally getting to GitHub and it will be permanently revealed to everybody.  (There is no delete button on GitHub!)
 
 ```{r keyget, eval=FALSE}
 key_get(service = "https://reprexbase.eu/demo/api.php", username = "Demo2@adminbot" )
 ```
-To work with your API access, you need to get a CSRF token, which is a secure random token (e.g., synchronizer token or challenge token) that is used to prevent CSRF attacks.
+
+To gain access to a MediaWiki API, you need to get a CSRF token, which is a secure random token (e.g., synchronizer token or challenge token) that is used to prevent CSRF attacks.
 
 
 ```{r csrftoken, eval=FALSE}
@@ -50,7 +56,7 @@ Login token: e2d4a59bc6***********
 Post login data to https://reprexbase.eu/demo/api.php
 ```
 
-To interact with the Wikibase Instance, you will have to provide the API address of the instance and this CSRF object. In fact, under the hood, from the CSRF object `get_csrf_token(csrf)` function will return your token itself, the CSRF object holds the data of your session.
+To interact with the Wikibase Instance, you will have to provide the API address of the instance and this CSRF object. In fact, under the hood, from the CSRF object `get_csrf_token(csrf)` function will unwrap your token itself from the CSRF security object holds the data of your session (not only the token itself.)
 
 Now you are ready to send API requests to the MediaWiki API.
 

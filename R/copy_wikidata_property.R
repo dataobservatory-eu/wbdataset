@@ -1,35 +1,40 @@
 #' @title Copy a Wikidata property
-#' @description
-#' This code will copy a property label and description from Wikidata to a
-#' new instance. It should work between instances, but the authentication to
-#' copy from a password protected instance is not yet coded. The function is more
-#' specific than \code{\link{create_property}}, because this one creates
-#' properties that exist in a similarly structured Wikibase instance, such as
-#' Wikidata.
-#' @details This function is slightly different from \code{\link{create_property}}.
-#' That function creates a new property that may not have an equivalent property
-#' on another Wikibase instance, but it may well have an equivalent property in
-#' another graph system. \cr
-#' In this function, we use \code{pid_equivalence_property}
-#' for equivalence. In the more general create function we use
-#' \code{equivalence_property}, because we may use different identifiers.
-#' Similarly, the \code{pid_on_wikidata} replaces the more general
-#' \code{equivalence_id}, because we must use PID for identification in an
-#' other Wikibase instance.
+#' @description This code will copy a property label and description from
+#' Wikidata to a new instance. It should work between instances, but the
+#' authentication to copy from a password protected instance is not yet coded.
+#' The function is more specific than \code{\link{create_property}}, because
+#' this one creates properties that exist in a similarly structured Wikibase
+#' instance, such as Wikidata.
+#' @details This function is slightly different from
+#'   \code{\link{create_property}}. That function creates a new property that
+#'   may not have an equivalent property on another Wikibase instance, but it
+#'   may well have an equivalent property in another graph system. \cr In this
+#'   function, we use \code{pid_equivalence_property} for equivalence. In the
+#'   more general create function we use \code{equivalence_property}, because we
+#'   may use different identifiers. Similarly, the \code{pid_on_wikidata}
+#'   replaces the more general \code{equivalence_id}, because we must use PID
+#'   for identification in an other Wikibase instance.
 #' @param pid_on_wikidata The PID of the property on Wikidata to be copied to
-#' your Wikibase. (Only works with non-authenticated sources, this should be
-#' changed.)
-#' @param pid_equivalence_property The PID in Wikibase that records the equivalent Wikidata
-#' PID as an external ID.
-#' @param language A vector of languages codes, for example, \code{c("en", "et")}.
-#' @param wikibase_api_url For example, \code{'https://reprexbase.eu/demowiki/api.php'}.
-#' @param csrf The CSRF token of your session, received with \code{\link{get_csrf}}.
-#' @export
-#' @return
-#' Currently returns a data.frame, this should be a dataset.
-#' The columns are:
+#'   your Wikibase. (Only works with non-authenticated sources, this should be
+#'   changed.)
+#' @param pid_equivalence_property The PID in Wikibase that records the
+#'   equivalent Wikidata PID as an external ID.
+#' @param language A vector of languages codes, for example, \code{c("en",
+#'   "et")}.
+#' @param wikibase_api_url For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param data_curator The name of the data curator who runs the function and
+#' creates the log file, created with \link[utils]{person}.
+#' @param log_path A path to save the log file. Defaults to the return value of
+#'   \code{\link{tempdir()}}.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}.
+#' @importFrom assertthat assert_that
+#' @importFrom utils person
+#' @return Returns a dataset_df object. The columns are:
 #' \itemize{
-#'  \item{"action"}{ create_property}
+#'  \item{"rowid"}{ A row identifier. }
+#'  \item{"action"}{ The create_property() function name. }
 #'  \item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
 #'  \item{"label"}{ The propery label}
 #'  \item{"description"}{ The description label}
@@ -43,6 +48,7 @@
 #'  \item{"time"}{ The time when the action started.}
 #'  \item{"logfile"}{ The name of the CSV logfile.}
 #' }
+#' @export
 
 copy_wikidata_property <- function(
     pid_on_wikidata,
@@ -51,6 +57,14 @@ copy_wikidata_property <- function(
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     log_path = tempdir(),
     csrf) {
+
+  # Credit the person who curates the data
+  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+
+  assertthat::assert_that(
+    inherits(data_curator, "person"),
+    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_property_", action_timestamp, ".csv")
@@ -79,9 +93,11 @@ copy_wikidata_property <- function(
 
   if (!is.null(get_claim$error)) {
     # there was an error
+    message(get_claim$error)
   } else {
     # there was no error
-    response <- httr::content(get_claim$result, as = "parsed", type = "application/json")
+    response <- httr::content(
+      get_claim$result, as = "parsed", type = "application/json")
   }
 
   if (!is_response_success(response)) {
@@ -98,14 +114,14 @@ copy_wikidata_property <- function(
 
     return_dataframe <- data.frame(
       action = "copy_property",
-      id_on_target = pid_on_wikidata,
+      id_on_target = NA_character_,
       label = "<not retrieved>",
       description = "<not retrieved>",
       language = "<not retrieved>",
       datatype = "<not retrieved>",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = equivalence_property,
-      equivalence_id = equivalence_id,
+      equivalence_id = pid_on_wikidata,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
@@ -124,9 +140,9 @@ copy_wikidata_property <- function(
 
   # aliases: response$entities[[1]]$aliases
 
-  ## We must determine which labels, descriptions, aliases actually exists
-  ## If the user wants to copy non-existing descriptions, we will replace them
-  ## with an empty string.
+  # We must determine which labels, descriptions, aliases actually exists
+  # If the user wants to copy non-existing descriptions, we will replace them
+  # with an empty string.
 
   labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
   labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
@@ -225,7 +241,8 @@ copy_wikidata_property <- function(
 
   if (is_response_success(created_property_response)) {
     # Successfully created the property, try to add the equivalence statement
-    # before returning
+    # before returning log data.
+
     message(
       "Successfully created item ",
       created_property_response$entity$id, " (",
@@ -241,7 +258,6 @@ copy_wikidata_property <- function(
         csrf = csrf
       )
     }
-
 
     # Unwrap the newly created label from the response for checking...
     created_item_label <- created_property_response$entity$labels[1]
@@ -278,8 +294,8 @@ copy_wikidata_property <- function(
     # Get the old, conflicting PID out of the error message
     message_strings <- message_strings[which(grepl("Property:", message_strings))]
     pattern <- "\\[\\[Property:*(.*?)\\|"
-    result <- regmatches(message_strings, regexec(pattern, message_strings))
-    old_pid <- result[[1]][2]
+    regmatchresult <- regmatches(message_strings, regexec(pattern, message_strings))
+    old_pid <- regmatchresult[[1]][2]
 
     # Unwrap the error messages
     error_messages <- lapply(
@@ -324,7 +340,7 @@ copy_wikidata_property <- function(
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
       success = FALSE,
-      comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
+      comment = "Wikibase validator label conflict: label-language pair already exists.",
       time = action_timestamp,
       logfile = log_file_name
     )
@@ -336,7 +352,9 @@ copy_wikidata_property <- function(
       na = "NA",
       fileEncoding = "UTF-8"
     )
-  } else { # Return an emptier data.frame if there was some error
+  } else {
+
+    # Return an emptier data.frame if there was some error
 
     # Print out the error message verbatim to terminal
     message(created_property_response$error)
@@ -375,5 +393,36 @@ copy_wikidata_property <- function(
   }
 
   # Return the results
-  return_dataframe
+  return_ds <- dataset_df(
+    action = return_dataframe$action,
+    id_on_target = defined(
+      return_dataframe$id_on_target,
+      label = paste0("PID on ", wikibase_api_url),
+      namespace = wikibase_api_url),
+    label = defined(
+      return_dataframe$label, label = "Label of item"),
+    description = defined(
+      return_dataframe$description, label = "Description of item"),
+    language = defined(
+      return_dataframe$language, label = "Language of label and description"),
+    datatype = return_dataframe$datatype,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = defined(
+      return_dataframe$equivalence_property ,
+      label = paste0("Equivalence property on  ", wikibase_api_url),
+      namespace = wikibase_api_url),
+    equivalence_id = defined(
+      return_dataframe$equivalence_id ,
+      label = "Equivalent PID on Wikidata",
+      namespace = "https://www.wikidata.org/wiki/"),
+    success = return_dataframe$success,
+    comment = return_dataframe$comment,
+    time = return_dataframe$time,
+    logfile = return_dataframe$logfile,
+    dataset_bibentry = dublincore(
+      title = "Wikibase Copy Property Log",
+      description = description,
+      creator = data_curator,
+      dataset_date = Sys.Date())
+  )
 }

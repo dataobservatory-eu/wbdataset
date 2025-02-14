@@ -23,6 +23,8 @@
 #'   claimed.
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param data_curator The name of the data curator who runs the function and
+#'   creates the log file, created with \link[utils]{person}.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param log_path A path to save the log file. Defaults to the return value of
@@ -70,8 +72,17 @@ create_property <- function(label,
                             equivalence_property = NA_character_,
                             equivalence_id = NA_character_,
                             wikibase_api_url,
+                            data_curator = NULL,
                             log_path = tempdir(),
                             csrf) {
+
+  # Credit the person who curates the data
+  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+
+  assertthat::assert_that(
+    inherits(data_curator, "person"),
+    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+
 
   # Save the time of running the code
   action_time <- action_timestamp_create()

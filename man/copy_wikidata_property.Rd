@@ -18,20 +18,29 @@ copy_wikidata_property(
 your Wikibase. (Only works with non-authenticated sources, this should be
 changed.)}
 
-\item{pid_equivalence_property}{The PID in Wikibase that records the equivalent Wikidata
-PID as an external ID.}
+\item{pid_equivalence_property}{The PID in Wikibase that records the
+equivalent Wikidata PID as an external ID.}
 
-\item{wikibase_api_url}{For example, \code{'https://reprexbase.eu/demowiki/api.php'}.}
+\item{wikibase_api_url}{For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}.}
 
-\item{csrf}{The CSRF token of your session, received with \code{\link{get_csrf}}.}
+\item{log_path}{A path to save the log file. Defaults to the return value of
+\code{\link{tempdir()}}.}
 
-\item{language}{A vector of languages codes, for example, \code{c("en", "et")}.}
+\item{csrf}{The CSRF token of your session, received with
+\code{\link{get_csrf}}.}
+
+\item{language}{A vector of languages codes, for example, \code{c("en",
+"et")}.}
+
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.}
 }
 \value{
-Currently returns a data.frame, this should be a dataset.
-The columns are:
+Returns a dataset_df object. The columns are:
 \itemize{
-\item{"action"}{ create_property}
+\item{"rowid"}{ A row identifier. }
+\item{"action"}{ The create_property() function name. }
 \item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
 \item{"label"}{ The propery label}
 \item{"description"}{ The description label}
@@ -47,22 +56,21 @@ The columns are:
 }
 }
 \description{
-This code will copy a property label and description from Wikidata to a
-new instance. It should work between instances, but the authentication to
-copy from a password protected instance is not yet coded. The function is more
-specific than \code{\link{create_property}}, because this one creates
-properties that exist in a similarly structured Wikibase instance, such as
-Wikidata.
+This code will copy a property label and description from
+Wikidata to a new instance. It should work between instances, but the
+authentication to copy from a password protected instance is not yet coded.
+The function is more specific than \code{\link{create_property}}, because
+this one creates properties that exist in a similarly structured Wikibase
+instance, such as Wikidata.
 }
 \details{
-This function is slightly different from \code{\link{create_property}}.
-That function creates a new property that may not have an equivalent property
-on another Wikibase instance, but it may well have an equivalent property in
-another graph system. \cr
-In this function, we use \code{pid_equivalence_property}
-for equivalence. In the more general create function we use
-\code{equivalence_property}, because we may use different identifiers.
-Similarly, the \code{pid_on_wikidata} replaces the more general
-\code{equivalence_id}, because we must use PID for identification in an
-other Wikibase instance.
+This function is slightly different from
+\code{\link{create_property}}. That function creates a new property that
+may not have an equivalent property on another Wikibase instance, but it
+may well have an equivalent property in another graph system. \cr In this
+function, we use \code{pid_equivalence_property} for equivalence. In the
+more general create function we use \code{equivalence_property}, because we
+may use different identifiers. Similarly, the \code{pid_on_wikidata}
+replaces the more general \code{equivalence_id}, because we must use PID
+for identification in an other Wikibase instance.
 }

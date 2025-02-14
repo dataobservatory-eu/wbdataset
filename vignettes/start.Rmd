@@ -1,8 +1,8 @@
 ---
-title: "Start (do not use yet)"
+title: "Getting Started To Create a Graph on Wikibase"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{start}
+  %\VignetteIndexEntry{Getting Started To Create a Graph on Wikibase}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -54,11 +54,60 @@ by equivalence between two password protected Wikibase instances.
 
 In the case of frequently used classes and with all properties, creation by equivalence is recommended, particularly if you are not experienced with graph data modelling. Both `create_item()` and `create_property()` offer the optional choice to create an item (node) or a property (edge) by equivalence with a well-defined vocabulary, like CIDOC-CRM, or FOAF.
 
-The statements or claims are created with the `add_statement` function family.
+The statements or claims are created with the `add_statement()` function family.
 
 ## Create items
 
+There are two ways to create items:
+
+-  [x] You can download them from Wikidata and copy the contents to a new target Wikibase Instance
+-  [x] You create a new item from scratch and send it to the target Wikibase instance.
+
+```{r copy-wikibase-item, eval=FALSE}
+# This code will not run as expected if the instance at 
+# https://reprexbase.eu/jekyll/api.php already has an item labelled "Paris".
+# copy_wikidata_item() does not overwrite existing items, see explanations below
+# the code snippet.
+
+paris_item <- copy_wikidata_item(
+  qid_on_wikidata = "Q90", # check https://www.wikidata.org/wiki/Q90
+  qid_equivalence_property = NULL, # we will get back to this later
+  languages = c("en", "fr", "nl"), # select languages with 2-letter codes
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",  # Wikibase address
+  data_curator = person("Jane", "Doe"), # Your name should go in here !
+  log_path = tempdir(), # You can add a location where you save log file
+  csrf = my_csrf # your session credentials on the Wikibase instance
+)
+```
+You get a message with the default label (currently set for English):
+
+```{r, echo=FALSE}
+message("Default abel for Q90: Paris")
+```
+And if your credentials were validated on the Wikibase instance, and it does not have already an item with the label Paris, you get this message:
+
+```{r, echo=FALSE}
+message("Successfully created item Q9 (Paris)")
+```
+
+If, however, there is already such a node, then you will get an error message similar to the one below; in such a labelling conflict, the original item is not overwritten:
+
+```{r error-message, eval=FALSE}
+wikibase-validator-label-with-description-conflictParisen[[Item:Q9|Q9]]Item <a href="/jekyll/index.php?title=Item:Q9" title="Item:Q9">Q9</a> already has label "Paris" associated with language code en, using the same description text.
+```
+The `equivalence_property`, as you will see later, can help you connect your new node toa  node on Wikidata, which later allows federation, and of course, data validation, or keeping your data refreshable. 
+
+If your Wikibase instance has defined a property where you can store this equivalence, say, `P35`="Equivalent item on Wikidata" then we can add to your newly created item this crucial information:
+
+-  `yourwikibase:Q9` [the new item for Paris] `yourwikibase:P35` (equals) `wikidata:Q90`
+
+Next, we show you how to create an item (a node in your graph), if you do not find, or do not want to use an item from Wikidata.
+
 ```{r create-item, eval=FALSE}
+# This code will not run as expected if the instance at 
+# https://reprexbase.eu/jekyll/api.php already has an item labelled 
+# "biological object", because create_item() does not overwrite existing items.
+
 e20 <- create_item(
   label = "biological object",
   description = "This class comprises individual items of a material nature, which live, have lived or are natural products of or from living organisms.",
@@ -73,19 +122,23 @@ e20 <- create_item(
 You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
 it is saved in `e20`. If the action was successul, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
 
-```{r copy-wikibase-item, eval=FALSE}
-# Not tested yet
-```
-
-
 ## Create properties
 
-Create the property by equivalence:
+Properties connect new information to your items (nodes.) Such properties need to be copied or defined:
 
-```{r copyproperty, eval=FALSE}
+-  [x] You can download them from Wikidata and copy the contents to a new target Wikibase Instance
+-  [x] You create a new item from scratch and send it to the target Wikibase instance.
+
+
+```{r copy-property, eval=FALSE}
+# This code will not run as expected if the instance at 
+# https://reprexbase.eu/jekyll/api.php already has an property that is 
+# equivalent to https://www.wikidata.org/wiki/Property:P21, because
+# copy_wikidata_property() does not overwrite existing properties.
+
 p21 <- copy_wikidata_property(
   pid_on_wikidata = "P21",
-  pid_equivalence_property = "P2",
+  pid_equivalence_property = "P2", # You need to change this to your numbering
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   csrf = your_csrf
@@ -93,11 +146,15 @@ p21 <- copy_wikidata_property(
 ```
 You have copied the property, identified by PID=21 on Wikidata. In your system, it received the value stored in `p21$id_on_target`. This information is messaged on the screen, returned to your environment (you saved it in this case to the data.frame `p21`), and it can be found in your log_file directory, too, as a .csv file.
 
-
-Create it manually, be defining a new property that will allow you to create later a property on equivalence with *Records in Context*:
+Alternatively, just like with items, you can create a property manually. Still remember the `equivalence_property` that keeps your items aligned with Wikidata? Such equivalence can be defined with Wikidata, but also with any well defined conceptual model. This is how you define such an equivalence property with the *Records in Context* conceptual model and ontology:
 
 
 ```{r create-property, eval=FALSE}
+# This code will not run as expected if the instance at 
+# https://reprexbase.eu/jekyll/api.php already has an property labelled 
+# "RiC equivalent property", because create_property() does not overwrite 
+# existing properties.
+
 ric_equivalence_pid <- create_property(
   label = "RiC equivalent property",
   description = "The equivalent property in Records in Context, an ontology used in archives.",
@@ -117,8 +174,12 @@ You will get a message on the screen, and a logfile that records the newly creat
 it is saved in `ric_equivalence_pid`.
 
 ```{r create-propery2, eval=FALSE}
+# This code will not run as expected if the instance at 
+# https://reprexbase.eu/jekyll/api.php already has a property labelled 
+# "has current or former member (is current or former member of)".
+
 p107 <- create_property(
-  label = "has current or former member (is current or former member of) ",
+  label = "has current or former member (is current or former member of)",
   description = "This property relates an E39 Actor to the E74 Group of which that E39 Actor is a member.",
   language = "en",
   equivalence_property = "P37", # a property connecting your PIDs to CIDOC

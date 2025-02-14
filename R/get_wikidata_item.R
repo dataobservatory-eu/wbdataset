@@ -1,70 +1,100 @@
 #' @title Get item definitions
-#' @description Get item definitions by QID from a Wikibase instance or Wikidata.
-#' @param qid A single QID or a vector of QIDs on a Wikibase instance (or Wikidata itself.)
-#' @param prefix The prefix to use before the QID, for example, defaults to
-#' \code{"http://www.wikidata.org/entity/"}.
+#' @description Get item definitions by qid_on_wikidata from a Wikibase instance or
+#'   Wikidata.
+#' @param qid_on_wikidata A single qid_on_wikidata or a vector of qid_on_wikidatas on a Wikibase instance (or
+#'   Wikidata itself.)
+#' @param prefix The prefix to use before the qid_on_wikidata, for example, defaults to
+#'   \code{"http://www.wikidata.org/entity/"}.
 #' @param language A character vector of language codes, for example,
-#' \code{c("en", "nl", "hu")}.
-#' @param wikibase_api_url Defaults to \code{"https://www.wikidata.org/w/api.php"}.
-#' @param creator The creator (author) of the dataset.
+#'   \code{c("en", "nl", "hu")}.
+#' @param wikibase_api_url Defaults to
+#'   \code{"https://www.wikidata.org/w/api.php"}.
+#' @param data_curator The name of the data curator who runs the function and
+#' creates the log file, created with \link[utils]{person}.
 #' @param title The title of the dataset.
 #' @importFrom dplyr left_join mutate relocate everything
 #' @importFrom httr POST content
 #' @importFrom utils person
 #' @importFrom dataset dataset_df defined dublincore
-#' @return A dataset with the QIDs, labels, description, and the language codes
-#' of the labels and descriptions.
-#' @export
+#' @return A dataset with the qid_on_wikidatas, labels, description, and the language codes
+#'   of the labels and descriptions.
 #' @examples
-#' get_item("Q42", language = c("en", "nl"))
-#'
-get_item <- function(qid,
-                     language,
-                     prefix = "http://www.wikidata.org/entity/",
-                     wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                     creator = person("Jane", "Doe"),
-                     title = "Dataset title") {
-  qid <- gsub(prefix, "", as.character(qid))
+#' get_wikidata_item("Q42", language = c("en", "nl"))
+#' @export
 
-  if (!all(is_qid(qid))) {
-    stop("The QIDs do not appear to look like QIDs.")
+get_wikidata_item <- function(
+    qid_on_wikidata,
+    language,
+    prefix = "http://www.wikidata.org/entity/",
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    data_curator = NULL,
+    title = "Dataset title") {
+
+  # Credit the person who curates the data
+  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+
+  assertthat::assert_that(
+    inherits(data_curator, "person"),
+    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+
+  qid_on_wikidata <- gsub(prefix, "", as.character(qid_on_wikidata))
+
+  if (!all(is_qid(qid_on_wikidata))) {
+    stop("Some of elements of the the qid_on_wikidata do not appear to look like QIDs.")
   }
 
-  if (length(qid) > 1) {
-    for (i in seq_along(qid)) {
+  if (length(qid_on_wikidata) > 1) {
+    # If there are more QIDs, then query them in a loop ....
+    for (i in seq_along(qid_on_wikidata)) {
       if (i == 1) {
-        return_df <- get_singe_item(qid = qid[i], language = language, wikibase_api_url = wikibase_api_url)
+        # Initialise the return_df
+        return_df <- get_singe_item(qid_on_wikidata = qid_on_wikidata[i],
+                                    language = language,
+                                    wikibase_api_url = wikibase_api_url)
       } else {
-        tmp <- get_singe_item(qid = qid[i], language = language, wikibase_api_url = wikibase_api_url)
+        tmp <- get_singe_item(qid_on_wikidata = qid_on_wikidata[i],
+                              language = language,
+                              wikibase_api_url = wikibase_api_url)
         return_df <- rbind(return_df, tmp)
       }
     }
   } else {
-    return_df <- get_singe_item(qid = qid, language = language, wikibase_api_url = wikibase_api_url)
+    # No loop is needed if there is only a single item that needs to be
+    # fetched by QID.
+    return_df <- get_singe_item(
+      qid_on_wikidata = qid_on_wikidata,
+      language = language,
+      wikibase_api_url = wikibase_api_url)
   }
 
   return_ds <- dataset_df(
-    qid = defined(return_df$qid, label = paste0("QID on ", wikibase_api_url), namespace = wikibase_api_url),
+    qid_on_wikidata = defined(
+      return_df$qid_on_wikidata,
+      label = paste0("qid_on_wikidata on ", wikibase_api_url),
+      namespace = wikibase_api_url),
     label = defined(return_df$label, label = "Label of item"),
     description = defined(return_df$description, label = "Description of item"),
     language = defined(return_df$language, label = "Language of label and description"),
-    dataset_bibentry = dublincore(title = title, creator = creator)
+    dataset_bibentry = dublincore(title = title,
+                                  creator = data_curator,
+                                  dataset_date = Sys.Date()
+                                  )
   )
 
-  wikibase_type <- c(qid = "QID")
+  wikibase_type <- c(qid_on_wikidata = "qid_on_wikidata")
   attr(return_ds, "wikibase_type") <- wikibase_type
   attr(return_ds, "class") <- c("wbdataset", attr(return_ds, "class"))
   return_ds
 }
 
 #' @keywords internal
-get_singe_item <- function(qid,
+get_singe_item <- function(qid_on_wikidata,
                            language = c("en", "nl", "hu"),
                            wikibase_api_url = "https://www.wikidata.org/w/api.php") {
   default_label <- ""
   claim_body <- list(
     action = "wbgetentities",
-    ids = qid,
+    ids = qid_on_wikidata,
     format = "json"
   )
 
@@ -77,12 +107,12 @@ get_singe_item <- function(qid,
   response <- httr::content(get_claim, as = "parsed", type = "application/json")
 
   if (!is_response_success(response)) {
-    message("Could not access ", qid)
+    message("Could not access ", qid_on_wikidata)
 
 
     return(
       dataset_df(
-        qid = defined(qid, label = "QID", namespace = wikibase_api_url),
+        qid_on_wikidata = defined(qid_on_wikidata, label = "qid_on_wikidata", namespace = wikibase_api_url),
         language = NA_character_,
         label = NA_character_,
         description = NA_character_
@@ -155,8 +185,8 @@ get_singe_item <- function(qid,
     description_df,
     by = "language"
   ) %>%
-    mutate(qid = qid) %>%
-    relocate(qid, .before = everything()) %>%
+    mutate(qid_on_wikidata = qid_on_wikidata) %>%
+    relocate(qid_on_wikidata, .before = everything()) %>%
     relocate(language, .after = everything())
 
   return_df

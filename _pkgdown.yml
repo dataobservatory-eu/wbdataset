@@ -37,7 +37,7 @@ reference:
     desc: >
       Work with DataSet objects that resemble the [W3C](https://www.w3.org/TR/vocab-data-cube/) and SDMX datacube model.
     contents:
-      - get_item
+      - get_wikidata_item
       - get_property_definition
       - get_claims
       - left_join_column

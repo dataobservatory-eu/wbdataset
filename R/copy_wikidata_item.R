@@ -1,16 +1,16 @@
-#' @title Copy a Wikibase item
+#' @title Copy a Wikidata item
 #' @description This code will copy a property label and description from
-#' Wikidata to a new instance. It should work between instances, but the
-#' authentication to copy from a password protected instance is not yet coded.
-#' The function is more specific than create_item, because this one creates
-#' items that exist in a similarly structured Wikibase instance, such as
-#' Wikidata.
+#'   Wikidata to a new instance. It should work between instances, but the
+#'   authentication to copy from a password protected instance is not yet coded.
+#'   The function is more specific than create_item, because this one creates
+#'   items that exist in a similarly structured Wikibase instance, such as
+#'   Wikidata.
 #' @details This function is slightly different from create_item. That function
 #'   creates a new item that may not have an equivalent item on another Wikibase
 #'   instance, but it may well have an equivalent item in another database. \cr
 #'   In this function, we use \code{qid_equivalence_property} for equivalence.
 #'   In the more general create function we use \code{equivalence_item}, because
-#'   we may use different identifiers. Similarly, the \code{qid_on_source}
+#'   we may use different identifiers. Similarly, the \code{qid_on_wikidata}
 #'   replaces the more general \code{equivalence_id}, because we must use QID
 #'   for identification in an other Wikibase instance.
 #' @param qid_on_wikidata The QID of the item to be copied to your Wikibase.
@@ -20,14 +20,19 @@
 #'   "et")}.
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param data_curator The name of the data curator who runs the function and
+#' creates the log file, created with \link[utils]{person}.
+#' @param log_path A path to save the log file. Defaults to the return value of
+#'   \code{\link{tempdir()}}.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
-#' @examples
-#' Currently returns a data.frame, this should be a dataset.
-#' The columns are:
+#' @importFrom assertthat assert_that
+#' @importFrom utils person
+#' @return Returns a dataset_df object. The columns are:
 #' \itemize{
-#'  \item{"action"}{ create_property}
-#'  \item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
+#'  \item{"rowid"}{ A row identifier. }
+#'  \item{"action"}{ The create_item() function name. }
+#'  \item{"id_on_target"}{ The new item identifier (QID) on the targeted Wikibase.}
 #'  \item{"label"}{ The propery label}
 #'  \item{"description"}{ The description label}
 #'  \item{"language"}{ The language code of the label.}
@@ -43,20 +48,31 @@
 #' @export
 
 copy_wikidata_item <- function(
-    qid_on_source = "Q4",
-    qid_equivalence_property = "P377",
-    languages = c("en", "nl", "de", "ru", "hu", "lv", "sk", "et", "fr", "es", "pt", "lt"),
-    wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
+    qid_on_wikidata = "Q4",
+    qid_equivalence_property = "P35",
+    languages = c("en", "nl", "hu" ),
+    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    data_curator = NULL,
+    log_path = tempdir(),
     csrf) {
 
+  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+
+  assertthat::assert_that(
+    inherits(data_curator, "person"),
+    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+
+  if (is.null(qid_equivalence_property)) qid_equivalence_property <- NA_character_
+
+  action_time <- Sys.time()
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv")
 
   # Assert that qid_on_wikidata looks like a QID
   qid_on_wikidata <- as.character(qid_on_wikidata)
-  assertthat::assert_that(is_qid(qid_on_source),
-    msg = "qid_on_source must start with Q followed by digits."
+  assertthat::assert_that(is_qid(qid_on_wikidata),
+    msg = "qid_on_wikidata must start with Q followed by digits."
   )
 
   claim_body <- list(
@@ -76,7 +92,8 @@ copy_wikidata_item <- function(
   )
 
   if (!is.null(get_claim$error)) {
-    # no error
+    # Some error
+    message(get_claim$error)
   } else {
     response <- httr::content(get_claim$result,
       as = "parsed", type = "application/json"
@@ -84,15 +101,49 @@ copy_wikidata_item <- function(
   }
 
   if (!is_response_success(response)) {
+    # Exception: retrieval of the item was not successful, even though we did not
+    # get an explicit error before.
+
     message("Could not access ", qid_on_wikidata)
-    message(response$error$messages[[1]])
-    return(data.frame(
-      default_label = default_label,
-      qid_on_wikidata = qid_on_wikidata,
-      pid_on_wikibase = NA_character_,
-      success = FALSE
-    ))
+
+    error_comments <- paste(
+      unlist(
+        lapply(response$error$messages, function(x) x$name)
+      ),
+      collapse = "|"
+    )
+
+    message(error_comments)
+
+    return_dataframe <- data.frame(
+      action = "copy_item",
+      id_on_target = NA_character_,
+      label = "<not retrieved>",
+      description = "<not retrieved>",
+      language = "<not retrieved>",
+      datatype = "<not retrieved>",
+      wikibase_api_url = wikibase_api_url,
+      equivalence_property = qid_equivalence_property,
+      equivalence_id = qid_on_wikidata,
+      success = FALSE,
+      comment = error_comments,
+      time = action_timestamp,
+      logfile = log_file_name
+    )
+
+    write.csv(return_dataframe,
+              file = file.path(log_path, log_file_name),
+              row.names = FALSE,
+              na = "NA",
+              fileEncoding = "UTF-8"
+    )
+
+    return(return_dataframe)
   }
+
+  # We must determine which labels, descriptions, aliases actually exists
+  # If the user wants to copy non-existing descriptions, we will replace them
+  # with an empty string.
 
   labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
   labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
@@ -104,6 +155,8 @@ copy_wikidata_item <- function(
   aliases_missing <- languages[which(!languages %in% names(response$entities[[1]]$aliases))]
   labels_missing
 
+  ## Set a default later, this is now hard coded to English but could be a parameter.
+
   if ("en" %in% names(response$entities[[1]]$labels)) {
     default_label <- response$entities[[1]]$labels$en$value
   } else {
@@ -112,6 +165,9 @@ copy_wikidata_item <- function(
 
   message("Default label for ", qid_on_wikidata, ": ", default_label)
   labels_missing_list <- list()
+
+  # The missing labels (i.e., translations that are missing for a label)
+  # are replaced with the missing label, so we always have a label.
 
   for  (l in labels_missing) {
     labels_missing_list <- c(labels_missing_list, tmp = list(list(
@@ -123,7 +179,11 @@ copy_wikidata_item <- function(
 
   labels_list <- c(response$entities[[1]]$labels[labels_present], labels_missing_list)
 
+  # The missing description  (i.e., translations that are missing for a descriptions)
+  # are replaced with an empty string.
+
   descriptions_missing_list <- list()
+
   for  (d in descriptions_missing) {
     descriptions_missing_list <- c(descriptions_missing_list,
       tmp = list(list(language = d, value = ""))
@@ -133,6 +193,10 @@ copy_wikidata_item <- function(
 
   descriptions_list <- c(response$entities[[1]]$descriptions[descriptions_present], descriptions_missing_list)
 
+  datastring <- item_identity_datastring_create(
+    labels_list = labels_list,
+    descriptions_list = descriptions_list
+  )
 
   datastring <- jsonlite::toJSON(
     list(
@@ -143,13 +207,25 @@ copy_wikidata_item <- function(
     auto_unbox = T
   )
 
-  csrf_token <- get_csrf_token(csrf = csrf)
+  ## Getting the user's CSRF token for writing.
+  ## See get_csrf, get_csrf_token.
+  csrf_token <- get_csrf_token(csrf)
 
+  assertthat::assert_that(!is.null(csrf_token),
+                          msg = "You do not have a CSRF token; perhaps your session has expired.
+    Try get_csrf() with your credentials."
+  )
+
+  assertthat::assert_that(nchar(csrf_token) == 42,
+                          msg = "Your CSRF token should have 42 characters."
+  )
+
+  # Posting the new item  ---------------------------------------------------
   new_item <- httr::POST(
     wikibase_api_url,
     body = list(
       action = "wbeditentity",
-      new    = "property",
+      new    = "item",
       data   = datastring,
       token  = csrf_token,
       format = "json"
@@ -158,15 +234,26 @@ copy_wikidata_item <- function(
     handle = csrf
   )
 
-  created_item_response <- httr::content(new_item, as = "parsed", type = "application/json")
+  # See if the created POST via wbeditentity was successful
+  created_item_response <- httr::content(
+    new_item, as = "parsed", type = "application/json")
 
+  # Creating the log file and the returned log data.frame ----------------------
 
-  if (is_response_success(created_item_response)) {
+  successful_post <- is_response_success(created_item_response)
+
+  if ( successful_post ) {
+    # Successfully created the item, try to add the equivalence statement
+    # before returning log data.
+
     message("Successfully created item ",
             created_item_response$entity$id, " (",
             created_item_response$entity$labels$en$value, ")")
 
-    if (is_qid(qid_equivalence_property)) {
+    if (is_pid(qid_equivalence_property)) {
+      # If there is a meaningful equivalence property
+      # add the equivalence statement to the target Wikibase instance.
+
       wikidata_qid_df <- add_id_statement(
         qid = created_item_response$entity$id,
         pid = qid_equivalence_property,
@@ -176,34 +263,184 @@ copy_wikidata_item <- function(
       )
     }
 
-    data.frame(
-      default_label = default_label,
-      qid_on_wikidata = qid_on_wikidata,
-      pid_on_wikibase = created_item_response$entity$id,
-      success = TRUE
+    # Unwrap the newly created label from the response for checking...
+    created_item_label <- created_item_response$entity$labels[1]
+    # ... and the description, too.
+    created_item_description <- created_item_response$entity$descriptions[1]
+
+    return_dataframe <- data.frame(
+      action = "copy_item",
+      id_on_target = created_item_response$entity$id,
+      label = created_item_label[[1]]$value,
+      description = created_item_description[[1]]$value,
+      language = created_item_label[[1]]$language,
+      datatype = "item",
+      wikibase_api_url = wikibase_api_url,
+      equivalence_property = qid_equivalence_property,
+      equivalence_id = qid_on_wikidata,
+      success = TRUE,
+      comment = "",
+      time = action_timestamp,
+      logfile = log_file_name
     )
+
+    write.csv(return_dataframe,
+              file = file.path(log_path, log_file_name),
+              row.names = FALSE,
+              na = "NA",
+              fileEncoding = "UTF-8"
+    )
+
   } else if (
-    "wikibase-validator-label-conflict" %in% unlist(created_item_response$error$messages)
+    # Case when we have clear message about a label conflict
+    any(c(
+      ("wikibase-validator-label-conflict"  %in% unlist(created_item_response$error$messages) ),
+      ("wikibase-validator-label-with-description-conflict" %in% unlist(created_item_response$error$messages) )
+    ))
     ) {
+
+    # Unwrap error message and send it to terminal
     message_strings <- unlist(created_item_response$error$messages)
     message(message_strings)
-    message_strings <- message_strings[which(grepl("Property:", message_strings))]
-    pattern <- "\\[\\[Property:*(.*?)\\|"
-    result <- regmatches(message_strings, regexec(pattern, message_strings))
-    old_pid <- result[[1]][2]
-    data.frame(
-      default_label = default_label,
-      qid_on_wikidata = qid_on_wikidata,
-      pid_on_wikibase = old_pid,
-      success = FALSE
+
+    # Get the old, conflicting QID out of the error message
+    message_strings <- message_strings[which(grepl("Item:", message_strings))]
+    pattern <- "\\[\\[Item:*(.*?)\\|"
+    regmatchresult <- regmatches(message_strings, regexec(pattern, message_strings))
+    old_qid <- regmatchresult[[1]][2]
+
+    # Unwrap the error messages
+    error_messages <- lapply(
+      created_item_response$error$messages,
+      function(x) unlist(x$parameters)
     )
+
+    # Try to find the English error message
+    error_languages <- unlist(
+      lapply(error_messages, function(x) ifelse(length(x) >= 2, x[2], NA_character_))
+    )
+
+    # Defaults for return data
+    existing_label <- "<not retrieved>"
+    existing_description <- "<not retrieved>"
+    language <- "<not retrieved>"
+
+    if ( # we have English-language error message
+      any(error_languages == "en")
+    ) {
+      # The error message contains the already existing (conflicting) label
+      existing_label <- error_messages[[which(error_languages == "en")]][1]
+      language <- "en"
+    } else if (any(!is.na(error_languages))) {
+      # The error message contains the already existing (conflicting) label
+      # but not in English, select the first language that is available,
+      # if there are any messages that can be read in a human language.
+      nr_language <- which(!is.na(error_languages))[1]
+      existing_label <- error_messages[[nr_language]][1]
+      language <- error_messages[[nr_language]][2]
+    }
+
+    return_dataframe <- data.frame(
+      action = "copy_item",
+      id_on_target = old_qid,
+      label = existing_label,
+      description = existing_description,
+      language = language,
+      datatype = "<not retrieved>",
+      wikibase_api_url = wikibase_api_url,
+      equivalence_property = qid_equivalence_property,
+      equivalence_id = qid_on_wikidata,
+      success = FALSE,
+      comment = "Wikibase validator label conflict: label-language pair already exists.",
+      time = action_timestamp,
+      logfile = log_file_name
+    )
+
+    write.csv(return_dataframe,
+              file = file.path(log_path, log_file_name),
+              row.names = FALSE,
+              na = "NA",
+              fileEncoding = "UTF-8"
+    )
+
   } else {
-    message(created_item_response$error)
-    data.frame(
-      default_label = default_label,
-      qid_on_wikidata = qid_on_wikidata,
-      pid_on_wikibase = NA_character_,
-      success = FALSE
+    # Return an emptier data.frame if there was some error
+
+    # Print out the error message verbatim to terminal
+    message(created_property_response$error)
+
+    # Wrap the main error types into the logfile and return data
+    error_comments <- paste(
+      unlist(
+        lapply(created_property_response$error$messages, function(x) x$name)
+      ),
+      collapse = "|"
+    )
+
+    return_dataframe <- data.frame(
+      action = "copy_item",
+      id_on_target = NA_character_,
+      label = "<not retrieved>",
+      description = "<not retrieved>",
+      language = "<not retrieved>",
+      datatype = "<not retrieved>",
+      wikibase_api_url = wikibase_api_url,
+      equivalence_property = qid_equivalence_property,
+      equivalence_id = qid_on_wikidata,
+      success = FALSE,
+      comment = error_comments,
+      time = action_timestamp,
+      logfile = log_file_name
+    )
+
+    # Save the log file
+    write.csv(return_dataframe,
+              file = file.path(log_path, log_file_name),
+              row.names = FALSE,
+              na = "NA",
+              fileEncoding = "UTF-8"
     )
   }
+
+
+  description <- paste0(
+    "Attempted and successful copying from Wikidata to ",
+    wikibase_api_url, " with wbdataset:copy_item() at ",
+    substr(as.character(action_time), 1, 19)
+  )
+
+  return_ds <- dataset_df(
+    action = return_dataframe$action,
+    id_on_target = defined(
+      return_dataframe$id_on_target,
+      label = paste0("QID on ", wikibase_api_url),
+      namespace = wikibase_api_url),
+    label = defined(
+      return_dataframe$label, label = "Label of item"),
+    description = defined(
+      return_dataframe$description, label = "Description of item"),
+    language = defined(
+      return_dataframe$language, label = "Language of label and description"),
+    datatype = return_dataframe$datatype,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = defined(
+      return_dataframe$equivalence_property ,
+      label = paste0("Equivalence property on  ", wikibase_api_url),
+      namespace = wikibase_api_url),
+    equivalence_id = defined(
+      return_dataframe$equivalence_id ,
+      label = "Equivalent QID on Wikidata",
+      namespace = "https://www.wikidata.org/wiki/"),
+    success = return_dataframe$success,
+    comment = return_dataframe$comment,
+    time = return_dataframe$time,
+    logfile = return_dataframe$logfile,
+    dataset_bibentry = dublincore(
+      title = "Wikibase Copy Item Log",
+      description = description,
+      creator = data_curator,
+      dataset_date = Sys.Date())
+  )
+
+  return_ds
 }
