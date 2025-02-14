@@ -85,7 +85,7 @@ create_property <- function(label,
 
 
   # Save the time of running the code
-  action_time <- action_timestamp_create()
+  action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_create_property_", action_timestamp, ".csv")
 
   if ( !is.na(equivalence_id) ) {
