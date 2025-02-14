@@ -2,30 +2,57 @@
 % Please edit documentation in R/copy_wikidata_item.R
 \name{copy_wikidata_item}
 \alias{copy_wikidata_item}
-\title{Copy a Wikibase item}
+\title{Copy a Wikidata item}
 \usage{
 copy_wikidata_item(
-  qid_on_source = "Q4",
-  qid_equivalence_property = "P377",
-  languages = c("en", "nl", "de", "ru", "hu", "lv", "sk", "et", "fr", "es", "pt", "lt"),
-  wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
+  qid_on_wikidata = "Q4",
+  qid_equivalence_property = "P35",
+  languages = c("en", "nl", "hu"),
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  data_curator = NULL,
+  log_path = tempdir(),
   csrf
 )
 }
 \arguments{
+\item{qid_on_wikidata}{The QID of the item to be copied to your Wikibase.}
+
 \item{qid_equivalence_property}{The QID in Wikibase that records the
 equivalent Wikidata QID as an external ID.}
 
 \item{wikibase_api_url}{For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}.}
 
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.}
+
+\item{log_path}{A path to save the log file. Defaults to the return value of
+\code{\link{tempdir()}}.}
+
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 
-\item{qid_on_wikidata}{The QID of the item to be copied to your Wikibase.}
-
 \item{language}{A vector of languages codes, for example, \code{c("en",
 "et")}.}
+}
+\value{
+Returns a dataset_df object. The columns are:
+\itemize{
+\item{"rowid"}{ A row identifier. }
+\item{"action"}{ The create_item() function name. }
+\item{"id_on_target"}{ The new item identifier (QID) on the targeted Wikibase.}
+\item{"label"}{ The propery label}
+\item{"description"}{ The description label}
+\item{"language"}{ The language code of the label.}
+\item{"datatype"}{ The datatype of the property, for example, \code{string}}
+\item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
+\item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
+\item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+\item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
+\item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
+\item{"time"}{ The time when the action started.}
+\item{"logfile"}{ The name of the CSV logfile.}
+}
 }
 \description{
 This code will copy a property label and description from
@@ -41,26 +68,7 @@ creates a new item that may not have an equivalent item on another Wikibase
 instance, but it may well have an equivalent item in another database. \cr
 In this function, we use \code{qid_equivalence_property} for equivalence.
 In the more general create function we use \code{equivalence_item}, because
-we may use different identifiers. Similarly, the \code{qid_on_source}
+we may use different identifiers. Similarly, the \code{qid_on_wikidata}
 replaces the more general \code{equivalence_id}, because we must use QID
 for identification in an other Wikibase instance.
-}
-\examples{
-Currently returns a data.frame, this should be a dataset.
-The columns are:
-\itemize{
- \item{"action"}{ create_property}
- \item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
- \item{"label"}{ The propery label}
- \item{"description"}{ The description label}
- \item{"language"}{ The language code of the label.}
- \item{"datatype"}{ The datatype of the property, for example, `string`}
- \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
- \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
- \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
- \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
- \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
- \item{"time"}{ The time when the action started.}
- \item{"logfile"}{ The name of the CSV logfile.}
-}
 }

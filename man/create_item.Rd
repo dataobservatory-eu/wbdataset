@@ -11,6 +11,7 @@ create_item(
   equivalence_property = NA_character_,
   equivalence_id = NA_character_,
   wikibase_api_url,
+  data_curator = NULL,
   log_path = tempdir(),
   csrf
 )
@@ -34,6 +35,9 @@ claimed.}
 
 \item{wikibase_api_url}{For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}.}
+
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.}
 
 \item{log_path}{A path to save the log file. Defaults to the return value of
 \code{\link{tempdir()}}.}

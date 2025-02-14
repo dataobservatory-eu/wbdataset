@@ -3,26 +3,53 @@
 \name{get_csrf}
 \alias{get_csrf}
 \alias{get_csrf_token}
-\title{Get CSRF}
+\title{Get CSRF object with security token}
 \usage{
 get_csrf(username, password, wikibase_api_url)
 
 get_csrf_token(csrf)
 }
 \arguments{
-\item{username}{Your bot username.}
+\item{username}{Your bot username on the Wikibase instance at
+\code{wikibase_api_url}.}
 
-\item{password}{Your bot password}
+\item{password}{Your bot password on the Wikibase instance at
+\code{wikibase_api_url}.}
 
 \item{wikibase_api_url}{The API URL for the Wikibase instance.}
 
 \item{csrf}{The csrf object returned by \code{\link{get_csrf}}.}
 }
 \value{
-A list, the CSRF response
+\code{\link{get_csrf}} returns a list that contains the CSRF token
+among other data.
 
-The CSRF response token.
+\code{\link{get_csrf_token}} returns a character string of length 1
+with the user's CSRF token from the list returned by \code{\link{get_csrf}}.
 }
 \description{
-Get a Cross-Site Request Forgery (CSRF) response
+Get a Cross-Site Request Forgery (CSRF) object containing your
+CSRF token.
+}
+\details{
+CSRF is a way for a malicious website to exploit your logged-in
+session on another website to perform actions as you without your consent.
+The MediaWiki API (the API of Wikibase instances) employs CSRF tokens (also
+often called "edit tokens" in the MediaWiki context) as a crucial defense
+mechanism against Cross-Site Request Forgery attacks.\cr \cr To receive
+such a CSRF security token (connected to your current editing session on a
+Wikibase instance) you have to run first \code{\link{get_csrf}} to
+establish your session and your credentials. As a result, you will receive
+a \code{csrf} object which contains among other data, your CSRF token. Then, now
+running the \code{\link{get_csrf_token}} function will unwrap from returned
+\code{csrf} object the token itself, which is often, but not necessarily, a
+character string of length 42.\cr \cr The MediaWiki API's CSRF tokens are
+not designed to be long-lived.  Their lifespan is intentionally kept short,
+typically tied to the user's current editing session or a reasonable
+timeframe for a single action.  This is a crucial security measure.
+
+CSRF tokens act like a secret handshake between the your R script
+and the MediaWiki server. Only requests that have the correct "handshake"
+(the matching token) are considered legitimate. They are returned by
+\code{\link{get_csrf}}.
 }

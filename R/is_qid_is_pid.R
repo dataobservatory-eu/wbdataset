@@ -34,6 +34,7 @@ is_pid <- function(x) {
   return_value <- ifelse(substr(x, 1, 1) != "p", FALSE, return_value)
   return_value <- ifelse(!grepl("[[:digit:]]", substr(x, 2, nchar(x))), FALSE, return_value)
   return_value <- ifelse(nchar(x) < 2, FALSE, return_value)
+
   return_value
 }
 
@@ -72,5 +73,6 @@ is_qid <- function(x) {
   return_value <- ifelse(substr(x, 1, 1) != "q", FALSE, return_value)
   return_value <- ifelse(!grepl("[[:digit:]]", substr(x, 2, nchar(x))), FALSE, return_value)
   return_value <- ifelse(nchar(x) < 2, FALSE, return_value)
+
   return_value
 }

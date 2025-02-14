@@ -17,24 +17,25 @@ left_join_column(
 )
 }
 \arguments{
-\item{ds}{A dataset object that contains the observations (QIDs)}
+\item{ds}{A dataset object that contains the observations (by QIDs).}
 
 \item{property}{The property}
 
 \item{label}{A short, human-readable description of the vector or \code{NULL}.}
 
-\item{unit}{A character string of length one containing the
-unit of measure or \code{NULL}.}
+\item{unit}{A character string of length one containing the unit of measure
+or \code{NULL}.}
 
-\item{definition}{A character string of length one containing a
-linked definition or \code{NULL}.}
+\item{definition}{A character string of length one containing a linked
+definition or \code{NULL}.}
 
-\item{namespace}{A namespace for individual observations or categories or \code{NULL}.}
+\item{namespace}{A namespace for individual observations or categories or
+\code{NULL}.}
 
 \item{wikibase_api_url}{The URL of the Wikibase API.}
 
-\item{silent}{If the function should send messages about individual requests to
-the API or not. Defaults to \code{FALSE}.}
+\item{silent}{If the function should send messages about individual requests
+to the API or not. Defaults to \code{FALSE}.}
 
 \item{csrf}{A}
 }

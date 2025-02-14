@@ -42,19 +42,34 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(wbdataset)
-get_item(
+small_countries_dataset <- get_wikidata_item(
   qid = c("Q228", "Q347"),
   language = c("en", "nl"),
-  creator = person("Jane Doe"),
+  data_curator = person("Jane Doe"),
   title = "Small Countries"
 )
 #> Downloaded Q228
 #> Downloaded Q347
+
+small_countries_dataset
 #> Jane Doe (????). "Small Countries."
-#>   rowid      qid        label         description                       language
-#>   <hvn_lbl_> <hvn_lbl_> <hvn_lbl_>    <hvn_lbl_>                        <hvn_lb>
-#> 1 eg:1       Q228       Andorra       sovereign microstate between Fra… en      
-#> 2 eg:2       Q228       Andorra       land in Europa                    nl      
-#> 3 eg:3       Q347       Liechtenstein country in Central Europe         en      
-#> 4 eg:4       Q347       Liechtenstein land in Europa                    nl
+#>   rowid      qid_on_wikidata label         description                  language
+#>   <hvn_lbl_> <hvn_lbl_>      <hvn_lbl_>    <hvn_lbl_>                   <hvn_lb>
+#> 1 eg:1       Q228            Andorra       sovereign microstate betwee… en      
+#> 2 eg:2       Q228            Andorra       land in Europa               nl      
+#> 3 eg:3       Q347            Liechtenstein country in Central Europe    en      
+#> 4 eg:4       Q347            Liechtenstein land in Europa               nl
 ```
+
+The *wbdataset* package has three tutorial articles:
+
+- [Importing from Wikidata or
+  Wikibase](https://wbdataset.dataobservatory.eu/articles/wikidata-import.html)
+  shows you how to import data from Wikidata.
+- [Authenticated MediaWiki API
+  Access](https://wbdataset.dataobservatory.eu/articles/Wikibase_API.html)
+  shows how you log in to a Wikibase instance. If you use `wbdataset` to
+  retrieve information only from Wikidata, you do not need this.
+- \[Getting Started To Create a Graph on
+  Wikibase\]((<https://wbdataset.dataobservatory.eu/articles/start.html>)
+  shows how to add data to a Wikibase graph database.

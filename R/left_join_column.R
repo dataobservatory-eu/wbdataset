@@ -1,16 +1,16 @@
 #' @title Join a new column by property
-#' @description
-#' Get the claims (statements) related to an item.
-#' @param ds A dataset object that contains the observations (QIDs)
+#' @description Get the claims (statements) related to an item.
+#' @param ds A dataset object that contains the observations (by QIDs).
 #' @param property The property
 #' @param label A short, human-readable description of the vector or `NULL`.
-#' @param unit A character string of length one containing the
-#' unit of measure or `NULL`.
-#' @param definition A character string of length one containing a
-#' linked definition or `NULL`.
-#' @param namespace A namespace for individual observations or categories or `NULL`.
-#' @param silent If the function should send messages about individual requests to
-#' the API or not. Defaults to \code{FALSE}.
+#' @param unit A character string of length one containing the unit of measure
+#'   or `NULL`.
+#' @param definition A character string of length one containing a linked
+#'   definition or `NULL`.
+#' @param namespace A namespace for individual observations or categories or
+#'   `NULL`.
+#' @param silent If the function should send messages about individual requests
+#'   to the API or not. Defaults to \code{FALSE}.
 #' @param wikibase_api_url The URL of the Wikibase API.
 #' @param csrf A
 #' @importFrom dplyr left_join select
@@ -18,15 +18,19 @@
 #' @importFrom purrr safely
 #' @export
 
-left_join_column <- function(ds,
-                             property,
-                             label = NULL,
-                             unit = NULL,
-                             definition = NULL,
-                             namespace = NULL,
-                             wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                             silent = FALSE,
-                             csrf = NULL) {
+left_join_column <- function(
+    ds,
+    property,
+    label = NULL,
+    unit = NULL,
+    definition = NULL,
+    namespace = NULL,
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    silent = FALSE,
+    csrf = NULL) {
+
+  # Initialise a data.frame to return the data.
+
   new_column <- data.frame(
     qid = vector("character"),
     property = vector("character"),
@@ -72,15 +76,26 @@ left_join_column <- function(ds,
 
   return_df <- return_df[, which(!names(return_df) %in% "type")]
 
-  if (!all(c(is.null(label), is.null(unit), is.null(definition), is.null(namespace)))) {
-    return_df[, 2] <- defined(return_df[, 2], label = label, unit = unit, definition = definition, namespace = namespace)
+  if (!all(
+    c(is.null(label), is.null(unit), is.null(definition), is.null(namespace))
+    )) {
+    return_df[, 2] <- defined(return_df[, 2],
+                              label = label,
+                              unit = unit,
+                              definition = definition,
+                              namespace = namespace)
   }
 
-  new_column_ds <- as_dataset_df(df = return_df, reference = list(author = creator(ds), title = dataset_title(ds)))
+  new_column_ds <- as_dataset_df(df = return_df,
+                                 reference = list(author = creator(ds),
+                                                  title = dataset_title(ds))
+                                 )
   newcol_prov <- attributes(new_column_ds)
 
-  new_ds <- invisible(left_join(ds, new_column_ds, by = "qid"))
-
+  new_ds <- invisible(
+    left_join(ds, new_column_ds,
+              by = intersect(names(ds), names(new_column_ds)))
+    )
 
   attr(new_ds, "Provenance") <- list(
     started_at = original_prov$started_at,
@@ -91,6 +106,7 @@ left_join_column <- function(ds,
   new_property_definition <- c("property" = column_type)
   names(new_property_definition) <- property
 
-  attr(new_ds, "wikibase_type") <- c(attr(ds, "wikibase_type"), new_property_definition)
+  attr(new_ds, "wikibase_type") <- c(attr(ds, "wikibase_type"),
+                                     new_property_definition)
   new_ds
 }
