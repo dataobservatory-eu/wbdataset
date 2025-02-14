@@ -22,11 +22,27 @@ To receive such a CSRF security token (connected to your current editing session
 
 The MediaWiki API's CSRF tokens are not designed to be long-lived. Their lifespan is intentionally kept short, typically tied to the user's current editing session or a reasonable timeframe for a single action. This is a crucial security measure, and therefore you may need to log in several times while you are working with *wbdataset*.
 
-A convenient and elegant solution to keep your login credentials R is the use of the keyring package. At first time use, you set up your credentials with `key_set_with_value`.
+A convenient and elegant solution to keep your login credentials R is the use of the *keyring* package. 
+
+```{r requirekeyring}
+require(keyring)
+```
+
+If keyring is not installed in your computer, you can do it like this: 
+
+```{r install, eval=FALSE}
+install.packages("keyring")
+```
+
+To get started, read the keyring package [website](https://keyring.r-lib.org/).
+At first time use, you set up your credentials with `key_set_with_value`.
 
 ```{r setup}
 library(wbdataset)
 ```
+
+You can of course use different secure ways to authenticate yourself, what is important that you will have to regularly give your username and password to `get_csrf()`. You should this in a way that you absolutely not at risk of revealing your bot password on the internet. With such a password a malicious actor can destroy an entire open knowledge graph.
+
 ```{r keyring, eval=FALSE}
 library(keyring)
 key_set_with_value(service = "https://reprexbase.eu/demo/api.php", 

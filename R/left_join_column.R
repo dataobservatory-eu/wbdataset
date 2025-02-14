@@ -12,7 +12,8 @@
 #' @param silent If the function should send messages about individual requests
 #'   to the API or not. Defaults to \code{FALSE}.
 #' @param wikibase_api_url The URL of the Wikibase API.
-#' @param csrf A
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}.
 #' @importFrom dplyr left_join select
 #' @importFrom dataset dataset_df as_dataset_df defined creator dataset_title
 #' @importFrom purrr safely

@@ -37,7 +37,8 @@ definition or \code{NULL}.}
 \item{silent}{If the function should send messages about individual requests
 to the API or not. Defaults to \code{FALSE}.}
 
-\item{csrf}{A}
+\item{csrf}{The CSRF token of your session, received with
+\code{\link{get_csrf}}.}
 }
 \description{
 Get the claims (statements) related to an item.
