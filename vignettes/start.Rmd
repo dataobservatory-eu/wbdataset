@@ -90,6 +90,13 @@ And if your credentials were validated on the Wikibase instance, and it does not
 message("Successfully created item Q9 (Paris)")
 ```
 
+You can print out your results:
+
+```{r, print_paris, eval=FALSE}
+print(paris_item)
+```
+
+
 If, however, there is already such a node, then you will get an error message similar to the one below; in such a labelling conflict, the original item is not overwritten:
 
 ```{r error-message, eval=FALSE}
@@ -115,10 +122,17 @@ e20 <- create_item(
   equivalence_property = "P37", # The creation of this is in the next section
   equivalence_id = "E20",
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  data_curator = person("Joe", "Doe")  # replace with your name
   log_path = tempdir(),
   csrf = my_csrf
 )
 ```
+
+```{r, e20, eval=FALSE}
+# You can print this out with: 
+print(e_20)
+```
+
 You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
 it is saved in `e20`. If the action was successul, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
 
@@ -141,6 +155,7 @@ p21 <- copy_wikidata_property(
   pid_equivalence_property = "P2", # You need to change this to your numbering
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  data_curator = person("Jane", "Doe") # Replace it with your name
   csrf = my_csrf
 )
 ```
@@ -162,6 +177,9 @@ ric_equivalence_pid <- create_property(
   datatype = "external-id",
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   log_path = tempdir(),
+  data_curator = person(
+    given="Joe", family="Doe", middle = "M", 
+    email = "joe@example.com", role = "ctb")  # add your data here with person()
   csrf = my_csrf
 )
 ```
