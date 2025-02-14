@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 
 You get reading API access to Wikidata (GET) without a password. But if you want API access to a privately managed Wikibase instance, you need to get a "bot" username and password and authenticate your scripted session.
 
-CSRF is a way for a malicious website to exploit your logged-in session on another website to perform actions as you without your consent. The MediaWiki API (the API of Wikibase instances) employs CSRF tokens (also often called "edit tokens" in the MediaWiki context) as a crucial defence mechanism against Cross-Site Request Forgery attacks.
+## Security first
+
+CSRF is a way for a malicious website to exploit your logged-in session on another website to perform actions as you without your consent. The [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) (the API of Wikibase instances) employs CSRF tokens (also often called "edit tokens" in the MediaWiki context) as a crucial defence mechanism against Cross-Site Request Forgery attacks.
 
 To receive such a CSRF security token (connected to your current editing session on a Wikibase instance) you have to run first `get_csrf()` to establish your session and your credentials. As a result, you will receive a csrf object which contains among other data, your CSRF token. Then, now running the `get_csrf_token()` function will unwrap from returned csrf object the token itself, which is often, but not necessarily, a character string of length 42.
 
@@ -36,6 +38,8 @@ install.packages("keyring")
 
 To get started, read the keyring package [website](https://keyring.r-lib.org/).
 At first time use, you set up your credentials with `key_set_with_value`.
+
+## Use wbdataset on a Wikibase instance
 
 ```{r setup}
 library(wbdataset)
@@ -76,7 +80,7 @@ To interact with the Wikibase Instance, you will have to provide the API address
 
 Now you are ready to send API requests to the MediaWiki API.
 
-```{r, eval=FALSE}
+```{r getclaims, eval=FALSE}
 get_claims(
   qid = "Q528626",
   property = "P625",
