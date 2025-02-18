@@ -1,10 +1,10 @@
-#' @title Copy a Wikidata property
-#' @description This code will copy a property label and description from
-#' Wikidata to a new instance. It should work between instances, but the
-#' authentication to copy from a password protected instance is not yet coded.
-#' The function is more specific than \code{\link{create_property}}, because
-#' this one creates properties that exist in a similarly structured Wikibase
-#' instance, such as Wikidata.
+#' @title Copy a Wikidata property or properties
+#' @description This code will copy one or multiple property label(s) and
+#'   description(s) from Wikidata to a new instance. It should work between
+#'   instances, but the authentication to copy from a password protected
+#'   instance is not yet coded. The function is more specific than
+#'   \code{\link{create_property}}, because this one creates properties that
+#'   exist in a similarly structured Wikibase instance, such as Wikidata.
 #' @details This function is slightly different from
 #'   \code{\link{create_property}}. That function creates a new property that
 #'   may not have an equivalent property on another Wikibase instance, but it
@@ -15,8 +15,8 @@
 #'   replaces the more general \code{equivalence_id}, because we must use PID
 #'   for identification in an other Wikibase instance.
 #' @param pid_on_wikidata The PID of the property on Wikidata to be copied to
-#'   your Wikibase. (Only works with non-authenticated sources, this should be
-#'   changed.)
+#'   your Wikibase.It can be one or more valid PIDs. (Only works with
+#'   non-authenticated sources, this should be changed.)
 #' @param pid_equivalence_property The PID in Wikibase that records the
 #'   equivalent Wikidata PID as an external ID.
 #' @param language A vector of languages codes, for example, \code{c("en",
@@ -24,7 +24,7 @@
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param data_curator The name of the data curator who runs the function and
-#' creates the log file, created with \link[utils]{person}.
+#'   creates the log file, created with \link[utils]{person}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
 #' @param csrf The CSRF token of your session, received with
@@ -48,6 +48,7 @@
 #'  \item{"time"}{ The time when the action started.}
 #'  \item{"logfile"}{ The name of the CSV logfile.}
 #' }
+#'   The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
 
 copy_wikidata_property <- function(
@@ -55,19 +56,46 @@ copy_wikidata_property <- function(
     pid_equivalence_property = "P2",
     languages = c("en", "hu"),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    data_curator = NULL,
     log_path = tempdir(),
     csrf) {
 
-  # Credit the person who curates the data
+  # Assertions for correct inputs ------------------------------------------------
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+  if (is.null(log_path)) log_path <- tempdir()
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
     msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
 
+
+  if ( length(pid_on_wikidata) > 1) {
+    # Run this function in a loop if there are several PIDs to copy
+
+    return_log_file <- copy_wikidata_properties(
+      pid_on_wikidata = pid_on_wikidata ,
+      pid_equivalence_property = pid_equivalence_property,
+      languages = languages,
+      wikibase_api_url = wikibase_api_url,
+      data_curator = data_curator,
+      log_path = log_path,
+      csrf = csrf)
+
+    return_log_file$rowid <- defined(
+      return_log_file$id_on_target,
+      label = "Wikibase QID",
+      namespace = return_log_file$wikibase_api_url[1])
+
+    return(return_log_file)
+
+  }
+
+  # Timestamping ---------------------------------------------------------------------
+  action_time <- Sys.time()
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
-  log_file_name <- paste0("wbdataset_copy_wikibase_property_", action_timestamp, ".csv")
+  log_file_name <- paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv")
+
 
   # Assert that pid_on_wikidata makes sense
   pid_on_wikidata <- as.character(pid_on_wikidata)
@@ -392,6 +420,12 @@ copy_wikidata_property <- function(
     )
   }
 
+  description_text <- paste0(
+    "Attempted and successful copying from Wikidata to ",
+    wikibase_api_url, " with wbdataset:copy_wikidata_property() at ",
+    substr(as.character(action_time), 1, 19)
+  )
+
   # Return the results
   return_ds <- dataset_df(
     action = return_dataframe$action,
@@ -421,8 +455,36 @@ copy_wikidata_property <- function(
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
       title = "Wikibase Copy Property Log",
-      description = description,
+      description = description_text,
       creator = data_curator,
       dataset_date = Sys.Date())
   )
+}
+
+
+#' @rdname  copy_wikidata_item
+#' @keywords internal
+copy_wikidata_properties <- function(
+    pid_on_wikidata,
+    pid_equivalence_property,
+    languages,
+    wikibase_api_url,
+    data_curator,
+    log_path,
+    csrf) {
+
+  returned_list <- lapply(
+    pid_on_wikidata, function(x) {
+      copy_wikidata_property(
+        pid_on_wikidata = x,
+        pid_equivalence_property = pid_equivalence_property,
+        languages = languages,
+        wikibase_api_url = wikibase_api_url,
+        data_curator = data_curator,
+        log_path = log_path,
+        csrf = csrf)
+    }
+  )
+
+  do.call(rbind, returned_list)
 }

@@ -102,6 +102,7 @@ If, however, there is already such a node, then you will get an error message si
 ```{r error-message, eval=FALSE}
 wikibase-validator-label-with-description-conflictParisen[[Item:Q9|Q9]]Item <a href="/jekyll/index.php?title=Item:Q9" title="Item:Q9">Q9</a> already has label "Paris" associated with language code en, using the same description text.
 ```
+
 The `equivalence_property`, as you will see later, can help you connect your new node to a  node on Wikidata, which later allows federation, and of course, data validation, or keeping your data refreshable. 
 
 If your Wikibase instance has defined a property where you can store this equivalence, say, `P35`="Equivalent item on Wikidata" then we can add to your newly created item this crucial information:
@@ -136,6 +137,20 @@ print(e_20)
 You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
 it is saved in `e20`. If the action was successul, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
 
+```{r mass-item-copy, eval=FALSE}
+capital_cities <- copy_wikidata_property(
+    qid_on_wikidata = c("Q2807", "Q3114", "Q1490"),
+    qid_equivalence_property = "P35",  # use your Wikibase instance's number
+    languages = c("en", "nl", "hu", "es" ),
+    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    data_curator = person("Joe", "Doe"),
+    log_path = tempdir(),
+    csrf=my_csrf
+    )
+
+capital_cities
+```
+
 ## Create properties
 
 Properties connect new information to your items (nodes.) Such properties need to be copied or defined:
@@ -163,7 +178,6 @@ You have copied the property, identified by PID=21 on Wikidata. In your system, 
 
 Alternatively, just like with items, you can create a property manually. Still remember the `equivalence_property` that keeps your items aligned with Wikidata? Such equivalence can be defined with Wikidata, but also with any well defined conceptual model. This is how you define such an equivalence property with the *Records in Context* conceptual model and ontology:
 
-
 ```{r create-property, eval=FALSE}
 # This code will not run as expected if the instance at 
 # https://reprexbase.eu/jekyll/api.php already has an property labelled 
@@ -183,6 +197,7 @@ ric_equivalence_pid <- create_property(
   csrf = my_csrf
 )
 ```
+
 The `ric_equivalence_pid$id_on_target` saves the new property identifier in your system. The complete log can be found in your log_file directory, too, as a .csv file.
 
 ```{r, echo=FALSE}
@@ -210,5 +225,21 @@ p107 <- create_property(
 ```
 ```{r, echo=FALSE}
 message("Successfully created item P47 (has current or former member (is current or former member of))")
+```
+
+You can copy many properties at once, too, but only with the same language, curator, wikibase_api_url parameters:
+
+```{r mass-property-copy, eval=FALSE}
+spotify_id_properties <- copy_wikidata_property(
+    pid_on_wikidata = c("P2207", "P2205", "P8704"),
+    pid_equivalence_property = "P2", # use the P number on your Wikibase instance
+    languages = c("en", "nl", "hu" ),
+    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    data_curator = person("Jane", "Doe"),
+    log_path = tempdir(),
+    csrf=my_csrf
+    )
+
+spotify_id_properties
 ```
 
