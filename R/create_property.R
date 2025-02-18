@@ -175,7 +175,7 @@ create_property <- function(label,
       equivalence_id = equivalence_id,
       success = TRUE,
       comment = NA_character_,
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
@@ -213,7 +213,7 @@ create_property <- function(label,
       equivalence_id = equivalence_id,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 
@@ -243,7 +243,7 @@ create_property <- function(label,
       equivalence_id = equivalence_id,
       success = FALSE,
       comment = error_comments,
-      time = action_time,
+      time = action_timestamp,
       logfile = log_file_name
     )
 

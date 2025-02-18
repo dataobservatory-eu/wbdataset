@@ -2,27 +2,31 @@
 % Please edit documentation in R/copy_wikidata_property.R
 \name{copy_wikidata_property}
 \alias{copy_wikidata_property}
-\title{Copy a Wikidata property}
+\title{Copy a Wikidata property or properties}
 \usage{
 copy_wikidata_property(
   pid_on_wikidata,
   pid_equivalence_property = "P2",
   languages = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  data_curator = NULL,
   log_path = tempdir(),
   csrf
 )
 }
 \arguments{
 \item{pid_on_wikidata}{The PID of the property on Wikidata to be copied to
-your Wikibase. (Only works with non-authenticated sources, this should be
-changed.)}
+your Wikibase.It can be one or more valid PIDs. (Only works with
+non-authenticated sources, this should be changed.)}
 
 \item{pid_equivalence_property}{The PID in Wikibase that records the
 equivalent Wikidata PID as an external ID.}
 
 \item{wikibase_api_url}{For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}.}
+
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.}
 
 \item{log_path}{A path to save the log file. Defaults to the return value of
 \code{\link{tempdir()}}.}
@@ -32,9 +36,6 @@ equivalent Wikidata PID as an external ID.}
 
 \item{language}{A vector of languages codes, for example, \code{c("en",
 "et")}.}
-
-\item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.}
 }
 \value{
 Returns a dataset_df object. The columns are:
@@ -54,14 +55,15 @@ Returns a dataset_df object. The columns are:
 \item{"time"}{ The time when the action started.}
 \item{"logfile"}{ The name of the CSV logfile.}
 }
+The number of rows corresponds to the length of the qid_on_wikidata vector.
 }
 \description{
-This code will copy a property label and description from
-Wikidata to a new instance. It should work between instances, but the
-authentication to copy from a password protected instance is not yet coded.
-The function is more specific than \code{\link{create_property}}, because
-this one creates properties that exist in a similarly structured Wikibase
-instance, such as Wikidata.
+This code will copy one or multiple property label(s) and
+description(s) from Wikidata to a new instance. It should work between
+instances, but the authentication to copy from a password protected
+instance is not yet coded. The function is more specific than
+\code{\link{create_property}}, because this one creates properties that
+exist in a similarly structured Wikibase instance, such as Wikidata.
 }
 \details{
 This function is slightly different from

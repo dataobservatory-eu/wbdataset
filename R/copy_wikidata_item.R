@@ -1,5 +1,5 @@
-#' @title Copy a Wikidata item
-#' @description This code will copy a property label and description from
+#' @title Copy a Wikidata item(s)
+#' @description This code will copy (an) item label(s) and description(s) from
 #'   Wikidata to a new instance. It should work between instances, but the
 #'   authentication to copy from a password protected instance is not yet coded.
 #'   The function is more specific than create_item, because this one creates
@@ -13,7 +13,8 @@
 #'   we may use different identifiers. Similarly, the \code{qid_on_wikidata}
 #'   replaces the more general \code{equivalence_id}, because we must use QID
 #'   for identification in an other Wikibase instance.
-#' @param qid_on_wikidata The QID of the item to be copied to your Wikibase.
+#' @param qid_on_wikidata The QID of the item to be copied to your Wikibase. A
+#' single valid QID or a vector of several QIDs.
 #' @param qid_equivalence_property The QID in Wikibase that records the
 #'   equivalent Wikidata QID as an external ID.
 #' @param language A vector of languages codes, for example, \code{c("en",
@@ -45,6 +46,7 @@
 #'  \item{"time"}{ The time when the action started.}
 #'  \item{"logfile"}{ The name of the CSV logfile.}
 #' }
+#' The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
 
 copy_wikidata_item <- function(
@@ -56,7 +58,10 @@ copy_wikidata_item <- function(
     log_path = tempdir(),
     csrf) {
 
+  # Assertions for correct inputs ------------------------------------------------
+
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+  if (is.null(log_path)) log_path <- tempdir()
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
@@ -64,6 +69,27 @@ copy_wikidata_item <- function(
 
   if (is.null(qid_equivalence_property)) qid_equivalence_property <- NA_character_
 
+  if ( length(qid_on_wikidata) > 1) {
+
+    return_log_file <- copy_wikidata_items(
+      qid_on_wikidata = qid_on_wikidata ,
+      qid_equivalence_property = qid_equivalence_property,
+      languages = languages,
+      wikibase_api_url = wikibase_api_url,
+      data_curator = data_curator,
+      log_path = log_path,
+      csrf = csrf)
+
+    return_log_file$rowid <- defined(
+      return_log_file$id_on_target,
+      label = "Wikibase QID",
+      namespace = return_log_file$wikibase_api_url[1])
+
+    return(return_log_file)
+
+    }
+
+  # Timestamping ---------------------------------------------------------------------
   action_time <- Sys.time()
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
@@ -74,6 +100,8 @@ copy_wikidata_item <- function(
   assertthat::assert_that(is_qid(qid_on_wikidata),
     msg = "qid_on_wikidata must start with Q followed by digits."
   )
+
+  # Getting the data ---------------------------------------------------------
 
   claim_body <- list(
     action = "wbgetentities",
@@ -214,10 +242,6 @@ copy_wikidata_item <- function(
   assertthat::assert_that(!is.null(csrf_token),
                           msg = "You do not have a CSRF token; perhaps your session has expired.
     Try get_csrf() with your credentials."
-  )
-
-  assertthat::assert_that(nchar(csrf_token) == 42,
-                          msg = "Your CSRF token should have 42 characters."
   )
 
   # Posting the new item  ---------------------------------------------------
@@ -403,9 +427,9 @@ copy_wikidata_item <- function(
   }
 
 
-  description <- paste0(
+  description_text <- paste0(
     "Attempted and successful copying from Wikidata to ",
-    wikibase_api_url, " with wbdataset:copy_item() at ",
+    wikibase_api_url, " with wbdataset:copy_wikidata_item() at ",
     substr(as.character(action_time), 1, 19)
   )
 
@@ -437,10 +461,36 @@ copy_wikidata_item <- function(
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
       title = "Wikibase Copy Item Log",
-      description = description,
+      description =  description_text,
       creator = data_curator,
       dataset_date = Sys.Date())
   )
 
   return_ds
+}
+
+#' @rdname  copy_wikidata_item
+#' @keywords internal
+copy_wikidata_items <- function( qid_on_wikidata,
+                                 qid_equivalence_property,
+                                 languages,
+                                 wikibase_api_url,
+                                 data_curator,
+                                 log_path,
+                                 csrf) {
+
+  returned_list <- lapply(
+    qid_on_wikidata, function(x) {
+      copy_wikidata_item(
+        qid_on_wikidata =x,
+        qid_equivalence_property = qid_equivalence_property,
+        languages = languages,
+        wikibase_api_url = wikibase_api_url,
+        data_curator = data_curator,
+        log_path = log_path,
+        csrf = csrf)
+    }
+  )
+
+  do.call(rbind, returned_list)
 }
