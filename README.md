@@ -71,6 +71,6 @@ The *wbdataset* package has three tutorial articles:
   Access](https://wbdataset.dataobservatory.eu/articles/Wikibase_API.html)
   shows how you log in to a Wikibase instance. If you use `wbdataset` to
   retrieve information only from Wikidata, you do not need this.
-- \[Getting Started To Create a Graph on
-  Wikibase\]((<https://wbdataset.dataobservatory.eu/articles/start.html>)
+- [Getting Started To Create a Graph on
+  Wikibase](https://wbdataset.dataobservatory.eu/articles/start.html)
   shows how to add data to a Wikibase graph database.
