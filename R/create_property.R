@@ -152,7 +152,7 @@ create_property <- function(label,
     # Successfully created the property
     message("Successfully created item ", created_property_response$entity$id, " (", created_property_response$entity$labels$en$value, ")")
 
-    if (is.na(equivalence_property)) {
+    if (!is.na(equivalence_property)) {
     # Add the optional equivalence statement
       wikidata_pid_df <- add_id_statement(
         qid = created_property_response$entity$id,

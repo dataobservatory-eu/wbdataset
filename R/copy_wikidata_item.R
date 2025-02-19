@@ -460,7 +460,8 @@ copy_wikidata_item <- function(
     time = return_dataframe$time,
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
-      title = "Wikibase Copy Item Log",
+        title = paste0("Wikibase Copy Item Log (",
+                       strftime(action_time,'%Y-%m-%d %H:%M:%OS0'), ")"),
       description =  description_text,
       creator = data_curator,
       dataset_date = Sys.Date())
@@ -478,6 +479,15 @@ copy_wikidata_items <- function( qid_on_wikidata,
                                  data_curator,
                                  log_path,
                                  csrf) {
+
+  # Ensure that QIDs are used in the loop ----------------------------
+  is_qid <- vapply(qid_on_wikidata, is_qid, logical(1))
+  not_qid <- paste(names(which(!is_qid)), collapse="|")
+
+  assertthat::assert_that(
+    not_qid == "",
+    msg=paste0("Error copy_wikidata_items(): ", not_qid,
+               " does not appear to be a QID."))
 
   returned_list <- lapply(
     qid_on_wikidata, function(x) {

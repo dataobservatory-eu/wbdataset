@@ -10,7 +10,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![CRAN
 status](https://www.r-pkg.org/badges/version/wbdataset)](https://CRAN.R-project.org/package=wbdataset)
 [![devel-version](https://img.shields.io/badge/devel%20version-0.1.1014-blue.svg)](https://github.com/dataobservatory-eu/wbdataset)
-\[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13972192.svg)\]
+\[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13972192.svg)
 [![Codecov test
 coverage](https://codecov.io/gh/dataobservatory-eu/wbdataset/graph/badge.svg)](https://app.codecov.io/gh/dataobservatory-eu/wbdataset)
 <!-- badges: end -->

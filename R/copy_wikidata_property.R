@@ -454,7 +454,8 @@ copy_wikidata_property <- function(
     time = return_dataframe$time,
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
-      title = "Wikibase Copy Property Log",
+      title = paste0("Wikibase Copy Property Log (",
+                     strftime(action_time,'%Y-%m-%d %H:%M:%OS0'), ")"),
       description = description_text,
       creator = data_curator,
       dataset_date = Sys.Date())
@@ -472,6 +473,16 @@ copy_wikidata_properties <- function(
     data_curator,
     log_path,
     csrf) {
+
+  # Ensure that PIDs are used in the loop ----------------------------
+  is_pid <- vapply(pid_on_wikidata, is_pid, logical(1))
+  not_pid <- paste(names(which(!is_pid)), collapse="|")
+
+  assertthat::assert_that(
+    not_pid == "",
+    msg=paste0("Error copy_wikidata_properties(): ", not_pid,
+               " does not appear to be a PID."))
+
 
   returned_list <- lapply(
     pid_on_wikidata, function(x) {
