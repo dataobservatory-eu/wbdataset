@@ -10,7 +10,7 @@
 copy_wikidata_item(
   qid_on_wikidata = "Q4",
   qid_equivalence_property = "P35",
-  languages = c("en", "nl", "hu"),
+  language = c("en", "nl", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
@@ -20,7 +20,7 @@ copy_wikidata_item(
 copy_wikidata_items(
   qid_on_wikidata,
   qid_equivalence_property,
-  languages,
+  language,
   wikibase_api_url,
   data_curator,
   log_path,
@@ -30,11 +30,12 @@ copy_wikidata_items(
 copy_wikidata_properties(
   pid_on_wikidata,
   pid_equivalence_property,
-  languages,
+  language,
   wikibase_api_url,
   data_curator,
   log_path,
-  csrf
+  csrf,
+  wikibase_session = NULL
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ single valid QID or a vector of several QIDs.}
 
 \item{qid_equivalence_property}{The QID in Wikibase that records the
 equivalent Wikidata QID as an external ID.}
+
+\item{language}{A vector of language codes, for example, \code{c("en",
+"et")}.}
 
 \item{wikibase_api_url}{For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}.}
@@ -56,8 +60,10 @@ creates the log file, created with \link[utils]{person}.}
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 
-\item{language}{A vector of languages codes, for example, \code{c("en",
-"et")}.}
+\item{wikibase_session}{An optional list that contains any of the values of
+parameters \code{qid_equivalence_property}, \code{language},
+\code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+\code{csrf} (for repeated use in a session.)}
 }
 \value{
 Returns a dataset_df object. The columns are:

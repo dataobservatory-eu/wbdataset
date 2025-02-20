@@ -14,7 +14,8 @@ create_property(
   wikibase_api_url,
   data_curator = NULL,
   log_path = tempdir(),
-  csrf
+  csrf,
+  wikibase_session = NULL
 )
 }
 \arguments{
@@ -48,6 +49,11 @@ creates the log file, created with \link[utils]{person}.}
 
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
+
+\item{wikibase_session}{An optional list that contains any of the values of
+\code{language},
+\code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+\code{csrf} (for repeated use in a session.)}
 }
 \value{
 Currently returns a data.frame, this should be a dataset. The columns

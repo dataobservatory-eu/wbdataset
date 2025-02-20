@@ -19,7 +19,7 @@
 #'   non-authenticated sources, this should be changed.)
 #' @param pid_equivalence_property The PID in Wikibase that records the
 #'   equivalent Wikidata PID as an external ID.
-#' @param language A vector of languages codes, for example, \code{c("en",
+#' @param language A vector of language codes, for example, \code{c("en",
 #'   "et")}.
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
@@ -29,6 +29,10 @@
 #'   \code{\link{tempdir()}}.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
+#' @param wikibase_session An optional list that contains any of the values of
+#'   parameters \code{qid_equivalence_property}, \code{language},
+#'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+#'   \code{csrf} (for repeated use in a session.)
 #' @importFrom assertthat assert_that
 #' @importFrom utils person
 #' @return Returns a dataset_df object. The columns are:
@@ -54,40 +58,69 @@
 copy_wikidata_property <- function(
     pid_on_wikidata,
     pid_equivalence_property = "P2",
-    languages = c("en", "hu"),
+    language = c("en", "hu"),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = NULL,
     log_path = tempdir(),
-    csrf) {
+    csrf,
+    wikibase_session = NULL) {
+  if (!is.null(wikibase_session)) {
+    # For repeated queries you can add your variables directly or in a list
+
+    if (!is.null(wikibase_session$pid_equivalence_property)) {
+      pid_equivalence_property <- wikibase_session$pid_equivalence_property
+    }
+
+    if (!is.null(wikibase_session$language)) {
+      language <- wikibase_session$language
+    }
+    if (!is.null(wikibase_session$data_curator)) {
+      data_curator <- wikibase_session$data_curator
+    }
+
+    if (!is.null(wikibase_session$wikibase_api_url)) {
+      wikibase_api_url <- wikibase_session$wikibase_api_url
+    }
+
+    if (!is.null(wikibase_session$log_path)) {
+      log_path <- wikibase_session$log_path
+    }
+
+    if (!is.null(wikibase_session$csrf)) {
+      csrf <- wikibase_session$csrf
+    }
+  }
 
   # Assertions for correct inputs ------------------------------------------------
-  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+  if (is.null(data_curator)) data_curator <- person("Person", "Unknown")
   if (is.null(log_path)) log_path <- tempdir()
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
-    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+    msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
+  )
 
 
-  if ( length(pid_on_wikidata) > 1) {
+  if (length(pid_on_wikidata) > 1) {
     # Run this function in a loop if there are several PIDs to copy
 
     return_log_file <- copy_wikidata_properties(
-      pid_on_wikidata = pid_on_wikidata ,
+      pid_on_wikidata = pid_on_wikidata,
       pid_equivalence_property = pid_equivalence_property,
-      languages = languages,
+      language = language,
       wikibase_api_url = wikibase_api_url,
       data_curator = data_curator,
       log_path = log_path,
-      csrf = csrf)
+      csrf = csrf
+    )
 
     return_log_file$rowid <- defined(
       return_log_file$id_on_target,
       label = "Wikibase QID",
-      namespace = return_log_file$wikibase_api_url[1])
+      namespace = return_log_file$wikibase_api_url[1]
+    )
 
     return(return_log_file)
-
   }
 
   # Timestamping ---------------------------------------------------------------------
@@ -125,7 +158,9 @@ copy_wikidata_property <- function(
   } else {
     # there was no error
     response <- httr::content(
-      get_claim$result, as = "parsed", type = "application/json")
+      get_claim$result,
+      as = "parsed", type = "application/json"
+    )
   }
 
   if (!is_response_success(response)) {
@@ -172,14 +207,14 @@ copy_wikidata_property <- function(
   # If the user wants to copy non-existing descriptions, we will replace them
   # with an empty string.
 
-  labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
-  labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
+  labels_present <- language[which(language %in% names(response$entities[[1]]$labels))]
+  labels_missing <- language[which(!language %in% names(response$entities[[1]]$labels))]
 
-  descriptions_present <- languages[which(languages %in% names(response$entities[[1]]$descriptions))]
-  descriptions_missing <- languages[which(!languages %in% names(response$entities[[1]]$descriptions))]
+  descriptions_present <- language[which(language %in% names(response$entities[[1]]$descriptions))]
+  descriptions_missing <- language[which(!language %in% names(response$entities[[1]]$descriptions))]
 
-  aliases_present <- languages[which(languages %in% names(response$entities[[1]]$aliases))]
-  aliases_missing <- languages[which(!languages %in% names(response$entities[[1]]$aliases))]
+  aliases_present <- language[which(language %in% names(response$entities[[1]]$aliases))]
+  aliases_missing <- language[which(!language %in% names(response$entities[[1]]$aliases))]
   labels_missing
 
   ## Set a default later, this is now hard coded to English but could be a parameter.
@@ -332,7 +367,7 @@ copy_wikidata_property <- function(
     )
 
     # Try to find the English error message
-    error_languages <- unlist(
+    error_language <- unlist(
       lapply(error_messages, function(x) ifelse(length(x) >= 2, x[2], NA_character_))
     )
 
@@ -342,16 +377,16 @@ copy_wikidata_property <- function(
     language <- "<not retrieved>"
 
     if ( # we have English-language error message
-      any(error_languages == "en")
+      any(error_language == "en")
     ) {
       # The error message contains the already existing (conflicting) label
-      existing_label <- error_messages[[which(error_languages == "en")]][1]
+      existing_label <- error_messages[[which(error_language == "en")]][1]
       language <- "en"
-    } else if (any(!is.na(error_languages))) {
+    } else if (any(!is.na(error_language))) {
       # The error message contains the already existing (conflicting) label
       # but not in English, select the first language that is available,
       # if there are any messages that can be read in a human language.
-      nr_language <- which(!is.na(error_languages))[1]
+      nr_language <- which(!is.na(error_language))[1]
       existing_label <- error_messages[[nr_language]][1]
       language <- error_messages[[nr_language]][2]
     }
@@ -381,7 +416,6 @@ copy_wikidata_property <- function(
       fileEncoding = "UTF-8"
     )
   } else {
-
     # Return an emptier data.frame if there was some error
 
     # Print out the error message verbatim to terminal
@@ -432,34 +466,53 @@ copy_wikidata_property <- function(
     id_on_target = defined(
       return_dataframe$id_on_target,
       label = paste0("PID on ", wikibase_api_url),
-      namespace = wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
     label = defined(
-      return_dataframe$label, label = "Label of item"),
+      return_dataframe$label,
+      label = "Label of item"
+    ),
     description = defined(
-      return_dataframe$description, label = "Description of item"),
+      return_dataframe$description,
+      label = "Description of item"
+    ),
     language = defined(
-      return_dataframe$language, label = "Language of label and description"),
+      return_dataframe$language,
+      label = "Language of label and description"
+    ),
     datatype = return_dataframe$datatype,
     wikibase_api_url = wikibase_api_url,
     equivalence_property = defined(
-      return_dataframe$equivalence_property ,
+      return_dataframe$equivalence_property,
       label = paste0("Equivalence property on  ", wikibase_api_url),
-      namespace = wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
     equivalence_id = defined(
-      return_dataframe$equivalence_id ,
+      return_dataframe$equivalence_id,
       label = "Equivalent PID on Wikidata",
-      namespace = "https://www.wikidata.org/wiki/"),
+      namespace = "https://www.wikidata.org/wiki/"
+    ),
     success = return_dataframe$success,
     comment = return_dataframe$comment,
     time = return_dataframe$time,
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
-      title = paste0("Wikibase Copy Property Log (",
-                     strftime(action_time,'%Y-%m-%d %H:%M:%OS0'), ")"),
+      title = paste0(
+        "Wikibase Copy Property Log (",
+        strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
+      ),
       description = description_text,
       creator = data_curator,
-      dataset_date = Sys.Date())
+      dataset_date = Sys.Date()
+    ),
+    identifier = c(wbi = wikibase_api_url)
   )
+
+  return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
+    namespace = wikibase_api_url
+  )
+
+  return_ds
 }
 
 
@@ -468,32 +521,62 @@ copy_wikidata_property <- function(
 copy_wikidata_properties <- function(
     pid_on_wikidata,
     pid_equivalence_property,
-    languages,
+    language,
     wikibase_api_url,
     data_curator,
     log_path,
-    csrf) {
-
+    csrf,
+    wikibase_session = NULL) {
   # Ensure that PIDs are used in the loop ----------------------------
   is_pid <- vapply(pid_on_wikidata, is_pid, logical(1))
-  not_pid <- paste(names(which(!is_pid)), collapse="|")
+  not_pid <- paste(names(which(!is_pid)), collapse = "|")
 
   assertthat::assert_that(
     not_pid == "",
-    msg=paste0("Error copy_wikidata_properties(): ", not_pid,
-               " does not appear to be a PID."))
+    msg = paste0(
+      "Error copy_wikidata_properties(): ", not_pid,
+      " does not appear to be a PID."
+    )
+  )
 
+  if (!is.null(wikibase_session)) {
+    # For repeated queries you can add your variables directly or in a list
+
+    if (!is.null(wikibase_session$pid_equivalence_property)) {
+      pid_equivalence_property <- wikibase_session$pid_equivalence_property
+    }
+
+    if (!is.null(wikibase_session$language)) {
+      language <- wikibase_session$language
+    }
+    if (!is.null(wikibase_session$data_curator)) {
+      data_curator <- wikibase_session$data_curator
+    }
+
+    if (!is.null(wikibase_session$wikibase_api_url)) {
+      wikibase_api_url <- wikibase_session$wikibase_api_url
+    }
+
+    if (!is.null(wikibase_session$log_path)) {
+      log_path <- wikibase_session$log_path
+    }
+
+    if (!is.null(wikibase_session$csrf)) {
+      csrf <- wikibase_session$csrf
+    }
+  }
 
   returned_list <- lapply(
     pid_on_wikidata, function(x) {
       copy_wikidata_property(
         pid_on_wikidata = x,
         pid_equivalence_property = pid_equivalence_property,
-        languages = languages,
+        language = language,
         wikibase_api_url = wikibase_api_url,
         data_curator = data_curator,
         log_path = log_path,
-        csrf = csrf)
+        csrf = csrf
+      )
     }
   )
 

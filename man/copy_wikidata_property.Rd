@@ -7,11 +7,12 @@
 copy_wikidata_property(
   pid_on_wikidata,
   pid_equivalence_property = "P2",
-  languages = c("en", "hu"),
+  language = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
-  csrf
+  csrf,
+  wikibase_session = NULL
 )
 }
 \arguments{
@@ -21,6 +22,9 @@ non-authenticated sources, this should be changed.)}
 
 \item{pid_equivalence_property}{The PID in Wikibase that records the
 equivalent Wikidata PID as an external ID.}
+
+\item{language}{A vector of language codes, for example, \code{c("en",
+"et")}.}
 
 \item{wikibase_api_url}{For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}.}
@@ -34,8 +38,10 @@ creates the log file, created with \link[utils]{person}.}
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 
-\item{language}{A vector of languages codes, for example, \code{c("en",
-"et")}.}
+\item{wikibase_session}{An optional list that contains any of the values of
+parameters \code{qid_equivalence_property}, \code{language},
+\code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+\code{csrf} (for repeated use in a session.)}
 }
 \value{
 Returns a dataset_df object. The columns are:

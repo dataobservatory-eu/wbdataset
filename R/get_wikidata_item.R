@@ -29,13 +29,13 @@ get_wikidata_item <- function(
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     data_curator = NULL,
     title = "Dataset title") {
-
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
-    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
+    msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
+  )
 
   qid_on_wikidata <- gsub(prefix, "", as.character(qid_on_wikidata))
 
@@ -48,13 +48,17 @@ get_wikidata_item <- function(
     for (i in seq_along(qid_on_wikidata)) {
       if (i == 1) {
         # Initialise the return_df
-        return_df <- get_singe_item(qid_on_wikidata = qid_on_wikidata[i],
-                                    language = language,
-                                    wikibase_api_url = wikibase_api_url)
+        return_df <- get_singe_item(
+          qid_on_wikidata = qid_on_wikidata[i],
+          language = language,
+          wikibase_api_url = wikibase_api_url
+        )
       } else {
-        tmp <- get_singe_item(qid_on_wikidata = qid_on_wikidata[i],
-                              language = language,
-                              wikibase_api_url = wikibase_api_url)
+        tmp <- get_singe_item(
+          qid_on_wikidata = qid_on_wikidata[i],
+          language = language,
+          wikibase_api_url = wikibase_api_url
+        )
         return_df <- rbind(return_df, tmp)
       }
     }
@@ -64,21 +68,24 @@ get_wikidata_item <- function(
     return_df <- get_singe_item(
       qid_on_wikidata = qid_on_wikidata,
       language = language,
-      wikibase_api_url = wikibase_api_url)
+      wikibase_api_url = wikibase_api_url
+    )
   }
 
   return_ds <- dataset_df(
     qid_on_wikidata = defined(
       return_df$qid_on_wikidata,
       label = paste0("qid_on_wikidata on ", wikibase_api_url),
-      namespace = wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
     label = defined(return_df$label, label = "Label of item"),
     description = defined(return_df$description, label = "Description of item"),
     language = defined(return_df$language, label = "Language of label and description"),
-    dataset_bibentry = dublincore(title = title,
-                                  creator = data_curator,
-                                  dataset_date = Sys.Date()
-                                  )
+    dataset_bibentry = dublincore(
+      title = title,
+      creator = data_curator,
+      dataset_date = Sys.Date()
+    )
   )
 
   wikibase_type <- c(qid_on_wikidata = "qid_on_wikidata")

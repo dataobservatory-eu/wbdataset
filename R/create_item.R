@@ -23,10 +23,14 @@
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param data_curator The name of the data curator who runs the function and
 #'   creates the log file, created with \link[utils]{person}.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}.
+#' @param wikibase_session An optional list that contains any of the values of
+#'   \code{language},
+#'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+#'   \code{csrf} (for repeated use in a session.)
 #' @export
 #' @return Currently returns a data.frame, this should be a dataset. The columns
 #' are:
@@ -73,7 +77,31 @@ create_item <- function(label,
                         wikibase_api_url,
                         data_curator = NULL,
                         log_path = tempdir(),
-                        csrf) {
+                        csrf,
+                        wikibase_session) {
+
+  if (!is.null(wikibase_session)) {
+    # For repeated queries you can add your variables directly or in a list
+
+    if(!is.null(wikibase_session$languages)) {
+      languages <- wikibase_session$languages
+    }
+    if(!is.null(wikibase_session$data_curator)) {
+      data_curator <- wikibase_session$data_curator
+    }
+
+    if(!is.null(wikibase_session$wikibase_api_url)) {
+      wikibase_api_url <-  wikibase_session$wikibase_api_url
+    }
+
+    if(!is.null(wikibase_session$log_path)) {
+      log_path <-  wikibase_session$log_path
+    }
+
+    if(!is.null(wikibase_session$csrf)) {
+      csrf <-  wikibase_session$csrf
+    }
+  }
 
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")

@@ -29,7 +29,6 @@ left_join_column <- function(
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     silent = FALSE,
     csrf = NULL) {
-
   # Initialise a data.frame to return the data.
 
   new_column <- data.frame(
@@ -79,24 +78,29 @@ left_join_column <- function(
 
   if (!all(
     c(is.null(label), is.null(unit), is.null(definition), is.null(namespace))
-    )) {
+  )) {
     return_df[, 2] <- defined(return_df[, 2],
-                              label = label,
-                              unit = unit,
-                              definition = definition,
-                              namespace = namespace)
+      label = label,
+      unit = unit,
+      definition = definition,
+      namespace = namespace
+    )
   }
 
-  new_column_ds <- as_dataset_df(df = return_df,
-                                 reference = list(author = creator(ds),
-                                                  title = dataset_title(ds))
-                                 )
+  new_column_ds <- as_dataset_df(
+    df = return_df,
+    reference = list(
+      author = creator(ds),
+      title = dataset_title(ds)
+    )
+  )
   newcol_prov <- attributes(new_column_ds)
 
   new_ds <- invisible(
     left_join(ds, new_column_ds,
-              by = intersect(names(ds), names(new_column_ds)))
+      by = intersect(names(ds), names(new_column_ds))
     )
+  )
 
   attr(new_ds, "Provenance") <- list(
     started_at = original_prov$started_at,
@@ -107,7 +111,9 @@ left_join_column <- function(
   new_property_definition <- c("property" = column_type)
   names(new_property_definition) <- property
 
-  attr(new_ds, "wikibase_type") <- c(attr(ds, "wikibase_type"),
-                                     new_property_definition)
+  attr(new_ds, "wikibase_type") <- c(
+    attr(ds, "wikibase_type"),
+    new_property_definition
+  )
   new_ds
 }

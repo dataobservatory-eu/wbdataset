@@ -10,7 +10,7 @@
 #' @keywords internal
 
 item_identity_datastring_create <- function(labels_list,
-                                                descriptions_list) {
+                                            descriptions_list) {
   # Assert that the inputs are of correct types
   assertthat::assert_that(
     inherits(labels_list, "list"),

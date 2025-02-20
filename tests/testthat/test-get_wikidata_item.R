@@ -7,8 +7,10 @@ test_that("get_wikidata_item() works with single qid_on_wikidata", {
 
 
 test_that("get_wikidata_item() works with multiple qid_on_wikidata", {
-  test_df2 <- get_wikidata_item(qid_on_wikidata = c("Q228", "Q347"),
-                                language = c("en", "nl"))
+  test_df2 <- get_wikidata_item(
+    qid_on_wikidata = c("Q228", "Q347"),
+    language = c("en", "nl")
+  )
   expect_equal(as.character(test_df2$language), c("en", "nl", "en", "nl"))
   expect_equal(as.character(test_df2$label), c("Andorra", "Andorra", "Liechtenstein", "Liechtenstein"))
   expect_equal(as.character(test_df2$qid_on_wikidata), c("Q228", "Q228", "Q347", "Q347"))

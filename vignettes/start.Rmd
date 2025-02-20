@@ -145,7 +145,7 @@ capital_cities <- copy_wikidata_property(
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = person("Joe", "Doe"),
     log_path = tempdir(),
-    csrf=my_csrf
+    csrf =m y_csrf
     )
 
 capital_cities
@@ -203,8 +203,10 @@ The `ric_equivalence_pid$id_on_target` saves the new property identifier in your
 ```{r, echo=FALSE}
 message("Successfully created item P44 (RiC equivalent property)")
 ```
+
 You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
 it is saved in `ric_equivalence_pid`.
+
 
 ```{r create-propery2, eval=FALSE}
 # This code will not run as expected if the instance at 
@@ -225,6 +227,28 @@ p107 <- create_property(
 ```
 ```{r, echo=FALSE}
 message("Successfully created item P47 (has current or former member (is current or former member of))")
+```
+
+For repeated queries, you can place the repeating variables into a list, and 
+provide this parameters as a list with `wikibase_session`=`my_wikibase_session`.
+
+```{r wikibasesession}
+my_wikibase_session <- list(
+  language = c("en", "nl"),
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  log_path = tempdir(),
+  csrf = my_csrf
+)
+```
+```{r wikibasesessionp, eval=FALSE}
+p107 <- create_property(
+  label = "has current or former member (is current or former member of)",
+  description = "This property relates an E39 Actor to the E74 Group of which that E39 Actor is a member.",
+  equivalence_property = "P37", # a property connecting your PIDs to CIDOC
+  equivalence_id = "P107",      # the number of the property definition in CIDOC
+  datatype = "external-id",
+  wikibase_session = my_wikibase_session
+)
 ```
 
 You can copy many properties at once, too, but only with the same language, curator, wikibase_api_url parameters:
