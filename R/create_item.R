@@ -1,7 +1,7 @@
 #' @title Create a property
 #' @description Creates an item entity on a Wikibase instance with a single
 #' language labelling and description. New labels and descriptions can be added
-#' in further languages later. This is a wrapper for
+#' in further language later. This is a wrapper for
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbeditentity}{MediaWiki
 #' action=wbeditentity}
 #' @details Optionally, the function adds an equivalent item to this newly
@@ -83,11 +83,14 @@ create_item <- function(label,
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
-    if(!is.null(wikibase_session$languages)) {
-      languages <- wikibase_session$languages
+    if(!is.null(wikibase_session$language)) {
+      # overwrite session default if it does not exist
+      if (is.null(language)) language <- wikibase_session$language
     }
+
     if(!is.null(wikibase_session$data_curator)) {
-      data_curator <- wikibase_session$data_curator
+      # overwrite session default if it does not exist
+      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
     }
 
     if(!is.null(wikibase_session$wikibase_api_url)) {

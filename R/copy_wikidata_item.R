@@ -68,11 +68,14 @@ copy_wikidata_item <- function(
       qid_equivalence_property <- wikibase_session$qid_equivalence_property
     }
 
-    if (!is.null(wikibase_session$language)) {
-      language <- wikibase_session$language
+    if(!is.null(wikibase_session$language)) {
+      # overwrite session default if it does not exist
+      if (is.null(language)) language <- wikibase_session$language
     }
-    if (!is.null(wikibase_session$data_curator)) {
-      data_curator <- wikibase_session$data_curator
+
+    if(!is.null(wikibase_session$data_curator)) {
+      # overwrite session default if it does not exist
+      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
     }
 
     if (!is.null(wikibase_session$wikibase_api_url)) {

@@ -72,7 +72,7 @@ There are two ways to create items:
 paris_item <- copy_wikidata_item(
   qid_on_wikidata = "Q90", # check https://www.wikidata.org/wiki/Q90
   qid_equivalence_property = NULL, # we will get back to this later
-  languages = c("en", "fr", "nl"), # select languages with 2-letter codes
+  language = c("en", "fr", "nl"), # select language with 2-letter codes
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",  # Wikibase address
   data_curator = person("Jane", "Doe"), # Your name should go in here !
   log_path = tempdir(), # You can add a location where you save log file
@@ -141,7 +141,7 @@ it is saved in `e20`. If the action was successul, which you can check with `e20
 capital_cities <- copy_wikidata_property(
     qid_on_wikidata = c("Q2807", "Q3114", "Q1490"),
     qid_equivalence_property = "P35",  # use your Wikibase instance's number
-    languages = c("en", "nl", "hu", "es" ),
+    language = c("en", "nl", "hu", "es" ),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = person("Joe", "Doe"),
     log_path = tempdir(),
@@ -168,7 +168,7 @@ Properties connect new information to your items (nodes.) Such properties need t
 p21 <- copy_wikidata_property(
   pid_on_wikidata = "P21",
   pid_equivalence_property = "P2", # You need to change this to your numbering
-  languages = c("en", "hu"),
+  language = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = person("Jane", "Doe"), # Replace it with your name
   csrf = my_csrf
@@ -257,7 +257,7 @@ You can copy many properties at once, too, but only with the same language, cura
 spotify_id_properties <- copy_wikidata_property(
     pid_on_wikidata = c("P2207", "P2205", "P8704"),
     pid_equivalence_property = "P2", # use the P number on your Wikibase instance
-    languages = c("en", "nl", "hu" ),
+    language = c("en", "nl", "hu" ),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = person("Jane", "Doe"),
     log_path = tempdir(),

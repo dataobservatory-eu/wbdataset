@@ -73,7 +73,7 @@ are:
 \description{
 Creates an item entity on a Wikibase instance with a single
 language labelling and description. New labels and descriptions can be added
-in further languages later. This is a wrapper for
+in further language later. This is a wrapper for
 \href{https://www.wikidata.org/w/api.php?action=help&modules=wbeditentity}{MediaWiki
 action=wbeditentity}
 }

@@ -71,11 +71,14 @@ copy_wikidata_property <- function(
       pid_equivalence_property <- wikibase_session$pid_equivalence_property
     }
 
-    if (!is.null(wikibase_session$language)) {
-      language <- wikibase_session$language
+    if(!is.null(wikibase_session$language)) {
+      # overwrite session default if it does not exist
+      if (is.null(language)) language <- wikibase_session$language
     }
-    if (!is.null(wikibase_session$data_curator)) {
-      data_curator <- wikibase_session$data_curator
+
+    if(!is.null(wikibase_session$data_curator)) {
+      # overwrite session default if it does not exist
+      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
     }
 
     if (!is.null(wikibase_session$wikibase_api_url)) {
@@ -126,7 +129,7 @@ copy_wikidata_property <- function(
   # Timestamping ---------------------------------------------------------------------
   action_time <- Sys.time()
   # Save the time of running the code
-  action_timestamp <- action_timestamp_create()
+  action_timestamp <- wbdataset:::action_timestamp_create()
   log_file_name <- paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv")
 
 
