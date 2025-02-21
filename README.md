@@ -9,7 +9,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/wbdataset)](https://CRAN.R-project.org/package=wbdataset)
-[![devel-version](https://img.shields.io/badge/devel%20version-0.1.1017-blue.svg)](https://github.com/dataobservatory-eu/wbdataset)
+[![devel-version](https://img.shields.io/badge/devel%20version-0.1.1018-blue.svg)](https://github.com/dataobservatory-eu/wbdataset)
 \[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13972192.svg)
 [![Codecov test
 coverage](https://codecov.io/gh/dataobservatory-eu/wbdataset/graph/badge.svg)](https://app.codecov.io/gh/dataobservatory-eu/wbdataset)
@@ -31,6 +31,12 @@ You can install the development version of wbdataset from
 # install.packages("devtools")
 devtools::install_github("antaldaniel/dataset")
 devtools::install_github("dataobservatory-eu/wbdataset")
+```
+
+Once installed,
+
+``` r
+library(wbdataset)
 ```
 
 ## Example
