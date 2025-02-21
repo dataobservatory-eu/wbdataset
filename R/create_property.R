@@ -115,6 +115,7 @@ create_property <- function(label,
 
 
   # Save the time of running the code
+  action_time <- Sys.time()
   action_timestamp <- action_timestamp_create()
   log_file_name <- paste0("wbdataset_create_property_", action_timestamp, ".csv")
 
@@ -222,7 +223,7 @@ create_property <- function(label,
     # wikibase-validator-label-conflict: the property already exists, and this
     # information should be returned to the user.
     message_strings <- unlist(created_property_response$error$messages)
-    message(message_strings)
+
     message_strings <- message_strings[which(grepl("Property:", message_strings))]
     pattern <- "\\[\\[Property:*(.*?)\\|"
     result <- regmatches(message_strings, regexec(pattern, message_strings))
@@ -284,5 +285,60 @@ create_property <- function(label,
               fileEncoding = "UTF-8")
   }
 
-  return_dataframe
+  description_text <- paste0(
+    "Attempted and successful property creation on Wikibase to ",
+    wikibase_api_url, " with wbdataset:create_property() at ",
+    substr(as.character(action_time), 1, 19)
+  )
+
+  return_ds <- dataset_df(
+    action = return_dataframe$action,
+    id_on_target = defined(
+      return_dataframe$id_on_target,
+      label = paste0("ID on ", wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
+    label = defined(
+      return_dataframe$label,
+      label = "Label of entity"
+    ),
+    description = defined(
+      return_dataframe$description,
+      label = "Description of entity"
+    ),
+    language = defined(
+      return_dataframe$language,
+      label = "Language of label and description"
+    ),
+    datatype = return_dataframe$datatype,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = defined(
+      return_dataframe$equivalence_property,
+      label = paste0("Equivalence property on  ", wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
+    equivalence_id = defined(
+      return_dataframe$equivalence_id,
+      label = "Equivalent entity on Wikidata",
+      namespace = "https://www.wikidata.org/wiki/"
+    ),
+    success = return_dataframe$success,
+    comment = return_dataframe$comment,
+    time = return_dataframe$time,
+    logfile = return_dataframe$logfile,
+    dataset_bibentry = dublincore(
+      title = paste0(
+        "Wikibase Create Property Log (",
+        strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
+      ),
+      creator = data_curator,
+      dataset_date = Sys.Date()
+    )
+  )
+
+  return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
+                             namespace = wikibase_api_url
+  )
+
+  return_ds
 }

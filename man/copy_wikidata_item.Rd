@@ -14,7 +14,8 @@ copy_wikidata_item(
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
-  csrf
+  csrf,
+  wikibase_session = NULL
 )
 
 copy_wikidata_items(

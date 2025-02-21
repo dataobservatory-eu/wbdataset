@@ -196,7 +196,7 @@ create_item <- function(label,
       label = label,
       description =  created_item_response$entity$descriptions[[1]]$value,
       language =  created_item_response$entity$descriptions[[1]]$language,
-      datatype = "item",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
@@ -237,7 +237,7 @@ create_item <- function(label,
       label = label,
       description = "<description match not inspected>",
       language =  language,
-      datatype = "item",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
@@ -267,7 +267,7 @@ create_item <- function(label,
       label = label,
       description = description,
       language =  language,
-      datatype = "item",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
@@ -284,5 +284,61 @@ create_item <- function(label,
               fileEncoding = "UTF-8")
   }
 
-  return_dataframe
+  description_text <- paste0(
+    "Attempted and successful item creation on Wikibase to ",
+    wikibase_api_url, " with wbdataset:create_item() at ",
+    substr(as.character(action_time), 1, 19)
+  )
+
+  return_ds <- dataset_df(
+    action = return_dataframe$action,
+    id_on_target = defined(
+      return_dataframe$id_on_target,
+      label = paste0("ID on ", wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
+    label = defined(
+      return_dataframe$label,
+      label = "Label of entity"
+    ),
+    description = defined(
+      return_dataframe$description,
+      label = "Description of entity"
+    ),
+    language = defined(
+      return_dataframe$language,
+      label = "Language of label and description"
+    ),
+    datatype = return_dataframe$datatype,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = defined(
+      return_dataframe$equivalence_property,
+      label = paste0("Equivalence property on  ", wikibase_api_url),
+      namespace = wikibase_api_url
+    ),
+    equivalence_id = defined(
+      return_dataframe$equivalence_id,
+      label = "Equivalent entity on Wikidata",
+      namespace = "https://www.wikidata.org/wiki/"
+    ),
+    success = return_dataframe$success,
+    comment = return_dataframe$comment,
+    time = return_dataframe$time,
+    logfile = return_dataframe$logfile,
+    dataset_bibentry = dublincore(
+      title = paste0(
+        "Wikibase Create Property Log (",
+        strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
+      ),
+      description_text,
+      creator = data_curator,
+      dataset_date = Sys.Date()
+    )
+  )
+
+  return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
+                             namespace = wikibase_api_url
+  )
+
+  return_ds
 }

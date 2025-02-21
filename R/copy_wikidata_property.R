@@ -64,6 +64,7 @@ copy_wikidata_property <- function(
     log_path = tempdir(),
     csrf,
     wikibase_session = NULL) {
+
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -103,6 +104,7 @@ copy_wikidata_property <- function(
     msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
   )
 
+  property_wikibase_datatype <- "<not retrieved>"  # set default value
 
   if (length(pid_on_wikidata) > 1) {
     # Run this function in a loop if there are several PIDs to copy
@@ -270,6 +272,7 @@ copy_wikidata_property <- function(
     datatype = response$entities[[1]]$datatype
   )
 
+  property_wikibase_datatype <- response$entities[[1]]$datatype
   datastring
 
   ## Getting the user's CSRF token for writing.
@@ -401,7 +404,7 @@ copy_wikidata_property <- function(
       label = existing_label,
       description = existing_description,
       language = language,
-      datatype = "<not retrieved>",
+      datatype = property_wikibase_datatype,
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
@@ -438,7 +441,7 @@ copy_wikidata_property <- function(
       label = "<not retrieved>",
       description = "<not retrieved>",
       language = "<not retrieved>",
-      datatype = "<not retrieved>",
+      datatype = property_wikibase_datatype,
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
@@ -468,7 +471,7 @@ copy_wikidata_property <- function(
     action = return_dataframe$action,
     id_on_target = defined(
       return_dataframe$id_on_target,
-      label = paste0("PID on ", wikibase_api_url),
+      label = paste0("ID on ", wikibase_api_url),
       namespace = wikibase_api_url
     ),
     label = defined(
@@ -504,7 +507,7 @@ copy_wikidata_property <- function(
         "Wikibase Copy Property Log (",
         strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
       ),
-      description = description_text,
+      description_text,
       creator = data_curator,
       dataset_date = Sys.Date()
     ),

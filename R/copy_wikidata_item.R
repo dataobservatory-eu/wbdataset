@@ -60,7 +60,9 @@ copy_wikidata_item <- function(
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = NULL,
     log_path = tempdir(),
-    csrf) {
+    csrf,
+    wikibase_session = NULL) {
+
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -336,7 +338,7 @@ copy_wikidata_item <- function(
       label = created_item_label[[1]]$value,
       description = created_item_description[[1]]$value,
       language = created_item_label[[1]]$language,
-      datatype = "item",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = qid_equivalence_property,
       equivalence_id = qid_on_wikidata,
@@ -406,7 +408,7 @@ copy_wikidata_item <- function(
       label = existing_label,
       description = existing_description,
       language = language,
-      datatype = "<not retrieved>",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = qid_equivalence_property,
       equivalence_id = qid_on_wikidata,
@@ -426,12 +428,12 @@ copy_wikidata_item <- function(
     # Return an emptier data.frame if there was some error
 
     # Print out the error message verbatim to terminal
-    message(created_property_response$error)
+    message(created_item_response$error)
 
     # Wrap the main error types into the logfile and return data
     error_comments <- paste(
       unlist(
-        lapply(created_property_response$error$messages, function(x) x$name)
+        lapply(created_item_response$error$messages, function(x) x$name)
       ),
       collapse = "|"
     )
@@ -442,7 +444,7 @@ copy_wikidata_item <- function(
       label = "<not retrieved>",
       description = "<not retrieved>",
       language = "<not retrieved>",
-      datatype = "<not retrieved>",
+      datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property = qid_equivalence_property,
       equivalence_id = qid_on_wikidata,
@@ -472,7 +474,7 @@ copy_wikidata_item <- function(
     action = return_dataframe$action,
     id_on_target = defined(
       return_dataframe$id_on_target,
-      label = paste0("QID on ", wikibase_api_url),
+      label = paste0("ID on ", wikibase_api_url),
       namespace = wikibase_api_url
     ),
     label = defined(
@@ -481,7 +483,7 @@ copy_wikidata_item <- function(
     ),
     description = defined(
       return_dataframe$description,
-      label = "Description of item"
+      label = "Description of entity"
     ),
     language = defined(
       return_dataframe$language,
@@ -496,7 +498,7 @@ copy_wikidata_item <- function(
     ),
     equivalence_id = defined(
       return_dataframe$equivalence_id,
-      label = "Equivalent QID on Wikidata",
+      label = "Equivalent entity on Wikidata",
       namespace = "https://www.wikidata.org/wiki/"
     ),
     success = return_dataframe$success,
@@ -508,7 +510,6 @@ copy_wikidata_item <- function(
         "Wikibase Copy Item Log (",
         strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
       ),
-      description = description_text,
       creator = data_curator,
       dataset_date = Sys.Date()
     )
