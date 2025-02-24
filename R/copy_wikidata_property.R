@@ -116,7 +116,8 @@ copy_wikidata_property <- function(
       wikibase_api_url = wikibase_api_url,
       data_curator = data_curator,
       log_path = log_path,
-      csrf = csrf
+      csrf = csrf,
+      wikibase_session = wikibase_session
     )
 
     return_log_file$rowid <- defined(

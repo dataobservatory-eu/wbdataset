@@ -113,7 +113,8 @@ copy_wikidata_item <- function(
       wikibase_api_url = wikibase_api_url,
       data_curator = data_curator,
       log_path = log_path,
-      csrf = csrf
+      csrf = csrf,
+      wikibase_session = wikibase_session
     )
 
     return_log_file$rowid <- defined(
@@ -530,7 +531,8 @@ copy_wikidata_items <- function(qid_on_wikidata,
                                 wikibase_api_url,
                                 data_curator,
                                 log_path,
-                                csrf) {
+                                csrf,
+                                wikibase_session) {
   # Ensure that QIDs are used in the loop ----------------------------
   is_qid <- vapply(qid_on_wikidata, is_qid, logical(1))
   not_qid <- paste(names(which(!is_qid)), collapse = "|")

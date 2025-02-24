@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN status](https://www.r-pkg.org/badges/version/wbdataset)](https://CRAN.R-project.org/package=wbdataset)
-[![devel-version](https://img.shields.io/badge/devel%20version-0.1.1018-blue.svg)](https://github.com/dataobservatory-eu/wbdataset)
+[![devel-version](https://img.shields.io/badge/devel%20version-0.1.1019-blue.svg)](https://github.com/dataobservatory-eu/wbdataset)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13972192.svg)
 [![Codecov test coverage](https://codecov.io/gh/dataobservatory-eu/wbdataset/graph/badge.svg)](https://app.codecov.io/gh/dataobservatory-eu/wbdataset)
 <!-- badges: end -->
@@ -61,5 +61,3 @@ The *wbdataset* package has three tutorial articles:
 - [Importing from Wikidata or Wikibase](https://wbdataset.dataobservatory.eu/articles/wikidata-import.html) shows you how to import data from Wikidata.
 -  [Authenticated MediaWiki API Access](https://wbdataset.dataobservatory.eu/articles/Wikibase_API.html) shows how you log in to a Wikibase instance. If you use `wbdataset` to retrieve information only from Wikidata, you do not need this.
 - [Getting Started To Create a Graph on Wikibase](https://wbdataset.dataobservatory.eu/articles/start.html) shows how to add data to a Wikibase graph database.
-
-
