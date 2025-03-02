@@ -19,6 +19,10 @@
 #'   non-authenticated sources, this should be changed.)
 #' @param pid_equivalence_property The PID in Wikibase that records the
 #'   equivalent Wikidata PID as an external ID.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
 #' @param language A vector of language codes, for example, \code{c("en",
 #'   "et")}.
 #' @param wikibase_api_url For example,
@@ -47,6 +51,8 @@
 #'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 #'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 #'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+#'  \item{"classification_property"}{ Not applicable for properties.}
+#'  \item{"classification_id"}{ Not applicable for properties.}
 #'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 #'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 #'  \item{"time"}{ The time when the action started.}
@@ -191,6 +197,8 @@ copy_wikidata_property <- function(
       wikibase_api_url = wikibase_api_url,
       equivalence_property = equivalence_property,
       equivalence_id = pid_on_wikidata,
+      classification_property = NA_character_,
+      classification_id = NA_character_,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
@@ -344,6 +352,8 @@ copy_wikidata_property <- function(
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
+      classification_property = NA_character_,
+      classification_id = NA_character_,
       success = TRUE,
       comment = "",
       time = action_timestamp,
@@ -409,6 +419,8 @@ copy_wikidata_property <- function(
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
+      classification_property = NA_character_,
+      classification_id = NA_character_,
       success = FALSE,
       comment = "Wikibase validator label conflict: label-language pair already exists.",
       time = action_timestamp,
@@ -446,6 +458,8 @@ copy_wikidata_property <- function(
       wikibase_api_url = wikibase_api_url,
       equivalence_property = pid_equivalence_property,
       equivalence_id = pid_on_wikidata,
+      classification_property = NA_character_,
+      classification_id = NA_character_,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
@@ -498,6 +512,16 @@ copy_wikidata_property <- function(
       return_dataframe$equivalence_id,
       label = "Equivalent PID on Wikidata",
       namespace = "https://www.wikidata.org/wiki/"
+    ),
+        classification_property = defined(
+      return_dataframe$classification_property,
+      label = "A property relationship to a class or superclass",
+      namespace = wikibase_api_url
+    ),
+    classification_id = defined(
+      return_dataframe$classification_id,
+      label = "Superclass or class on the target instance.",
+      namespace = wikibase_api_url
     ),
     success = return_dataframe$success,
     comment = return_dataframe$comment,

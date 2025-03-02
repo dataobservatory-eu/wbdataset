@@ -20,6 +20,8 @@
 #'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 #'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 #'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+#'  \item{"classification_property"}{ Not applicable for properties.}
+#'  \item{"classification_id"}{ Not applicable for properties.}
 #'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 #'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 #'  \item{"time"}{ The time when the action started.}
@@ -51,6 +53,8 @@ initialise_logfile <- function(logfile_description="A wbdataset logfile.",
     wikibase_api_url = NA_character_,
     equivalence_property =  NA_character_,
     equivalence_id = NA_character_,
+    classification_property = NA_character_,
+    classification_id = NA_character_,
     success = FALSE,
     comment = NA_character_,
     time = NA_character_,

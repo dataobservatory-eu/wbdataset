@@ -19,6 +19,10 @@
 #' another system's defintions. Defaults to
 #'   \code{NA_character_}; if left missing, no equivalence relations is will be
 #'   claimed.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param data_curator The name of the data curator who runs the function and
@@ -44,6 +48,8 @@
 #'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created}
 #'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property}
 #'  \item{"equivalence_id"}{ The ID of an equivalent item defined elsewhere}
+#'  \item{"classification_property"}{ The PID that connects the item to a superclass, or class.}
+#'  \item{"classification_id"}{ The QID of a class, subclass or superclass.}
 #'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error}
 #'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE}
 #'  \item{"time"}{ The time when the action started}
@@ -74,6 +80,8 @@ create_item <- function(label,
                         language,
                         equivalence_property = NA_character_,
                         equivalence_id = NA_character_,
+                        classification_property = NA_character_,
+                        classification_id = NA_character_,
                         wikibase_api_url,
                         data_curator = NULL,
                         log_path = tempdir(),
@@ -200,6 +208,8 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
+      classificaiton_property = classification_property,
+      classification_id = classification_id,
       success = TRUE,
       comment = NA_character_,
       time = action_timestamp,
@@ -241,6 +251,8 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
+      classificaiton_property = classification_property,
+      classification_id = classification_id,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
       time = action_timestamp,
@@ -271,6 +283,8 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
+      classificaiton_property = classification_property,
+      classification_id = classification_id,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
@@ -320,6 +334,16 @@ create_item <- function(label,
       return_dataframe$equivalence_id,
       label = "Equivalent entity on Wikidata",
       namespace = "https://www.wikidata.org/wiki/"
+    ),
+    classification_property = defined(
+      return_dataframe$classification_property,
+      label = "A property relationship to a class or superclass",
+      namespace = wikibase_api_url
+    ),
+    classification_id = defined(
+      return_dataframe$classification_id,
+      label = "Superclass or class on the target instance.",
+      namespace = wikibase_api_url
     ),
     success = return_dataframe$success,
     comment = return_dataframe$comment,

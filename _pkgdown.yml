@@ -45,6 +45,7 @@ reference:
     desc: >
      Write to a Wikibase instance
     contents:
+     - initialise_logfile
      - create_item
      - create_property
      - add_statement

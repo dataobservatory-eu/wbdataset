@@ -11,6 +11,8 @@ copy_wikidata_item(
   qid_on_wikidata = "Q4",
   qid_equivalence_property = "P35",
   language = c("en", "nl", "hu"),
+  classification_property = NA_character_,
+  classification_id = NA_character_,
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
@@ -21,11 +23,14 @@ copy_wikidata_item(
 copy_wikidata_items(
   qid_on_wikidata,
   qid_equivalence_property,
+  classification_property,
+  classification_id,
   language,
   wikibase_api_url,
   data_curator,
   log_path,
-  csrf
+  csrf,
+  wikibase_session
 )
 
 copy_wikidata_properties(
@@ -79,6 +84,8 @@ Returns a dataset_df object. The columns are:
 \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+\item{"classification_property"}{ Not applicable for properties.}
+\item{"classification_id"}{ Not applicable for properties.}
 \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 \item{"time"}{ The time when the action started.}

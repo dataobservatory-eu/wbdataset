@@ -42,6 +42,12 @@ creates the log file, created with \link[utils]{person}.}
 parameters \code{qid_equivalence_property}, \code{language},
 \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
 \code{csrf} (for repeated use in a session.)}
+
+\item{classification_property}{The instance of, or subclass of, or superclass
+of property. Defaults to \code{NA_character} when not used.}
+
+\item{classification_id}{The QID of the class. Defaults to
+\code{NA_character} when not used.}
 }
 \value{
 Returns a dataset_df object. The columns are:
@@ -56,6 +62,8 @@ Returns a dataset_df object. The columns are:
 \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
+\item{"classification_property"}{ Not applicable for properties.}
+\item{"classification_id"}{ Not applicable for properties.}
 \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 \item{"time"}{ The time when the action started.}
