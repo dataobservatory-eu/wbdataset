@@ -19,6 +19,10 @@
 #'   equivalent Wikidata QID as an external ID.
 #' @param language A vector of language codes, for example, \code{c("en",
 #'   "et")}.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
 #' @param wikibase_api_url For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param data_curator The name of the data curator who runs the function and
@@ -45,8 +49,8 @@
 #'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 #'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 #'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
-#'  \item{"classification_property"}{ Not applicable for properties.}
-#'  \item{"classification_id"}{ Not applicable for properties.}
+#'  \item{"classification_property"}{ The PID that connects the item to a superclass, or class.}
+#'  \item{"classification_id"}{ The QID of a class, subclass or superclass.}
 #'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 #'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 #'  \item{"time"}{ The time when the action started.}
