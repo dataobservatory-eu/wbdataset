@@ -45,8 +45,8 @@
 #'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
 #'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
 #'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
-#'  \item{"classification_property"}{ Not applicable for properties.}
-#'  \item{"classification_id"}{ Not applicable for properties.}
+#'  \item{"classification_property"}{ The PID that connects the item to a superclass, or class.}
+#'  \item{"classification_id"}{ The QID of a class, subclass or superclass.}
 #'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
 #'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
 #'  \item{"time"}{ The time when the action started.}
