@@ -1,7 +1,7 @@
 Package: wbdataset
 Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
-Version: 0.1.1020
-Date: 2024-03-02
+Version: 0.1.1021
+Date: 2024-03-15
 Authors@R: 
     c(person(given="Daniel", family="Antal", 
            email= "daniel.antal@dataobservatory.eu", 
@@ -40,6 +40,7 @@ Imports:
     httr,
     magrittr,
     purrr,
+    readr,
     utils
 Language: en-US
 VignetteBuilder: knitr
