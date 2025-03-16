@@ -55,7 +55,9 @@ reference:
      Wikidata works, which is a special instance that does not require authentication.
     contents:
      - copy_wikidata_property
+     - check_existing_property
      - copy_wikidata_item
+     - check_existing_item
   - title: "Replication Dataset"
     desc: >
       Pre-downloaded data for tutorials and examples.

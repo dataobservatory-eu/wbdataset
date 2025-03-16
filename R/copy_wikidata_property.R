@@ -247,6 +247,26 @@ copy_wikidata_property <- function(
   }
 
   message("Default label for ", pid_on_wikidata, ": ", default_label)
+
+  existing_property <- check_existing_property(
+    action="copy_property",
+    search_term = default_label,
+    language="en",
+    action_timestamp = action_timestamp,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = NA_character_,
+    classification_id = NA_character_,
+    data_curator = data_curator,
+    log_file_name = log_file_name,
+    wikibase_api_url = wikibase_api_url,
+    csrf =  csrf )
+
+  if (!is.null(existing_property)) {
+    # return existing item
+    return(existing_property)
+  }
+
   labels_missing_list <- list()
 
   # The missing labels (i.e., translations that are missing for a label)
@@ -300,8 +320,8 @@ copy_wikidata_property <- function(
     Try get_csrf() with your credentials."
   )
 
-  assertthat::assert_that(nchar(csrf_token) == 42,
-    msg = "Your CSRF token should have 42 characters."
+  assertthat::assert_that(nchar(csrf_token) > 10,
+    msg = "Your CSRF token is usually, but not always 42 characters long."
   )
 
   # Posting the new property ----------------------------------------------

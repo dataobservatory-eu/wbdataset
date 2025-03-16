@@ -1,4 +1,4 @@
-#' @title Create a property
+#' @title Create an item
 #' @description Creates an item entity on a Wikibase instance with a single
 #' language labelling and description. New labels and descriptions can be added
 #' in further language later. This is a wrapper for
@@ -16,7 +16,7 @@
 #'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
 #'   equivalence relations is will be claimed.
 #' @param equivalence_id The identifier that uniquely identifies this item among
-#' another system's defintions. Defaults to
+#' another system's definitions. Defaults to
 #'   \code{NA_character_}; if left missing, no equivalence relations is will be
 #'   claimed.
 #' @param classification_property The instance of, or subclass of, or superclass
@@ -144,6 +144,25 @@ create_item <- function(label,
     assertthat::assert_that(
       ! is.na(equivalence_property),
       msg = "create_item() cannot add equivalence_id statement without equivalence_property.")
+  }
+
+  existing_item <- check_existing_item(
+    action="create_item",
+    search_term = label,
+    language=language,
+    action_timestamp = action_timestamp,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = classification_property,
+    classification_id = classification_id,
+    data_curator = data_curator,
+    log_file_name =  log_file_name,
+    wikibase_api_url = wikibase_api_url,
+    csrf =  csrf )
+
+  if (!is.null(existing_item)) {
+    # return existing item
+    return(existing_item)
   }
 
   default_labels <- list (language = language, value = label)
@@ -318,8 +337,6 @@ create_item <- function(label,
               append = TRUE
     )
   }
-
-
 
   description_text <- paste0(
     "Attempted and successful item creation on Wikibase to ",

@@ -140,6 +140,25 @@ create_property <- function(label,
       msg = "create_property() cannot add equivalence_id statement without equivalence_property.")
   }
 
+  existing_property <- check_existing_property(
+    action="create_property",
+    search_term = label,
+    language=language,
+    action_timestamp = action_timestamp,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = NA_character_,
+    classification_id = NA_character_,
+    data_curator = data_curator,
+    log_file_name =  log_file_name,
+    wikibase_api_url = wikibase_api_url,
+    csrf =  csrf )
+
+  if (!is.null(existing_property)) {
+    # return existing item
+    return(existing_property)
+  }
+
   default_labels <- list ( language = language,
                         value = label)
   labels_list <- list ( default_labels )

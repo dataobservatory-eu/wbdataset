@@ -23,3 +23,7 @@ get_claims(
 \description{
 Get the claims (statements) related to an item.
 }
+\details{
+A wrapper around
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities}{wbgetentities}.
+}

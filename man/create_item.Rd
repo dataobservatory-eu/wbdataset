@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_item.R
 \name{create_item}
 \alias{create_item}
-\title{Create a property}
+\title{Create an item}
 \usage{
 create_item(
   label,
@@ -33,7 +33,7 @@ CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
 equivalence relations is will be claimed.}
 
 \item{equivalence_id}{The identifier that uniquely identifies this item among
-another system's defintions. Defaults to
+another system's definitions. Defaults to
 \code{NA_character_}; if left missing, no equivalence relations is will be
 claimed.}
 

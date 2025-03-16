@@ -1,6 +1,9 @@
 #' @title Get claims of an item
 #' @description
 #' Get the claims (statements) related to an item.
+#' @details
+#' A wrapper around
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities}{wbgetentities}.
 #' @param qid The QID of the item.
 #' @param property The property for which the claim is required.
 #' @param wikibase_api_url The URL of the Wikibase API.

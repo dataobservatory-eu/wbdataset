@@ -81,6 +81,10 @@ copy_wikidata_item <- function(
       qid_equivalence_property <- wikibase_session$qid_equivalence_property
     }
 
+    if (!is.null(wikibase_session$classification_property)) {
+      classification_property <- wikibase_session$classification_property
+    }
+
     if(!is.null(wikibase_session$language)) {
       # overwrite session default if it does not exist
       if (is.null(language)) language <- wikibase_session$language
@@ -219,13 +223,6 @@ copy_wikidata_item <- function(
       logfile = log_file_name
     )
 
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-
-              append = TRUE
-    )
-
     return(return_dataframe)
   }
 
@@ -249,6 +246,25 @@ copy_wikidata_item <- function(
     default_label <- response$entities[[1]]$labels$en$value
   } else {
     default_label <- response$entities[[1]]$sitelinks$enwiki$title
+  }
+
+  existing_item <- check_existing_item(
+    action="copy_item",
+    search_term = default_label,
+    language = "en",
+    action_timestamp = action_timestamp,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = classification_property,
+    classification_id = classification_id,
+    data_curator = data_curator,
+    log_file_name =  log_file_name,
+    wikibase_api_url = wikibase_api_url,
+    csrf =  csrf )
+
+  if (!is.null(existing_item)) {
+    # return existing item
+    return(existing_item)
   }
 
   message("Default label for ", qid_on_wikidata, ": ", default_label)
