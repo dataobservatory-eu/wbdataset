@@ -49,7 +49,9 @@ You can of course use different secure ways to authenticate yourself, what is im
 
 ```{r keyring, eval=FALSE}
 library(keyring)
-key_set_with_value(service = "https://reprexbase.eu/demo/api.php", 
+# https://reprexbase.eu/example/api.php does not exist in reality
+
+key_set_with_value(service = "https://reprexbase.eu/example/api.php", 
                    username = "Demo@adminbot",
                    password = "8******************************b")
 ```
@@ -57,23 +59,33 @@ key_set_with_value(service = "https://reprexbase.eu/demo/api.php",
 You must never store those username-password pairs in your code to prevent it from accidentally getting to GitHub and it will be permanently revealed to everybody.  (There is no delete button on GitHub!)
 
 ```{r keyget, eval=FALSE}
-key_get(service = "https://reprexbase.eu/demo/api.php", username = "Demo2@adminbot" )
+key_get(service = "https://reprexbase.eu/example/api.php", 
+        username = "Demo2@adminbot" )
 ```
+
+
 
 To gain access to a MediaWiki API, you need to get a CSRF token, which is a secure random token (e.g., synchronizer token or challenge token) that is used to prevent CSRF attacks.
 
 
 ```{r csrftoken, eval=FALSE}
-my_csrf <- get_csrf(username="Demo@adminbot",
-                      password = key_get(service = "https://reprexbase.eu/demo/api.php",
-                                         username = "Demo@adminbot" ),
-                      wikibase_api_url =  "https://reprexbase.eu/demo/api.php")
+my_csrf <- get_csrf(
+  username="Demo@adminbot",
+  password = key_get(service = "https://reprexbase.eu/example/api.php",
+                     username = "Demo@adminbot" ),
+  wikibase_api_url =  "https://reprexbase.eu/example/api.php")
+```
 
-`Received a `handle`: https://reprexbase.eu/demo/api.php`
-response: Establish session with https://reprexbase.eu/demo/api.php: 200
-response: login to https://reprexbase.eu/demo/api.php: 200
-Login token: e2d4a59bc6***********
-Post login data to https://reprexbase.eu/demo/api.php
+If all goes well, you receive similar messages on your terminal (the API instance as well as the login token are fictional in this example):
+
+```
+Received a `handle`: https://reprexbase.eu/example/api.php
+response: Establish session with https://reprexbase.eu/example/api.php: 200
+Session: OK(200)
+response: login to https://reprexbase.eu/example/api.php: 200
+Login: OK(200)
+Login token: 7c7af4d52x***********
+Post login data to https://reprexbase.eu/example/api.php
 ```
 
 To interact with the Wikibase Instance, you will have to provide the API address of the instance and this CSRF object. In fact, under the hood, from the CSRF object `get_csrf_token(csrf)` function will unwrap your token itself from the CSRF security object holds the data of your session (not only the token itself.)
