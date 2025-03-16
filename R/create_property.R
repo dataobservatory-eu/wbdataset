@@ -29,6 +29,8 @@
 #'   \code{\link{get_csrf}}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
+#' @param log_file An explicitly stated full path to a possible log file,
+#' defaults to \code{NULL}.
 #' @param wikibase_session An optional list that contains any of the values of
 #'   \code{language},
 #'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
@@ -80,6 +82,7 @@ create_property <- function(label,
                             wikibase_api_url,
                             data_curator = NULL,
                             log_path = tempdir(),
+                            log_file_name = NULL,
                             csrf,
                             wikibase_session = NULL) {
 
@@ -103,6 +106,10 @@ create_property <- function(label,
       log_path <-  wikibase_session$log_path
     }
 
+    if (!is.null(wikibase_session$log_file_name)) {
+      log_file_name <- wikibase_session$log_file_name
+    }
+
     if(!is.null(wikibase_session$csrf)) {
       csrf <-  wikibase_session$csrf
     }
@@ -119,7 +126,10 @@ create_property <- function(label,
   # Save the time of running the code
   action_time <- Sys.time()
   action_timestamp <- action_timestamp_create()
-  log_file_name <- paste0("wbdataset_create_property_", action_timestamp, ".csv")
+
+  if (is.null(log_file_name)) {
+    log_file_name <- here(log_path, paste0("wbdataset_create_property_", action_timestamp, ".csv"))
+  }
 
   if ( !is.na(equivalence_id) ) {
     # If there is an equivalence ID, for example, a PID on Wikidata, than the
@@ -214,11 +224,11 @@ create_property <- function(label,
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE
+    )
 
     return_dataframe
   } else if (
@@ -253,12 +263,11 @@ create_property <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE
+    )
   } else {
     # Return an empty data.frame if there was some error, with trying to log
     # the error itself.
@@ -286,11 +295,10 @@ create_property <- function(label,
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE)
   }
 
   description_text <- paste0(
