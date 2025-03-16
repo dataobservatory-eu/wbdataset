@@ -1,5 +1,8 @@
 # wbdataset
 
+# 0.1.1023
+* check_existing_item, check_existing_property
+
 # 0.1.1014
 * copy_wikidata_item, copy_wikidata_property works with one or several items/properties
 
