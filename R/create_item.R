@@ -29,6 +29,8 @@
 #'   creates the log file, created with \link[utils]{person}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
+#' @param log_file An explicitly stated full path to a possible log file,
+#' defaults to \code{NULL}.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
@@ -85,6 +87,7 @@ create_item <- function(label,
                         wikibase_api_url,
                         data_curator = NULL,
                         log_path = tempdir(),
+                        log_file_name = NULL,
                         csrf,
                         wikibase_session) {
 
@@ -109,6 +112,10 @@ create_item <- function(label,
       log_path <-  wikibase_session$log_path
     }
 
+    if (!is.null(wikibase_session$log_file_name)) {
+      log_file_name <- wikibase_session$log_file_name
+    }
+
     if(!is.null(wikibase_session$csrf)) {
       csrf <-  wikibase_session$csrf
     }
@@ -124,7 +131,11 @@ create_item <- function(label,
 
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
-  log_file_name <- paste0("wbdataset_create_item_", action_timestamp, ".csv")
+  action_time <- Sys.time()
+
+  if (is.null(log_file_name)) {
+    log_file_name <- here(log_path, paste0("wbdataset_create_item_", action_timestamp, ".csv"))
+  }
 
   if ( !is.na(equivalence_id) ) {
     # If there is an equivalence ID, for example, a QID on Wikidata, than the
@@ -163,7 +174,7 @@ create_item <- function(label,
   )
 
   # Posting the new property ----------------------------------------------
-  new_property <- httr::POST(
+  new_item <- httr::POST(
     wikibase_api_url,
     body = list(
       action = "wbeditentity",
@@ -177,9 +188,9 @@ create_item <- function(label,
   )
 
   # See if the created POST via wbeditentity was successful
-  created_item_response <- httr::content(new_property,
-                                             as = "parsed",
-                                             type = "application/json")
+  created_item_response <- httr::content(new_item,
+                                         as = "parsed",
+                                         type = "application/json")
   created_item_response
 
   if (is_response_success(created_item_response)) {
@@ -187,12 +198,22 @@ create_item <- function(label,
     message("Successfully created item ", created_item_response$entity$id,
             " (", created_item_response$entity$labels$en$value, ")")
 
-    if (is.na(equivalence_property)) {
+    if (!is.na(equivalence_property)) {
       # If equivalence must be handled, not rewritten yet
       wikidata_qid_df <- add_id_statement(
         qid = created_item_response$entity$id,
         pid = equivalence_property,
         o = equivalence_id,
+        wikibase_api_url = wikibase_api_url,
+        csrf = csrf
+      )
+    }
+
+    if (!is.na(classification_property)) {
+      wikidata_classification_df <- add_item_statement(
+        qid = created_item_response$entity$id,
+        pid = classification_property,
+        o = classification_id,
         wikibase_api_url = wikibase_api_url,
         csrf = csrf
       )
@@ -216,11 +237,11 @@ create_item <- function(label,
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE
+    )
 
     return_dataframe
   } else if (
@@ -259,11 +280,11 @@ create_item <- function(label,
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE
+    )
   } else {
     # Return an empty data.frame if there was some error, with trying to log
     # the error itself.
@@ -291,11 +312,11 @@ create_item <- function(label,
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-              file = file.path(log_path, log_file_name),
-              row.names=FALSE,
+    write_csv(return_dataframe,
+              file = log_file_name,
               na = "NA",
-              fileEncoding = "UTF-8")
+              append = TRUE
+    )
   }
 
   description_text <- paste0(
