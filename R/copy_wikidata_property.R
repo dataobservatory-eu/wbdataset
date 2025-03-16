@@ -31,6 +31,8 @@
 #'   creates the log file, created with \link[utils]{person}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
+#' @param log_file An explicitly stated full path to a possible log file,
+#' defaults to \code{NULL}.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
@@ -68,6 +70,7 @@ copy_wikidata_property <- function(
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = NULL,
     log_path = tempdir(),
+    log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
 
@@ -94,6 +97,10 @@ copy_wikidata_property <- function(
 
     if (!is.null(wikibase_session$log_path)) {
       log_path <- wikibase_session$log_path
+    }
+
+    if (!is.null(wikibase_session$log_file_name)) {
+      log_file_name <- wikibase_session$log_file_name
     }
 
     if (!is.null(wikibase_session$csrf)) {
@@ -139,8 +146,9 @@ copy_wikidata_property <- function(
   action_time <- Sys.time()
   # Save the time of running the code
   action_timestamp <- wbdataset:::action_timestamp_create()
-  log_file_name <- paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv")
-
+  if (is.null(log_file_name)) {
+   log_file_name <- here(log_path, paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv"))
+  }
 
   # Assert that pid_on_wikidata makes sense
   pid_on_wikidata <- as.character(pid_on_wikidata)
@@ -205,11 +213,10 @@ copy_wikidata_property <- function(
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-      file = file.path(log_path, log_file_name),
-      row.names = FALSE,
-      na = "NA",
-      fileEncoding = "UTF-8"
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
     )
 
     return(return_dataframe)
@@ -343,6 +350,7 @@ copy_wikidata_property <- function(
     created_item_description <- created_property_response$entity$descriptions[1]
 
     return_dataframe <- data.frame(
+
       action = "copy_property",
       id_on_target = created_property_response$entity$id,
       label = created_item_label[[1]]$value,
@@ -360,11 +368,10 @@ copy_wikidata_property <- function(
       logfile = log_file_name
     )
 
-    write.csv(return_dataframe,
-      file = file.path(log_path, log_file_name),
-      row.names = FALSE,
-      na = "NA",
-      fileEncoding = "UTF-8"
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
     )
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     # Unwrap error message and send it to terminal
@@ -410,6 +417,7 @@ copy_wikidata_property <- function(
 
     # Create a return dataset that describes the conflict
     return_dataframe <- data.frame(
+
       action = "copy_property",
       id_on_target = old_pid,
       label = existing_label,
@@ -428,11 +436,10 @@ copy_wikidata_property <- function(
     )
 
     # Save the log file
-    write.csv(return_dataframe,
-      file = file.path(log_path, log_file_name),
-      row.names = FALSE,
-      na = "NA",
-      fileEncoding = "UTF-8"
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
     )
   } else {
     # Return an emptier data.frame if there was some error
@@ -449,6 +456,7 @@ copy_wikidata_property <- function(
     )
 
     return_dataframe <- data.frame(
+
       action = "copy_property",
       id_on_target = NA_character_,
       label = "<not retrieved>",
@@ -467,12 +475,10 @@ copy_wikidata_property <- function(
     )
 
     # Save the log file
-    write.csv(return_dataframe,
-      file = file.path(log_path, log_file_name),
-      row.names = FALSE,
-      na = "NA",
-      fileEncoding = "UTF-8"
-    )
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE)
   }
 
   description_text <- paste0(

@@ -11,6 +11,7 @@ copy_wikidata_property(
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
+  log_file_name = NULL,
   csrf,
   wikibase_session = NULL
 )
@@ -48,6 +49,9 @@ of property. Defaults to \code{NA_character} when not used.}
 
 \item{classification_id}{The QID of the class. Defaults to
 \code{NA_character} when not used.}
+
+\item{log_file}{An explicitly stated full path to a possible log file,
+defaults to \code{NULL}.}
 }
 \value{
 Returns a dataset_df object. The columns are:
