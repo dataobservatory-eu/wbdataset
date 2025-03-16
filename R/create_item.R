@@ -194,7 +194,7 @@ create_item <- function(label,
   created_item_response
 
   if (is_response_success(created_item_response)) {
-    # Successfully created the property
+    # Successfully created the item
     message("Successfully created item ", created_item_response$entity$id,
             " (", created_item_response$entity$labels$en$value, ")")
 
@@ -229,7 +229,7 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
-      classificaiton_property = classification_property,
+      classification_property = classification_property,
       classification_id = classification_id,
       success = TRUE,
       comment = NA_character_,
@@ -272,7 +272,7 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
-      classificaiton_property = classification_property,
+      classification_property = classification_property,
       classification_id = classification_id,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
@@ -304,7 +304,7 @@ create_item <- function(label,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
       equivalence_id = equivalence_id,
-      classificaiton_property = classification_property,
+      classification_property = classification_property,
       classification_id = classification_id,
       success = FALSE,
       comment = error_comments,
@@ -318,6 +318,8 @@ create_item <- function(label,
               append = TRUE
     )
   }
+
+
 
   description_text <- paste0(
     "Attempted and successful item creation on Wikibase to ",

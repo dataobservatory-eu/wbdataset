@@ -19,3 +19,14 @@ is_df_not_empty <- function(df) {
     FALSE
   }
 }
+
+#' @title Get return dataset column names
+#' @keywords internal
+get_return_ds_structure <- function(){
+  c("rowid", "action", "id_on_target",
+    "label", "description", "language",
+    "datatype","wikibase_api_url", "equivalence_property",
+    "equivalence_id", "classification_property", "classification_id",
+    "success", "comment", "time",
+    "logfile")
+}
