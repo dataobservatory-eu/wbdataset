@@ -205,7 +205,6 @@ copy_wikidata_item <- function(
     message(error_comments)
 
     return_dataframe <- data.frame(
-
       action = "copy_item",
       id_on_target = NA_character_,
       label = "<not retrieved>",
@@ -253,8 +252,8 @@ copy_wikidata_item <- function(
     search_term = default_label,
     language = "en",
     action_timestamp = action_timestamp,
-    equivalence_property = equivalence_property,
-    equivalence_id = equivalence_id,
+    equivalence_property = qid_equivalence_property,
+    equivalence_id = qid_on_wikidata,
     classification_property = classification_property,
     classification_id = classification_id,
     data_curator = data_curator,

@@ -62,11 +62,8 @@ check_existing_item <- function(action = "create_item",
   matching_items[exact_match]
 
   matching_item_data <- search_response$search[[which(exact_match)]]
-
-  if (action == "create_item") {
-    datatype <- "wikibase-item"
-    comment_text <- glue::glue("An item with the label ", search_term, " already exists in this Wikibase.")
-  }
+  datatype <- "wikibase-item"
+  comment_text <- glue::glue("An item with the label ", search_term, " already exists in this Wikibase.")
 
   return_dataframe <- data.frame(
     action = action,

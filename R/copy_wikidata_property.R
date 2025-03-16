@@ -253,8 +253,8 @@ copy_wikidata_property <- function(
     search_term = default_label,
     language="en",
     action_timestamp = action_timestamp,
-    equivalence_property = equivalence_property,
-    equivalence_id = equivalence_id,
+    equivalence_property = pid_equivalence_property,
+    equivalence_id = pid_on_wikidata,
     classification_property = NA_character_,
     classification_id = NA_character_,
     data_curator = data_curator,
@@ -370,7 +370,6 @@ copy_wikidata_property <- function(
     created_item_description <- created_property_response$entity$descriptions[1]
 
     return_dataframe <- data.frame(
-
       action = "copy_property",
       id_on_target = created_property_response$entity$id,
       label = created_item_label[[1]]$value,
@@ -539,7 +538,7 @@ copy_wikidata_property <- function(
       label = "Equivalent PID on Wikidata",
       namespace = "https://www.wikidata.org/wiki/"
     ),
-        classification_property = defined(
+    classification_property = defined(
       return_dataframe$classification_property,
       label = "A property relationship to a class or superclass",
       namespace = wikibase_api_url
