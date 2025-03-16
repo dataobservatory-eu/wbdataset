@@ -24,9 +24,8 @@ check_existing_item <- function(action = "create_item",
                                 wikibase_api_url,
                                 csrf) {
 
-  if ( is.null(action_timestamp)) {
-    action_timestamp <- action_timestamp_create()
-  }
+  action_timestamp <- action_timestamp_create()
+  action_time <- Sys.time()
 
   get_search <- httr::POST(
     wikibase_api_url,
