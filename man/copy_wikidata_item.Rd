@@ -16,6 +16,7 @@ copy_wikidata_item(
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   data_curator = NULL,
   log_path = tempdir(),
+  log_file_name = NULL,
   csrf,
   wikibase_session = NULL
 )
@@ -76,6 +77,9 @@ creates the log file, created with \link[utils]{person}.}
 parameters \code{qid_equivalence_property}, \code{language},
 \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
 \code{csrf} (for repeated use in a session.)}
+
+\item{log_file}{An explicitly stated full path to a possible log file,
+defaults to \code{NULL}.}
 }
 \value{
 Returns a dataset_df object. The columns are:
