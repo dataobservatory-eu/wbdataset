@@ -519,7 +519,7 @@ copy_wikidata_property <- function(
     ),
     description = defined(
       return_dataframe$description,
-      label = "Description of item"
+      label = "Description of entity"
     ),
     language = defined(
       return_dataframe$language,
