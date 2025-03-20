@@ -51,16 +51,20 @@ You can of course use different secure ways to authenticate yourself, what is im
 library(keyring)
 # https://reprexbase.eu/example/api.php does not exist in reality
 
-key_set_with_value(service = "https://reprexbase.eu/example/api.php", 
-                   username = "Demo@adminbot",
-                   password = "8******************************b")
+key_set_with_value(
+  service = "https://reprexbase.eu/example/api.php",
+  username = "Demo@adminbot",
+  password = "8******************************b"
+)
 ```
 
 You must never store those username-password pairs in your code to prevent it from accidentally getting to GitHub and it will be permanently revealed to everybody.  (There is no delete button on GitHub!)
 
 ```{r keyget, eval=FALSE}
-key_get(service = "https://reprexbase.eu/example/api.php", 
-        username = "Demo2@adminbot" )
+key_get(
+  service = "https://reprexbase.eu/example/api.php",
+  username = "Demo2@adminbot"
+)
 ```
 
 
@@ -70,10 +74,13 @@ To gain access to a MediaWiki API, you need to get a CSRF token, which is a secu
 
 ```{r csrftoken, eval=FALSE}
 my_csrf <- get_csrf(
-  username="Demo@adminbot",
-  password = key_get(service = "https://reprexbase.eu/example/api.php",
-                     username = "Demo@adminbot" ),
-  wikibase_api_url =  "https://reprexbase.eu/example/api.php")
+  username = "Demo@adminbot",
+  password = key_get(
+    service = "https://reprexbase.eu/example/api.php",
+    username = "Demo@adminbot"
+  ),
+  wikibase_api_url = "https://reprexbase.eu/example/api.php"
+)
 ```
 
 If all goes well, you receive similar messages on your terminal (the API instance as well as the login token are fictional in this example):

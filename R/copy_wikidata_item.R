@@ -73,7 +73,6 @@ copy_wikidata_item <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
-
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -85,14 +84,14 @@ copy_wikidata_item <- function(
       classification_property <- wikibase_session$classification_property
     }
 
-    if(!is.null(wikibase_session$language)) {
+    if (!is.null(wikibase_session$language)) {
       # overwrite session default if it does not exist
       if (is.null(language)) language <- wikibase_session$language
     }
 
-    if(!is.null(wikibase_session$data_curator)) {
+    if (!is.null(wikibase_session$data_curator)) {
       # overwrite session default if it does not exist
-      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
+      if (is.null(data_curator)) data_curator <- wikibase_session$data_curator
     }
 
     if (!is.null(wikibase_session$wikibase_api_url)) {
@@ -248,7 +247,7 @@ copy_wikidata_item <- function(
   }
 
   existing_item <- check_existing_item(
-    action="copy_item",
+    action = "copy_item",
     search_term = default_label,
     language = "en",
     action_timestamp = action_timestamp,
@@ -257,9 +256,10 @@ copy_wikidata_item <- function(
     classification_property = classification_property,
     classification_id = classification_id,
     data_curator = data_curator,
-    log_file_name =  log_file_name,
+    log_file_name = log_file_name,
     wikibase_api_url = wikibase_api_url,
-    csrf =  csrf )
+    csrf = csrf
+  )
 
   if (!is.null(existing_item)) {
     # return existing item
@@ -372,7 +372,6 @@ copy_wikidata_item <- function(
     created_item_description <- created_item_response$entity$descriptions[1]
 
     return_dataframe <- data.frame(
-
       action = "copy_item",
       id_on_target = created_item_response$entity$id,
       label = created_item_label[[1]]$value,
@@ -391,9 +390,9 @@ copy_wikidata_item <- function(
     )
 
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   } else if (
     # Case when we have clear message about a label conflict
@@ -462,10 +461,9 @@ copy_wikidata_item <- function(
     )
 
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   } else {
     # Return an emptier data.frame if there was some error
@@ -501,9 +499,9 @@ copy_wikidata_item <- function(
 
     # Save the log file
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   }
 
@@ -551,7 +549,7 @@ copy_wikidata_item <- function(
     ),
     classification_id = defined(
       return_dataframe$classification_id,
-      label = "Superclass or class on the target instance.",
+      label = "Superclass or class on the target instance",
       namespace = wikibase_api_url
     ),
     success = return_dataframe$success,

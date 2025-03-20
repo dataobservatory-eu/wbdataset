@@ -73,7 +73,6 @@ copy_wikidata_property <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
-
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -81,14 +80,14 @@ copy_wikidata_property <- function(
       pid_equivalence_property <- wikibase_session$pid_equivalence_property
     }
 
-    if(!is.null(wikibase_session$language)) {
+    if (!is.null(wikibase_session$language)) {
       # overwrite session default if it does not exist
       if (is.null(language)) language <- wikibase_session$language
     }
 
-    if(!is.null(wikibase_session$data_curator)) {
+    if (!is.null(wikibase_session$data_curator)) {
       # overwrite session default if it does not exist
-      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
+      if (is.null(data_curator)) data_curator <- wikibase_session$data_curator
     }
 
     if (!is.null(wikibase_session$wikibase_api_url)) {
@@ -117,7 +116,7 @@ copy_wikidata_property <- function(
     msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
   )
 
-  property_wikibase_datatype <- "<not retrieved>"  # set default value
+  property_wikibase_datatype <- "<not retrieved>" # set default value
 
   if (length(pid_on_wikidata) > 1) {
     # Run this function in a loop if there are several PIDs to copy
@@ -147,7 +146,7 @@ copy_wikidata_property <- function(
   # Save the time of running the code
   action_timestamp <- wbdataset:::action_timestamp_create()
   if (is.null(log_file_name)) {
-   log_file_name <- here(log_path, paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv"))
+    log_file_name <- here(log_path, paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv"))
   }
 
   # Assert that pid_on_wikidata makes sense
@@ -214,9 +213,9 @@ copy_wikidata_property <- function(
     )
 
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
 
     return(return_dataframe)
@@ -249,9 +248,9 @@ copy_wikidata_property <- function(
   message("Default label for ", pid_on_wikidata, ": ", default_label)
 
   existing_property <- check_existing_property(
-    action="copy_property",
+    action = "copy_property",
     search_term = default_label,
-    language="en",
+    language = "en",
     action_timestamp = action_timestamp,
     equivalence_property = pid_equivalence_property,
     equivalence_id = pid_on_wikidata,
@@ -260,7 +259,8 @@ copy_wikidata_property <- function(
     data_curator = data_curator,
     log_file_name = log_file_name,
     wikibase_api_url = wikibase_api_url,
-    csrf =  csrf )
+    csrf = csrf
+  )
 
   if (!is.null(existing_property)) {
     # return existing item
@@ -388,9 +388,9 @@ copy_wikidata_property <- function(
     )
 
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     # Unwrap error message and send it to terminal
@@ -436,7 +436,6 @@ copy_wikidata_property <- function(
 
     # Create a return dataset that describes the conflict
     return_dataframe <- data.frame(
-
       action = "copy_property",
       id_on_target = old_pid,
       label = existing_label,
@@ -456,9 +455,9 @@ copy_wikidata_property <- function(
 
     # Save the log file
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   } else {
     # Return an emptier data.frame if there was some error
@@ -475,7 +474,6 @@ copy_wikidata_property <- function(
     )
 
     return_dataframe <- data.frame(
-
       action = "copy_property",
       id_on_target = NA_character_,
       label = "<not retrieved>",
@@ -495,9 +493,10 @@ copy_wikidata_property <- function(
 
     # Save the log file
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE)
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
+    )
   }
 
   description_text <- paste0(
@@ -544,7 +543,7 @@ copy_wikidata_property <- function(
     ),
     classification_id = defined(
       return_dataframe$classification_id,
-      label = "Superclass or class on the target instance.",
+      label = "Superclass or class on the target instance",
       namespace = wikibase_api_url
     ),
     success = return_dataframe$success,

@@ -381,7 +381,7 @@ create_item <- function(label,
     ),
     classification_id = defined(
       return_dataframe$classification_id,
-      label = "Superclass or class on the target instance.",
+      label = "Superclass or class on the target instance",
       namespace = wikibase_api_url
     ),
     success = return_dataframe$success,

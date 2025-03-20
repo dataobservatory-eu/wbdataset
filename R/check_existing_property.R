@@ -16,7 +16,7 @@ check_existing_property <- function(
     search_term,
     language,
     action_timestamp = NULL,
-    equivalence_property =  NA_character_,
+    equivalence_property = NA_character_,
     equivalence_id = NA_character_,
     classification_property = NA_character_,
     classification_id = NA_character_,
@@ -24,7 +24,6 @@ check_existing_property <- function(
     data_curator = person("Unknown", "Person"),
     wikibase_api_url,
     csrf) {
-
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
@@ -36,17 +35,16 @@ check_existing_property <- function(
       language = language,
       formatversion = 2,
       format = "json",
-      type="property",
-      strictlanguage="true"
+      type = "property",
+      strictlanguage = "true"
     ),
     encode = "form",
     handle = csrf
   )
 
   search_response <- httr::content(get_search, as = "parsed", type = "application/json")
-  if ( search_response$success == 1 ) {
-
-    if ( length(search_response$search) == 0 ) {
+  if (search_response$success == 1) {
+    if (length(search_response$search) == 0) {
       # No match was found
       return(NULL)
     }
@@ -56,9 +54,11 @@ check_existing_property <- function(
     this_display$label$value == search_term && this_display$label$language == language
   }
 
-  matching_props <- vapply (1:length(search_response$search), function(x) search_response$search[[x]]$id, character(1)  )
-  exact_match <- vapply (1:length(search_response$search), function(x) is_display_match(search_response$search[[x]]$display),
-                         logical(1)  )
+  matching_props <- vapply(1:length(search_response$search), function(x) search_response$search[[x]]$id, character(1))
+  exact_match <- vapply(
+    1:length(search_response$search), function(x) is_display_match(search_response$search[[x]]$display),
+    logical(1)
+  )
 
   matching_props[exact_match]
 
@@ -73,8 +73,8 @@ check_existing_property <- function(
     action = action,
     id_on_target = matching_property_data$id,
     label = matching_property_data$label,
-    description =  matching_property_data$description,
-    language =  language,
+    description = matching_property_data$description,
+    language = language,
     datatype = datatype,
     wikibase_api_url = wikibase_api_url,
     equivalence_property = equivalence_property,
@@ -116,13 +116,12 @@ check_existing_property <- function(
     wikibase_api_url = wikibase_api_url,
     equivalence_property = defined(
       return_dataframe$equivalence_property,
-      label = paste0("Equivalence property on  ", wikibase_api_url),
+      label = paste0("Equivalence property on ", wikibase_api_url),
       namespace = wikibase_api_url
     ),
     equivalence_id = defined(
       return_dataframe$equivalence_id,
-      label = "Equivalent entity on Wikidata",
-      namespace = "https://www.wikidata.org/wiki/"
+      label = "Equivalent entity in a different graph"
     ),
     classification_property = defined(
       return_dataframe$classification_property,
@@ -131,7 +130,7 @@ check_existing_property <- function(
     ),
     classification_id = defined(
       return_dataframe$classification_id,
-      label = "Superclass or class on the target instance.",
+      label = "Superclass or class on the target instance",
       namespace = wikibase_api_url
     ),
     success = return_dataframe$success,
@@ -150,7 +149,8 @@ check_existing_property <- function(
   )
 
   return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
-                             namespace = wikibase_api_url)
+    namespace = wikibase_api_url
+  )
 
   return_ds
 }

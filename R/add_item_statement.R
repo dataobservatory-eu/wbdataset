@@ -6,30 +6,31 @@
 
 add_item_statement <- function(qid, pid, o,
                                wikibase_type = "item",
-                               wikibase_api_url=NULL,
+                               wikibase_api_url = NULL,
                                csrf) {
-
   # api.php?action=wbcreateclaim&entity=Q4115189&property=P9003&snaktype=value&value={"entity-type":"item","numeric-id":1}
 
   assertthat::assert_that(!is.null(wikibase_api_url),
-                          msg="No wikibase_api_url is given")
+    msg = "No wikibase_api_url is given"
+  )
 
   csrf_token <- get_csrf_token(csrf = csrf)
 
   base_string <- '{"entity-type":"item","numeric-id":numid}'
   new_numeric_id <- gsub("Q", "", o)
-  datavalue <- gsub('numid', new_numeric_id, base_string)
+  datavalue <- gsub("numid", new_numeric_id, base_string)
   datavalue
 
   claim_body <- list(
     action = "wbcreateclaim",
-    entity   = qid,
+    entity = qid,
     property = pid,
     snaktype = "value",
-    value =  datavalue,
+    value = datavalue,
     # '"datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}}',
     token = csrf_token,
-    format = "json")
+    format = "json"
+  )
 
   new_claim <- httr::POST(
     wikibase_api_url,
@@ -38,10 +39,11 @@ add_item_statement <- function(qid, pid, o,
       entity = qid,
       property = pid,
       snaktype = "value",
-      value =  datavalue,
+      value = datavalue,
       # '"datavalue":{"value":"https://www.wikidata.org/wiki/Q43878","type":"string"}}',
       token = csrf_token,
-      format = "json"),
+      format = "json"
+    ),
     encode = "form",
     handle = csrf
   )
@@ -49,7 +51,7 @@ add_item_statement <- function(qid, pid, o,
   response <- httr::content(new_claim, as = "parsed", type = "application/json")
 
   if ("error" %in% names(response)) {
-    #invalid snak error at type mismatch
+    # invalid snak error at type mismatch
     warning_message <- glue::glue("Error in 'wbcreateclaim' wrapper add_item_statement():\n", response$error$code, ": ", response$error$info)
     warning(warning_message)
 
@@ -68,6 +70,5 @@ add_item_statement <- function(qid, pid, o,
       o = pid,
       p = response$claim$mainsnak$datavalue$value$id
     )
-    }
+  }
 }
-
