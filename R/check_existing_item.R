@@ -112,13 +112,12 @@ check_existing_item <- function(action = "create_item",
     wikibase_api_url = wikibase_api_url,
     equivalence_property = defined(
       return_dataframe$equivalence_property,
-      label = paste0("Equivalence property on  ", wikibase_api_url),
+      label = paste0("Equivalence property on ", wikibase_api_url),
       namespace = wikibase_api_url
     ),
     equivalence_id = defined(
       return_dataframe$equivalence_id,
-      label = "Equivalent entity on Wikidata",
-      namespace = "https://www.wikidata.org/wiki/"
+      label = "Equivalent entity in a different graph"
     ),
     classification_property = defined(
       return_dataframe$classification_property,
