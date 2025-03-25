@@ -390,7 +390,7 @@ create_item <- function(label,
     logfile = return_dataframe$logfile,
     dataset_bibentry = dublincore(
       title = paste0(
-        "Wikibase Create Property Log (",
+        "Wikibase Create Item Log (",
         strftime(action_time, "%Y-%m-%d %H:%M:%OS0"), ")"
       ),
       description_text,

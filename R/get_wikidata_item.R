@@ -78,8 +78,8 @@ get_wikidata_item <- function(
       label = paste0("qid_on_wikidata on ", wikibase_api_url),
       namespace = wikibase_api_url
     ),
-    label = defined(return_df$label, label = "Label of item"),
-    description = defined(return_df$description, label = "Description of item"),
+    label = defined(return_df$label, label = "Label of entity"),
+    description = defined(return_df$description, label = "Description of entity"),
     language = defined(return_df$language, label = "Language of label and description"),
     dataset_bibentry = dublincore(
       title = title,

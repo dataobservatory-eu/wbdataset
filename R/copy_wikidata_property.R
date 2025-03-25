@@ -515,7 +515,7 @@ copy_wikidata_property <- function(
     ),
     label = defined(
       return_dataframe$label,
-      label = "Label of item"
+      label = "Label of entity"
     ),
     description = defined(
       return_dataframe$description,

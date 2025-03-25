@@ -42,6 +42,12 @@ check_existing_item <- function(action = "create_item",
   )
 
   search_response <- httr::content(get_search, as = "parsed", type = "application/json")
+
+  if (is.null(search_response$error)) {
+    stop(paste(search_response$error$code, ": ", search_response$error$info))
+  }
+
+
   if (search_response$success == 1) {
     if (length(search_response$search) == 0) {
       # No match was found
