@@ -44,7 +44,7 @@ check_existing_property <- function(
 
   search_response <- httr::content(get_search, as = "parsed", type = "application/json")
 
-  if (is.null(search_response$error)) {
+  if (!is.null(search_response$error)) {
     stop(paste(search_response$error$code, ": ", search_response$error$info))
   }
 
