@@ -29,8 +29,9 @@
 #' creates the log file, created with \link[utils]{person}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
-#' @param log_file An explicitly stated full path to a possible log file,
-#' defaults to \code{NULL}.
+#' @param log_file An explicitly stated full path to a possible CSV log file,
+#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
+#' created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
@@ -151,7 +152,7 @@ copy_wikidata_item <- function(
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
   if (is.null(log_file_name)) {
-    log_file_name <- here(log_path, paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv"))
+    log_file_name <- ""
   }
 
 
@@ -389,11 +390,6 @@ copy_wikidata_item <- function(
       logfile = log_file_name
     )
 
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
-    )
   } else if (
     # Case when we have clear message about a label conflict
     any(c(
@@ -459,12 +455,6 @@ copy_wikidata_item <- function(
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
-    )
   } else {
     # Return an emptier data.frame if there was some error
 
@@ -495,13 +485,6 @@ copy_wikidata_item <- function(
       comment = error_comments,
       time = action_timestamp,
       logfile = log_file_name
-    )
-
-    # Save the log file
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
     )
   }
 
@@ -570,6 +553,13 @@ copy_wikidata_item <- function(
     namespace = wikibase_api_url
   )
 
+  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
+    )
+  }
   return_ds
 }
 

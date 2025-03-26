@@ -29,8 +29,9 @@
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}.
 #' @param data_curator The name of the data curator who runs the function and
 #'   creates the log file, created with \link[utils]{person}.
-#' @param log_path A path to save the log file. Defaults to the return value of
-#'   \code{\link{tempdir()}}.
+#' @param log_file An explicitly stated full path to a possible CSV log file,
+#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
+#' created.
 #' @param log_file An explicitly stated full path to a possible log file,
 #' defaults to \code{NULL}.
 #' @param csrf The CSRF token of your session, received with
@@ -146,7 +147,7 @@ copy_wikidata_property <- function(
   # Save the time of running the code
   action_timestamp <- wbdataset:::action_timestamp_create()
   if (is.null(log_file_name)) {
-    log_file_name <- here(log_path, paste0("wbdataset_copy_wikibase_item_", action_timestamp, ".csv"))
+    log_file_name <- ""
   }
 
   # Assert that pid_on_wikidata makes sense
@@ -211,14 +212,6 @@ copy_wikidata_property <- function(
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
-    )
-
-    return(return_dataframe)
   }
 
   # aliases: response$entities[[1]]$aliases
@@ -387,11 +380,6 @@ copy_wikidata_property <- function(
       logfile = log_file_name
     )
 
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
-    )
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     # Unwrap error message and send it to terminal
     message_strings <- unlist(created_property_response$error$messages)
@@ -453,12 +441,6 @@ copy_wikidata_property <- function(
       logfile = log_file_name
     )
 
-    # Save the log file
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
-    )
   } else {
     # Return an emptier data.frame if there was some error
 
@@ -489,13 +471,6 @@ copy_wikidata_property <- function(
       comment = error_comments,
       time = action_timestamp,
       logfile = log_file_name
-    )
-
-    # Save the log file
-    write_csv(return_dataframe,
-      file = log_file_name,
-      na = "NA",
-      append = TRUE
     )
   }
 
@@ -565,6 +540,14 @@ copy_wikidata_property <- function(
   return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
     namespace = wikibase_api_url
   )
+
+  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
+    )
+  }
 
   return_ds
 }

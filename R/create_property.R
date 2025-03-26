@@ -29,8 +29,9 @@
 #'   \code{\link{get_csrf}}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
-#' @param log_file An explicitly stated full path to a possible log file,
-#' defaults to \code{NULL}.
+#' @param log_file An explicitly stated full path to a possible CSV log file,
+#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
+#' created.
 #' @param wikibase_session An optional list that contains any of the values of
 #'   \code{language},
 #'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
@@ -242,13 +243,6 @@ create_property <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
-    )
-
     return_dataframe
   } else if (
     "wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)
@@ -282,11 +276,6 @@ create_property <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
-    )
   } else {
     # Return an empty data.frame if there was some error, with trying to log
     # the error itself.
@@ -313,11 +302,6 @@ create_property <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE)
   }
 
   description_text <- paste0(
@@ -383,6 +367,14 @@ create_property <- function(label,
   return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
                              namespace = wikibase_api_url
   )
+
+  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
+    )
+  }
 
   return_ds
 }

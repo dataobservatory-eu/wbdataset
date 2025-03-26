@@ -1,6 +1,6 @@
 Package: wbdataset
 Title: Making Datasets Truly Interoperable and Reusable in R with Wikibase
-Version: 0.1.1033
+Version: 0.1.1034
 Date: 2024-03-26
 Authors@R: 
     c(person(given="Daniel", family="Antal", 

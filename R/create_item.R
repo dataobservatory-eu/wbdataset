@@ -29,8 +29,9 @@
 #'   creates the log file, created with \link[utils]{person}.
 #' @param log_path A path to save the log file. Defaults to the return value of
 #'   \code{\link{tempdir()}}.
-#' @param log_file An explicitly stated full path to a possible log file,
-#' defaults to \code{NULL}.
+#' @param log_file An explicitly stated full path to a possible CSV log file,
+#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
+#' created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
@@ -255,13 +256,6 @@ create_item <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
-    )
-
     return_dataframe
   } else if (
     # There is a wikibase-validator-...-conflict in the error message
@@ -298,12 +292,6 @@ create_item <- function(label,
       time = action_timestamp,
       logfile = log_file_name
     )
-
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
-    )
   } else {
     # Return an empty data.frame if there was some error, with trying to log
     # the error itself.
@@ -329,12 +317,6 @@ create_item <- function(label,
       comment = error_comments,
       time = action_timestamp,
       logfile = log_file_name
-    )
-
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
     )
   }
 
@@ -402,6 +384,14 @@ create_item <- function(label,
   return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
                              namespace = wikibase_api_url
   )
+
+  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+    write_csv(return_dataframe,
+              file = log_file_name,
+              na = "NA",
+              append = TRUE
+    )
+  }
 
   return_ds
 }
