@@ -66,6 +66,11 @@ check_existing_property <- function(
     logical(1)
   )
 
+  if (! any(exact_match)) { return(NULL) }
+  if ( is.null(search_response$search[[1]])) { return(NULL) }
+  if ( ! is.list(search_response$search[[1]])) { return(NULL) }
+  if ( is.null(search_response$search[[which(exact_match)]])) { return(NULL)}
+
   matching_props[exact_match]
 
   matching_property_data <- search_response$search[[which(exact_match)]]

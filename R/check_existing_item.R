@@ -65,6 +65,11 @@ check_existing_item <- function(action = "create_item",
     logical(1)
   )
 
+  if (! any(exact_match)) { return(NULL) }
+  if ( is.null(search_response$search[[1]])) { return(NULL) }
+  if ( ! is.list(search_response$search[[1]])) { return(NULL) }
+  if ( is.null(search_response$search[[which(exact_match)]])) { return(NULL)}
+
   matching_items[exact_match]
 
   matching_item_data <- search_response$search[[which(exact_match)]]
