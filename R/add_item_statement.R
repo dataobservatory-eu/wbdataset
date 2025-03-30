@@ -1,7 +1,8 @@
 #' @rdname add_statement
-#' @inheritParams add_statement
-#' @param wikibase_type Defaults to \code{'item'}.
-#' @param o The item to be added to the statement as an object in the semantic triple.
+#' @param qid The QID of the item in the Wikibase instance that you use.
+#' @param pid The PID of the equivalent Wikidata (or reference Wikibase) URI.
+#' @param o The object of the semantic statement.
+#' @param wikibase_type It must be \code{'item'}.
 #' @export
 
 add_item_statement <- function(qid, pid, o,

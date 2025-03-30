@@ -14,24 +14,28 @@
 #'   replaces the more general \code{equivalence_id}, because we must use QID
 #'   for identification in an other Wikibase instance.
 #' @param qid_on_wikidata The QID of the item to be copied to your Wikibase. A
-#' single valid QID or a vector of several QIDs.
+#'   single valid QID or a vector of several QIDs.
 #' @param qid_equivalence_property The QID in Wikibase that records the
 #'   equivalent Wikidata QID as an external ID.
-#' @param language A vector of language codes, for example, \code{c("en",
-#'   "et")}.
+#' @param language Defaults to \code{c("en", "nl", "hu")}. A character string of
+#'   the languages in which the users wants to receive the labels and
+#'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+#'   47}-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
+#'   for Hungarian.)
 #' @param classification_property The instance of, or subclass of, or superclass
 #'   of property. Defaults to \code{NA_character} when not used.
 #' @param classification_id The QID of the class. Defaults to
 #'   \code{NA_character} when not used.
-#' @param wikibase_api_url For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+#'   api.php.
 #' @param data_curator The name of the data curator who runs the function and
-#' creates the log file, created with \link[utils]{person}.
-#' @param log_path A path to save the log file. Defaults to the return value of
-#'   \code{\link{tempdir()}}.
-#' @param log_file An explicitly stated full path to a possible CSV log file,
-#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
-#' created.
+#'   creates the log file, created with \link[utils]{person}.
+#' @param log_file_name An explicitly stated full path to a possible CSV log
+#'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+#'   will be created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
@@ -40,24 +44,25 @@
 #'   \code{csrf} (for repeated use in a session.)
 #' @importFrom assertthat assert_that
 #' @importFrom utils person
-#' @return Returns a dataset_df object. The columns are:
-#' \itemize{
-#'  \item{"rowid"}{ A row identifier. }
-#'  \item{"action"}{ The create_item() function name. }
-#'  \item{"id_on_target"}{ The new item identifier (QID) on the targeted Wikibase.}
-#'  \item{"label"}{ The propery label}
-#'  \item{"description"}{ The description label}
-#'  \item{"language"}{ The language code of the label.}
-#'  \item{"datatype"}{ The datatype of the property, for example, `string`}
-#'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
-#'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
-#'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
-#'  \item{"classification_property"}{ The PID that connects the item to a superclass, or class.}
-#'  \item{"classification_id"}{ The QID of a class, subclass or superclass.}
-#'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
-#'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
-#'  \item{"time"}{ The time when the action started.}
-#'  \item{"logfile"}{ The name of the CSV logfile.}
+#' @return Returns a \code{\link[dataset]{dataset_df}} object.
+#' The columns are:\cr
+#' \describe{
+#'  \item{\code{rowid}}{A row identifier. }
+#'  \item{\code{action}}{\code{copy_wikidata_item}}
+#'  \item{\code{id_on_target}}{The new item identifier (QID) on the targeted Wikibase.}
+#'  \item{\code{label}}{The propery label}
+#'  \item{\code{description}}{The description label}
+#'  \item{\code{language}}{The language code of the label.}
+#'  \item{\code{datatype}}{The datatype of the property, for example, `string`}
+#'  \item{\code{wikibase_api_url}}{The MediaWiki API URL where the new property is created.}
+#'  \item{\code{equivalence_property}}{The PID that connects an equivalence ID to the property.}
+#'  \item{\code{equivalence_id}}{The ID of an equivalent property defined elsewhere.}
+#'  \item{\code{classification_property}}{The PID that connects the item to a superclass, or class.}
+#'  \item{\code{classification_id}}{The QID of a class, subclass or superclass.}
+#'  \item{\code{success}}{TRUE if successfully created, FALSE if there was an error.}
+#'  \item{\code{comment}}{A summary of the error messages(s), if success is FALSE.}
+#'  \item{\code{time}}{The time when the action started.}
+#'  \item{\code{logfile}}{The name of the CSV logfile.}
 #' }
 #' The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
@@ -70,7 +75,6 @@ copy_wikidata_item <- function(
     classification_id = NA_character_,
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = NULL,
-    log_path = tempdir(),
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
@@ -99,10 +103,6 @@ copy_wikidata_item <- function(
       wikibase_api_url <- wikibase_session$wikibase_api_url
     }
 
-    if (!is.null(wikibase_session$log_path)) {
-      log_path <- wikibase_session$log_path
-    }
-
     if (!is.null(wikibase_session$log_file_name)) {
       log_file_name <- wikibase_session$log_file_name
     }
@@ -115,7 +115,6 @@ copy_wikidata_item <- function(
   # Assertions for correct inputs ------------------------------------------------
 
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
-  if (is.null(log_path)) log_path <- tempdir()
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
@@ -133,7 +132,6 @@ copy_wikidata_item <- function(
       language = language,
       wikibase_api_url = wikibase_api_url,
       data_curator = data_curator,
-      log_path = log_path,
       csrf = csrf,
       wikibase_session = wikibase_session
     )
@@ -251,7 +249,6 @@ copy_wikidata_item <- function(
     action = "copy_item",
     search_term = default_label,
     language = "en",
-    action_timestamp = action_timestamp,
     equivalence_property = qid_equivalence_property,
     equivalence_id = qid_on_wikidata,
     classification_property = classification_property,
@@ -572,7 +569,6 @@ copy_wikidata_items <- function(qid_on_wikidata,
                                 language,
                                 wikibase_api_url,
                                 data_curator,
-                                log_path,
                                 csrf,
                                 wikibase_session) {
   # Ensure that QIDs are used in the loop ----------------------------
@@ -605,10 +601,6 @@ copy_wikidata_items <- function(qid_on_wikidata,
       wikibase_api_url <- wikibase_session$wikibase_api_url
     }
 
-    if (!is.null(wikibase_session$log_path)) {
-      log_path <- wikibase_session$log_path
-    }
-
     if (!is.null(wikibase_session$csrf)) {
       csrf <- wikibase_session$csrf
     }
@@ -624,7 +616,6 @@ copy_wikidata_items <- function(qid_on_wikidata,
         language = language,
         wikibase_api_url = wikibase_api_url,
         data_curator = data_curator,
-        log_path = log_path,
         csrf = csrf
       )
     }

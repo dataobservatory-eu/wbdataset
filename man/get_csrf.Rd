@@ -16,7 +16,11 @@ get_csrf_token(csrf)
 \item{password}{Your bot password on the Wikibase instance at
 \code{wikibase_api_url}.}
 
-\item{wikibase_api_url}{The API URL for the Wikibase instance.}
+\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
+address that the \code{wbdataset} R client sends requests to when
+interacting with the knowledge base. For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+api.php.}
 
 \item{csrf}{The csrf object returned by \code{\link{get_csrf}}.}
 }

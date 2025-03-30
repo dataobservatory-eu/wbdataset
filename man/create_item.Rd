@@ -14,17 +14,25 @@ create_item(
   classification_id = NA_character_,
   wikibase_api_url,
   data_curator = NULL,
-  log_path = tempdir(),
   log_file_name = NULL,
   csrf,
-  wikibase_session
+  wikibase_session = NULL
 )
 }
 \arguments{
-\item{description}{A single description, for example, \code{"A member of the
+\item{label}{A language-specific, human-readable name for the Wikibase entity
+(item, property, or Lexeme). Used when setting or retrieving the entity’s
+label in the specified language, for example, \code{"human"}.}
+
+\item{description}{A short, language-specific textual summary of the Wikibase
+entity (such as an item, property, or Lexeme). Descriptions help
+disambiguate entities with similar labels and are not required to be unique
+but are typically distinct within the same language. For example, \code{"A member of the
 homo sapience species."}.}
 
-\item{language}{A single language code, for example, \code{"en"}.}
+\item{language}{A single language code that indicates the language of the
+label and description, using BCP 47-compliant language tags (e.g., "en" for
+English, "fr" for French).}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new
@@ -43,45 +51,46 @@ of property. Defaults to \code{NA_character} when not used.}
 \item{classification_id}{The QID of the class. Defaults to
 \code{NA_character} when not used.}
 
-\item{wikibase_api_url}{For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}.}
+\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
+address that the \code{wbdataset} R client sends requests to when
+interacting with the knowledge base. For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+api.php.}
 
 \item{data_curator}{The name of the data curator who runs the function and
 creates the log file, created with \link[utils]{person}.}
 
-\item{log_path}{A path to save the log file. Defaults to the return value of
-\code{\link{tempdir()}}.}
+\item{log_file_name}{An explicitly stated full path to a possible CSV log
+file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+will be created.}
 
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 
 \item{wikibase_session}{An optional list that contains any of the values of
 \code{language},
-\code{wikibase_api_url}, \code{data_curator},\code{log_path} and
+\code{wikibase_api_url}, \code{data_curator}, and
 \code{csrf} (for repeated use in a session.)}
-
-\item{log_file}{An explicitly stated full path to a possible log file,
-defaults to \code{NULL}.}
 }
 \value{
-Currently returns a data.frame, this should be a dataset. The columns
-are:
-\itemize{
-\item{"action"}{ create_property}
-\item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
-\item{"label"}{ The propery label}
-\item{"description"}{ The description label}
-\item{"language"}{ The language code of the label}
-\item{"datatype"}{ Defaults to \code{item}}
-\item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created}
-\item{"equivalence_property"}{ The PID that connects an equivalence ID to the property}
-\item{"equivalence_id"}{ The ID of an equivalent item defined elsewhere}
-\item{"classification_property"}{ The PID that connects the item to a superclass, or class.}
-\item{"classification_id"}{ The QID of a class, subclass or superclass.}
-\item{"success"}{ TRUE if successfully created, FALSE if there was an error}
-\item{"comment"}{ A summary of the error messages(s), if success is FALSE}
-\item{"time"}{ The time when the action started}
-\item{"logfile"}{ The name of the CSV logfile}
+Returns a \code{\link[dataset]{dataset_df}} object.
+The columns are:\cr
+\describe{
+\item{\code{action}}{\code{create_item}}
+\item{\code{id_on_target}}{The new Property Identifier (PID) on the targeted Wikibase.}
+\item{\code{label}}{The propery label}
+\item{\code{description}}{The description label}
+\item{\code{language}}{The language code of the label}
+\item{\code{datatype}}{Defaults to \code{item}}
+\item{\code{wikibase_api_url}}{The MediaWiki API URL where the new property is created}
+\item{\code{equivalence_property}}{The PID that connects an equivalence ID to the property}
+\item{\code{equivalence_id}}{The ID of an equivalent item defined elsewhere}
+\item{\code{classification_property}}{The PID that connects the item to a superclass, or class.}
+\item{\code{classification_id}}{The QID of a class, subclass or superclass.}
+\item{\code{success}}{TRUE if successfully created, FALSE if there was an error}
+\item{\code{comment}}{A summary of the error messages(s), if success is FALSE}
+\item{\code{time}}{The time when the action started}
+\item{\code{logfile}}{The name of the CSV logfile}
 }
 }
 \description{

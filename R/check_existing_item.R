@@ -14,7 +14,6 @@
 check_existing_item <- function(action = "create_item",
                                 search_term,
                                 language,
-                                action_timestamp = NULL,
                                 equivalence_property = NA_character_,
                                 equivalence_id = NA_character_,
                                 classification_property = NA_character_,

@@ -5,8 +5,11 @@
 #'   Wikidata itself.)
 #' @param prefix The prefix to use before the qid_on_wikidata, for example, defaults to
 #'   \code{"http://www.wikidata.org/entity/"}.
-#' @param language A character vector of language codes, for example,
-#'   \code{c("en", "nl", "hu")}.
+#' @param language Defaults to \code{c("en", "nl", "hu")}. A character string of
+#'   the languages in which the users wants to receive the labels and
+#'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+#'   47}-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
+#'   for Hungarian.)
 #' @param wikibase_api_url Defaults to
 #'   \code{"https://www.wikidata.org/w/api.php"}.
 #' @param data_curator The name of the data curator who runs the function and
@@ -16,8 +19,9 @@
 #' @importFrom httr POST content
 #' @importFrom utils person
 #' @importFrom dataset dataset_df defined dublincore
-#' @return A dataset with the qid_on_wikidatas, labels, description, and the language codes
-#'   of the labels and descriptions.
+#' @return A Returns a \code{\link[dataset]{dataset_df}} object with the
+#'   qid_on_wikidatas, labels, description, and the language codes of the labels
+#'   and descriptions.
 #' @examples
 #' get_wikidata_item("Q42", language = c("en", "nl"))
 #' @export

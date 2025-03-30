@@ -6,6 +6,10 @@
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 #' action=wbsearchentities}.
 #' @param action Defaults to \code{"create_property"}.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
 #' @param search_term A label in the given language, for example, "Estonia".
 #' @inheritParams create_property
 #' @return A data.frame or NULL.
@@ -15,7 +19,6 @@ check_existing_property <- function(
     action = "create_property",
     search_term,
     language,
-    action_timestamp = NULL,
     equivalence_property = NA_character_,
     equivalence_id = NA_character_,
     classification_property = NA_character_,
@@ -24,6 +27,7 @@ check_existing_property <- function(
     data_curator = person("Unknown", "Person"),
     wikibase_api_url,
     csrf) {
+
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 

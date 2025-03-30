@@ -8,7 +8,6 @@ check_existing_item(
   action = "create_item",
   search_term,
   language,
-  action_timestamp = NULL,
   equivalence_property = NA_character_,
   equivalence_id = NA_character_,
   classification_property = NA_character_,
@@ -24,7 +23,9 @@ check_existing_item(
 
 \item{search_term}{A label in the given language, for example, "Estonia".}
 
-\item{language}{A single language code, for example, \code{"en"}.}
+\item{language}{A single language code that indicates the language of the
+label and description, using BCP 47-compliant language tags (e.g., "en" for
+English, "fr" for French).}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new
@@ -43,11 +44,18 @@ of property. Defaults to \code{NA_character} when not used.}
 \item{classification_id}{The QID of the class. Defaults to
 \code{NA_character} when not used.}
 
+\item{log_file_name}{An explicitly stated full path to a possible CSV log
+file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+will be created.}
+
 \item{data_curator}{The name of the data curator who runs the function and
 creates the log file, created with \link[utils]{person}.}
 
-\item{wikibase_api_url}{For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}.}
+\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
+address that the \code{wbdataset} R client sends requests to when
+interacting with the knowledge base. For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+api.php.}
 
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}

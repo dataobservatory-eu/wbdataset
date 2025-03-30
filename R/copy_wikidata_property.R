@@ -23,43 +23,48 @@
 #'   of property. Defaults to \code{NA_character} when not used.
 #' @param classification_id The QID of the class. Defaults to
 #'   \code{NA_character} when not used.
-#' @param language A vector of language codes, for example, \code{c("en",
-#'   "et")}.
-#' @param wikibase_api_url For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#' @param language Defaults to \code{c("en", "nl", "hu")}. A character string of
+#'   the languages in which the users wants to receive the labels and
+#'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+#'   47}-compliant language tags (e.g., "en" for English, and "hu"
+#'   for Hungarian.)
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+#'   api.php.
 #' @param data_curator The name of the data curator who runs the function and
 #'   creates the log file, created with \link[utils]{person}.
-#' @param log_file An explicitly stated full path to a possible CSV log file,
-#' defaults to \code{NULL}. If the value is \code{NULL}, no log file will be
-#' created.
-#' @param log_file An explicitly stated full path to a possible log file,
-#' defaults to \code{NULL}.
+#' @param log_file_name An explicitly stated full path to a possible CSV log
+#'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+#'   will be created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @param wikibase_session An optional list that contains any of the values of
 #'   parameters \code{qid_equivalence_property}, \code{language},
-#'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
-#'   \code{csrf} (for repeated use in a session.)
+#'   \code{wikibase_api_url}, \code{data_curator}, and \code{csrf} (for repeated
+#'   use in a session.)
 #' @importFrom assertthat assert_that
 #' @importFrom utils person
-#' @return Returns a dataset_df object. The columns are:
-#' \itemize{
-#'  \item{"rowid"}{ A row identifier. }
-#'  \item{"action"}{ The create_property() function name. }
-#'  \item{"id_on_target"}{ The new Property Identifier (PID) on the targeted Wikibase.}
-#'  \item{"label"}{ The propery label}
-#'  \item{"description"}{ The description label}
-#'  \item{"language"}{ The language code of the label.}
-#'  \item{"datatype"}{ The datatype of the property, for example, `string`}
-#'  \item{"wikibase_api_url"}{ The MediaWiki API URL where the new property is created.}
-#'  \item{"equivalence_property"}{ The PID that connects an equivalence ID to the property.}
-#'  \item{"equivalence_id"}{ The ID of an equivalent property defined elsewhere.}
-#'  \item{"classification_property"}{ Not applicable for properties.}
-#'  \item{"classification_id"}{ Not applicable for properties.}
-#'  \item{"success"}{ TRUE if successfully created, FALSE if there was an error.}
-#'  \item{"comment"}{ A summary of the error messages(s), if success is FALSE.}
-#'  \item{"time"}{ The time when the action started.}
-#'  \item{"logfile"}{ The name of the CSV logfile.}
+#' @return Returns a \code{\link[dataset]{dataset_df}} object. The columns
+#'   are:\cr
+#' \describe{
+#'  \item{\code{rowid}}{A row identifier.}
+#'  \item{\code{action}}{The \code{copy_wikidata_property} function name.}
+#'  \item{\code{id_on_target}}{The new Property Identifier (PID) on the targeted Wikibase.}
+#'  \item{\code{label}}{The propery label.}
+#'  \item{\code{description}}{The description label.}
+#'  \item{\code{language}}{The language code of the label.}
+#'  \item{\code{datatype}}{The datatype of the property, for example, `string`}
+#'  \item{\code{wikibase_api_url}}{The MediaWiki API URL where the new property is created.}
+#'  \item{\code{equivalence_property}}{The PID that connects an equivalence ID to the property.}
+#'  \item{\code{equivalence_id}}{The ID of an equivalent property defined elsewhere.}
+#'  \item{\code{classification_property}}{Not applicable for properties.}
+#'  \item{\code{classification_id}}{Not applicable for properties.}
+#'  \item{\code{success}}{TRUE if successfully created, FALSE if there was an error.}
+#'  \item{\code{comment}}{A summary of the error messages(s), if success is FALSE.}
+#'  \item{\code{time}}{The time when the action started.}
+#'  \item{\code{logfile}}{The name of the CSV logfile.}
 #' }
 #'   The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
@@ -70,7 +75,6 @@ copy_wikidata_property <- function(
     language = c("en", "hu"),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = NULL,
-    log_path = tempdir(),
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
@@ -95,10 +99,6 @@ copy_wikidata_property <- function(
       wikibase_api_url <- wikibase_session$wikibase_api_url
     }
 
-    if (!is.null(wikibase_session$log_path)) {
-      log_path <- wikibase_session$log_path
-    }
-
     if (!is.null(wikibase_session$log_file_name)) {
       log_file_name <- wikibase_session$log_file_name
     }
@@ -110,7 +110,6 @@ copy_wikidata_property <- function(
 
   # Assertions for correct inputs ------------------------------------------------
   if (is.null(data_curator)) data_curator <- person("Person", "Unknown")
-  if (is.null(log_path)) log_path <- tempdir()
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
@@ -128,7 +127,6 @@ copy_wikidata_property <- function(
       language = language,
       wikibase_api_url = wikibase_api_url,
       data_curator = data_curator,
-      log_path = log_path,
       csrf = csrf,
       wikibase_session = wikibase_session
     )
@@ -145,10 +143,7 @@ copy_wikidata_property <- function(
   # Timestamping ---------------------------------------------------------------------
   action_time <- Sys.time()
   # Save the time of running the code
-  action_timestamp <- wbdataset:::action_timestamp_create()
-  if (is.null(log_file_name)) {
-    log_file_name <- ""
-  }
+  action_timestamp <- action_timestamp_create()
 
   # Assert that pid_on_wikidata makes sense
   pid_on_wikidata <- as.character(pid_on_wikidata)
@@ -244,7 +239,6 @@ copy_wikidata_property <- function(
     action = "copy_property",
     search_term = default_label,
     language = "en",
-    action_timestamp = action_timestamp,
     equivalence_property = pid_equivalence_property,
     equivalence_id = pid_on_wikidata,
     classification_property = NA_character_,
@@ -561,7 +555,6 @@ copy_wikidata_properties <- function(
     language,
     wikibase_api_url,
     data_curator,
-    log_path,
     csrf,
     wikibase_session = NULL) {
   # Ensure that PIDs are used in the loop ----------------------------
@@ -594,10 +587,6 @@ copy_wikidata_properties <- function(
       wikibase_api_url <- wikibase_session$wikibase_api_url
     }
 
-    if (!is.null(wikibase_session$log_path)) {
-      log_path <- wikibase_session$log_path
-    }
-
     if (!is.null(wikibase_session$csrf)) {
       csrf <- wikibase_session$csrf
     }
@@ -611,7 +600,6 @@ copy_wikidata_properties <- function(
         language = language,
         wikibase_api_url = wikibase_api_url,
         data_curator = data_curator,
-        log_path = log_path,
         csrf = csrf
       )
     }

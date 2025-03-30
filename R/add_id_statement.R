@@ -1,13 +1,27 @@
 #' @rdname add_statement
-#' @inheritParams add_statement
+#' @description See
+#' \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+#' API help}
+#' @param qid The QID of the item in the Wikibase instance that you use.
+#' @param pid The PID of the equivalent Wikidata (or reference Wikibase) URI.
+#' @param o The object of the semantic statement.
 #' @param wikibase_type Defaults to \code{"external-id"}.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+#'   api.php.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}.
 #' @importFrom httr POST content
 #' @importFrom glue glue
 #' @export
-add_id_statement <- function(qid, pid, o,
-                             wikibase_type = "external-id",
-                             wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
-                             csrf) {
+add_id_statement <- function(
+    qid, pid, o,
+    wikibase_type = "external-id",
+    wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
+    csrf) {
+
   datavalue <- paste0('"', o, '"')
   datavalue
 

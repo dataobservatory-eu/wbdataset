@@ -17,8 +17,11 @@ get_wikidata_item(
 \item{qid_on_wikidata}{A single qid_on_wikidata or a vector of qid_on_wikidatas on a Wikibase instance (or
 Wikidata itself.)}
 
-\item{language}{A character vector of language codes, for example,
-\code{c("en", "nl", "hu")}.}
+\item{language}{Defaults to \code{c("en", "nl", "hu")}. A character string of
+the languages in which the users wants to receive the labels and
+descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+47}-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
+for Hungarian.)}
 
 \item{prefix}{The prefix to use before the qid_on_wikidata, for example, defaults to
 \code{"http://www.wikidata.org/entity/"}.}
@@ -32,8 +35,9 @@ creates the log file, created with \link[utils]{person}.}
 \item{title}{The title of the dataset.}
 }
 \value{
-A dataset with the qid_on_wikidatas, labels, description, and the language codes
-of the labels and descriptions.
+A Returns a \code{\link[dataset]{dataset_df}} object with the
+qid_on_wikidatas, labels, description, and the language codes of the labels
+and descriptions.
 }
 \description{
 Get item definitions by qid_on_wikidata from a Wikibase instance or

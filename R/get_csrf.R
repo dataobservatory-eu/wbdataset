@@ -20,7 +20,11 @@
 #'   \code{wikibase_api_url}.
 #' @param password Your bot password on the Wikibase instance at
 #'   \code{wikibase_api_url}.
-#' @param wikibase_api_url The API URL for the Wikibase instance.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+#'   api.php.
 #' @return \code{\link{get_csrf}} returns a list that contains the CSRF token
 #'   among other data.
 #' @importFrom httr handle GET POST content

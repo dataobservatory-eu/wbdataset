@@ -1,28 +1,31 @@
 #' @title Get property definition
-#' @description
-#' Receive the label and description of a property on the basis of its PID from
-#' a Wikibase instance. It will not add further statements about the property.
-#' @details
-#' Currently the languages choose a default, "en", for cases where the user-chosen
-#' language return empty labels and descriptions. This feature may be elaborated
-#' or changed later. The function receives aliases (alternative labels), too,
-#' but does not return them; the format of aliases needs to be decided in view
-#' of how other functions will use them, as aliases themselves can break the
-#' tidiness of the returned data.
-#' @param pid The PID of the property in the Wikibase instance (or Wikidata itself).
-#' @param languages Defaults to \code{c("en", "nl", "hu")}. A character string of
-#' the languages in which the users wants to receive the labels and descriptions
-#' of the property.
-#' @param wikibase_api_url Defaults to \code{"https://www.wikidata.org/w/api.php"},
-#' may be replaced with a similar API address of a Wikibase instance. Private
-#' instances may require an authenticated session.
-#' @return_type Defaults to \code{"data.frame"} that is suitable for receiving
-#' the information in stand-alone use. The \code{"JSON"} passes on a JSON string
-#' in the format that you may need it in further Wikibase API calls.
-#' @return A data.frame of the \code{PID} with the labels and descriptions of the
-#' property in the selected languages. Alternatively, when
-#' \code{return_type="JSON"}, the same data prepared for use in a subsequent
-#' API call, for example, to copy these contents into a new Wikibase instance.
+#' @description Receive the label and description of a property on the basis of
+#' its PID from a Wikibase instance. It will not add further statements about
+#' the property.
+#' @details Currently the languages choose a default, "en", for cases where the
+#' user-chosen language return empty labels and descriptions. This feature may
+#' be elaborated or changed later. The function receives aliases (alternative
+#' labels), too, but does not return them; the format of aliases needs to be
+#' decided in view of how other functions will use them, as aliases themselves
+#' can break the tidiness of the returned data.
+#' @param pid The PID of the property in the Wikibase instance (or Wikidata
+#'   itself).
+#' @param languages Defaults to \code{c("en", "nl", "hu")}. A character string
+#'   of the languages in which the users wants to receive the labels and
+#'   descriptions of the property. The vector of languages must use BCP
+#'   47-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
+#'   ofr Hungarian.)
+#' @param wikibase_api_url Defaults to
+#'   \code{"https://www.wikidata.org/w/api.php"}, may be replaced with a similar
+#'   API address of a Wikibase instance. Private instances may require an
+#'   authenticated session.
+#' @param return_type Defaults to \code{"data.frame"} that is suitable for receiving
+#'   the information in stand-alone use. The \code{"JSON"} passes on a JSON
+#'   string in the format that you may need it in further Wikibase API calls.
+#' @return A data.frame of the \code{PID} with the labels and descriptions of
+#'   the property in the selected languages. Alternatively, when
+#'   \code{return_type="JSON"}, the same data prepared for use in a subsequent
+#'   API call, for example, to copy these contents into a new Wikibase instance.
 #' @importFrom assertthat assert_that
 #' @importFrom purrr safely
 #' @importFrom httr content

@@ -5,7 +5,6 @@
 \alias{add_id_statement}
 \alias{add_item_statement}
 \alias{add_statement}
-\alias{add_wikibase_url_statement}
 \title{Add statements}
 \usage{
 add_id_statement(
@@ -13,7 +12,7 @@ add_id_statement(
   pid,
   o,
   wikibase_type = "external-id",
-  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
   csrf
 )
 
@@ -34,14 +33,6 @@ add_statement(
   wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
   csrf
 )
-
-add_wikibase_url_statement(
-  qid,
-  pid,
-  wikibase_url,
-  wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
-  csrf_token
-)
 }
 \arguments{
 \item{qid}{The QID of the item in the Wikibase instance that you use.}
@@ -52,11 +43,14 @@ add_wikibase_url_statement(
 
 \item{wikibase_type}{A \code{'item'}, \code{'numeric'}, or \code{'string'}.}
 
-\item{wikibase_api_url}{\code{\link{"https://reprexbase.eu/demowiki/api.php"}}.}
+\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
+address that the \code{wbdataset} R client sends requests to when
+interacting with the knowledge base. For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+api.php.}
 
-\item{csrf}{The CSRF token of your session, received with \code{\link{get_csrf}}.}
-
-\item{wikidata_uri}{The QID on Wikidata (or a reference Wikibase).}
+\item{csrf}{The CSRF token of your session, received with
+\code{\link{get_csrf}}.}
 }
 \value{
 A data.frame with four columns:
@@ -64,5 +58,11 @@ A data.frame with four columns:
 \code{o} with the PID, and \code{p} with the  wikidata_uri.
 }
 \description{
-See \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki API help}
+See
+\link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+API help}
+
+See
+\link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+API help}
 }

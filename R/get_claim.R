@@ -6,7 +6,11 @@
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities}{wbgetentities}.
 #' @param qid The QID of the item.
 #' @param property The property for which the claim is required.
-#' @param wikibase_api_url The URL of the Wikibase API.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+#'   api.php.
 #' @param csrf A response csrf received with \code{\link{get_csrf}}.
 #' @export
 
