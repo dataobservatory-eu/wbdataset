@@ -2,19 +2,14 @@
 #' @description Receive the label and description of a property on the basis of
 #' its PID from a Wikibase instance. It will not add further statements about
 #' the property.
-#' @details Currently the languages choose a default, "en", for cases where the
-#' user-chosen language return empty labels and descriptions. This feature may
-#' be elaborated or changed later. The function receives aliases (alternative
-#' labels), too, but does not return them; the format of aliases needs to be
-#' decided in view of how other functions will use them, as aliases themselves
-#' can break the tidiness of the returned data.
+#' @details Currently the language has a choose a default, \code{"en"}, for
+#'   cases where the user-chosen language return empty labels and descriptions.
+#'   This feature may be elaborated or changed later. The function receives
+#'   aliases (alternative labels), too, but does not return them; the format of
+#'   aliases needs to be decided in view of how other functions will use them,
+#'   as aliases themselves can break the tidiness of the returned data.
 #' @param pid The PID of the property in the Wikibase instance (or Wikidata
 #'   itself).
-#' @param languages Defaults to \code{c("en", "nl", "hu")}. A character string
-#'   of the languages in which the users wants to receive the labels and
-#'   descriptions of the property. The vector of languages must use BCP
-#'   47-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
-#'   ofr Hungarian.)
 #' @param wikibase_api_url Defaults to
 #'   \code{"https://www.wikidata.org/w/api.php"}, may be replaced with a similar
 #'   API address of a Wikibase instance. Private instances may require an
@@ -33,13 +28,14 @@
 #' @examples
 #' # Receive a data.frame for further use
 #' get_property_definition(pid = "P2047", return_type = "data.frame")
+#'
 #' # Receive JSON for copying with wbeditidentiy
 #' get_property_definition(pid = "P2047", languages = c("en", "hu"))
 #' @export
 
 get_property_definition <- function(
     pid,
-    languages = c("en", "nl", "hu"),
+    language = c("en", "nl", "hu"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     return_type = "JSON") {
   ## Ensure that the pid is a character string starting with P followed by
@@ -116,15 +112,15 @@ get_property_definition <- function(
 
   ## We must determine which labels, descriptions, aliases actually exist
   ## in the languages requested by the user.
-  labels_present <- languages[which(languages %in% names(response$entities[[1]]$labels))]
-  labels_missing <- languages[which(!languages %in% names(response$entities[[1]]$labels))]
+  labels_present <- language[which(language %in% names(response$entities[[1]]$labels))]
+  labels_missing <- language[which(!language %in% names(response$entities[[1]]$labels))]
 
-  descriptions_present <- languages[which(languages %in% names(response$entities[[1]]$descriptions))]
-  descriptions_missing <- languages[which(!languages %in% names(response$entities[[1]]$descriptions))]
+  descriptions_present <- language[which(language %in% names(response$entities[[1]]$descriptions))]
+  descriptions_missing <- language[which(!language %in% names(response$entities[[1]]$descriptions))]
 
   # We do not work with the aliases now, but they may be used later.
-  aliases_present <- languages[which(languages %in% names(response$entities[[1]]$aliases))]
-  aliases_missing <- languages[which(!languages %in% names(response$entities[[1]]$aliases))]
+  aliases_present <- language[which(language %in% names(response$entities[[1]]$aliases))]
+  aliases_missing <- language[which(!language %in% names(response$entities[[1]]$aliases))]
 
   ## Set a default later, this is now hard coded to English but could be a parameter.
 
