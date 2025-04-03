@@ -87,7 +87,7 @@ check_existing_item <- function(search_term,
     logical(1)
   )
 
-  if (sum(exact_match)>0) {
+  if (sum(exact_match)>1) {
     stop("Multiple items [", paste(matching_items, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
   }
 

@@ -87,7 +87,7 @@ check_existing_property <- function(
     logical(1)
   )
 
-  if (sum(exact_match)>0) {
+  if (sum(exact_match)>1) {
     stop("Multiple items [", paste(matching_props, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
   }
 
