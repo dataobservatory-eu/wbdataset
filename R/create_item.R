@@ -150,7 +150,7 @@ create_item <- function(label,
   existing_item <- check_existing_item(
     action="create_item",
     search_term = label,
-    language=language,
+    language = language,
     equivalence_property = equivalence_property,
     equivalence_id = equivalence_id,
     classification_property = classification_property,

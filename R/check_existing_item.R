@@ -76,11 +76,20 @@ check_existing_item <- function(search_term,
     this_display$label$value == search_term && this_display$label$language == language
   }
 
-  matching_items <- vapply(1:length(search_response$search), function(x) search_response$search[[x]]$id, character(1))
+  matching_items <- vapply(1:length(search_response$search),
+                           function(x) search_response$search[[x]]$id,
+                           character(1))
+
+
   exact_match <- vapply(
-    1:length(search_response$search), function(x) is_display_match(search_response$search[[x]]$display),
+    1:length(search_response$search),
+    function(x) is_display_match(search_response$search[[x]]$display),
     logical(1)
   )
+
+  if (sum(exact_match)>0) {
+    stop("Multiple items [", paste(matching_items, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
+  }
 
   if (! any(exact_match)) { return(NULL) }
   if ( is.null(search_response$search[[1]])) { return(NULL) }

@@ -81,10 +81,15 @@ check_existing_property <- function(
   }
 
   matching_props <- vapply(1:length(search_response$search), function(x) search_response$search[[x]]$id, character(1))
+
   exact_match <- vapply(
     1:length(search_response$search), function(x) is_display_match(search_response$search[[x]]$display),
     logical(1)
   )
+
+  if (sum(exact_match)>0) {
+    stop("Multiple items [", paste(matching_props, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
+  }
 
   if (! any(exact_match)) { return(NULL) }
   if ( is.null(search_response$search[[1]])) { return(NULL) }
