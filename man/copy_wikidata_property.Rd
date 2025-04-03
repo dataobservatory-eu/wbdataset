@@ -65,7 +65,7 @@ are:\cr
 \item{\code{rowid}}{A row identifier.}
 \item{\code{action}}{The \code{copy_wikidata_property} function name.}
 \item{\code{id_on_target}}{The new Property Identifier (PID) on the targeted Wikibase.}
-\item{\code{label}}{The propery label.}
+\item{\code{label}}{The property label.}
 \item{\code{description}}{The description label.}
 \item{\code{language}}{The language code of the label.}
 \item{\code{datatype}}{The datatype of the property, for example, \code{string}}

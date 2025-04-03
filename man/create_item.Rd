@@ -78,7 +78,7 @@ The columns are:\cr
 \describe{
 \item{\code{action}}{\code{create_item}}
 \item{\code{id_on_target}}{The new Property Identifier (PID) on the targeted Wikibase.}
-\item{\code{label}}{The propery label}
+\item{\code{label}}{The property label}
 \item{\code{description}}{The description label}
 \item{\code{language}}{The language code of the label}
 \item{\code{datatype}}{Defaults to \code{item}}

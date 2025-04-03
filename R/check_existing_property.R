@@ -95,8 +95,6 @@ check_existing_property <- function(
 
   matching_property_data <- search_response$search[[which(exact_match)]]
 
-
-
   if (action %in% c("create_property", "copy_property")) {
     datatype <- get_property_definition(matching_property_data$id, "en",
                                         wikibase_api_url = wikibase_api_url,
@@ -120,7 +118,7 @@ check_existing_property <- function(
     success = FALSE,
     comment = comment_text,
     time = action_timestamp,
-    logfile = log_file_name
+    logfile = ifelse(is.null(log_file_name), "", log_file_name)
   )
 
   description_text <- paste0(

@@ -108,7 +108,7 @@ check_existing_item <- function(search_term,
     success = FALSE,
     comment = comment_text,
     time = action_timestamp,
-    logfile = log_file_name
+    logfile = ifelse(is.null(log_file_name), "", log_file_name)
   )
 
   description_text <- paste0(
