@@ -5,22 +5,20 @@
 \title{Check if a label already has an property.}
 \usage{
 check_existing_property(
-  action = "create_property",
   search_term,
   language,
   equivalence_property = NA_character_,
   equivalence_id = NA_character_,
   classification_property = NA_character_,
   classification_id = NA_character_,
+  action = "create_property",
   log_file_name = NA_character_,
   data_curator = person("Unknown", "Person"),
-  wikibase_api_url,
-  csrf
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf = NULL
 )
 }
 \arguments{
-\item{action}{Defaults to \code{"create_property"}.}
-
 \item{search_term}{A label in the given language, for example, "Estonia".}
 
 \item{language}{A single language code that indicates the language of the
@@ -44,6 +42,8 @@ of property. Defaults to \code{NA_character} when not used.}
 \item{classification_id}{The QID of the class. Defaults to
 \code{NA_character} when not used.}
 
+\item{action}{Defaults to \code{"create_property"}.}
+
 \item{log_file_name}{An explicitly stated full path to a possible CSV log
 file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 will be created.}
@@ -53,21 +53,31 @@ creates the log file, created with \link[utils]{person}.}
 
 \item{wikibase_api_url}{The full URL of the Wikibase API, which is the
 address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+interacting with the knowledge base. In this case it defaults to
+\code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
+CSRF is needed.}
 
 \item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}.}
+\code{\link{get_csrf}}, not needed if
+\code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
+to \code{NULL}.}
 }
 \value{
 A data.frame or NULL.
 }
 \description{
-Avoid failed writing attempts by checking if a label already matches an item.
+Avoid failed writing attempts by checking if a label already
+matches an item.
 }
 \details{
 A wrapper around
 \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 action=wbsearchentities}.
+}
+\examples{
+# No CSRF needed for Wikidata, but you will need it for Wikibase Suit
+check_existing_property(
+    search_term="instance of",
+    language = "en",
+    wikibase_api_url="https://www.wikidata.org/w/api.php")
 }

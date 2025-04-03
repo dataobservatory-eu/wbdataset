@@ -18,7 +18,7 @@ You get reading API access to Wikidata (GET) without a password. But if you want
 
 ## Security first
 
-CSRF is a way for a malicious website to exploit your logged-in session on another website to perform actions as you without your consent. The [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) (the API of Wikibase instances) employs CSRF tokens (also often called "edit tokens" in the MediaWiki context) as a crucial defence mechanism against Cross-Site Request Forgery attacks.
+CSRF is a way for a malicious website to exploit your logged-in session on another website to perform actions as you without your consent. The [MediaWiki API](https://www.mediawiki.org/wiki/API:Main_page) (the API of Wikibase instances) employs CSRF tokens (also often called "edit tokens" in the MediaWiki context) as a crucial defense mechanism against Cross-Site Request Forgery attacks.
 
 To receive such a CSRF security token (connected to your current editing session on a Wikibase instance) you have to run first `get_csrf()` to establish your session and your credentials. As a result, you will receive a csrf object which contains among other data, your CSRF token. Then, now running the `get_csrf_token()` function will unwrap from returned CSRF object the token itself, which is often, but not necessarily, a character string of length 42.
 

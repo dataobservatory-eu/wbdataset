@@ -1,8 +1,7 @@
-#' Countries on Wikidata
-#'
+#' @title Countries on Wikidata
+#' @description
 #' A small dataset of countries, including sovereign states and autonomous
 #' parts of federal states taken from Wikidata.
-#'
 #' @format ## `wikidata_countries_df`
 #' A data frame with 4 rows and 4 columns:
 #' \describe{

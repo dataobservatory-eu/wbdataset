@@ -1,27 +1,45 @@
 #' @title Check if a label already has an item.
-#' @description
-#' Avoid failed writing attempts by checking if a label already matches an item.
-#' @details
-#' A wrapper around
+#' @description Avoid failed writing attempts by checking if a label already
+#' matches an item.
+#' @details A wrapper around
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 #' action=wbsearchentities}.
 #' @param action Defaults to \code{"create_item"}.
 #' @param search_term A label in the given language, for example, "Estonia".
+#' @param language A single language code that indicates the language of the
+#'   label and description, using BCP 47-compliant language tags (e.g., "en" for
+#'   English, "fr" for French). Defaults to \code{"en"} for English.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. In this case it defaults to
+#'   \code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
+#'   CSRF is needed.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}, not needed if
+#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
+#'   to \code{NULL}.
 #' @inheritParams create_item
 #' @return A data.frame or NULL.
+#' @examples
+#' check_existing_item(
+#'     search_term="Estonian National Museum",
+#'     language = "en",
+#'     wikibase_api_url="https://www.wikidata.org/w/api.php",
+#'     csrf=NULL)
 #' @export
 
-check_existing_item <- function(action = "create_item",
-                                search_term,
-                                language,
+check_existing_item <- function(search_term,
+                                language = "en",
                                 equivalence_property = NA_character_,
                                 equivalence_id = NA_character_,
                                 classification_property = NA_character_,
                                 classification_id = NA_character_,
+                                action = "create_item",
                                 log_file_name = NA_character_,
                                 data_curator = person("Unknown", "Person"),
-                                wikibase_api_url,
-                                csrf) {
+                                wikibase_api_url = "https://www.wikidata.org/w/api.php",
+                                csrf = NULL) {
+
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
@@ -154,7 +172,8 @@ check_existing_item <- function(action = "create_item",
     )
   )
 
-  return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
+  prefix <- ifelse(wikibase_api_url=="https://www.wikidata.org/w/api.php", "wbi:", "wd:")
+  return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
     namespace = wikibase_api_url
   )
 

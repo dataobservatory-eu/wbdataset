@@ -74,6 +74,8 @@ copy_wikidata_property <- function(
     pid_equivalence_property = "P2",
     language = c("en", "hu"),
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    classification_property = NA_character_,
+    classification_id = NA_character_,
     data_curator = NULL,
     log_file_name = NULL,
     csrf,

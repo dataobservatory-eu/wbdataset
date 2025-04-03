@@ -1,7 +1,7 @@
 #' @title Get property definition
 #' @description Receive the label and description of a property on the basis of
-#' its PID from a Wikibase instance. It will not add further statements about
-#' the property.
+#'   its PID from a Wikibase instance. It will not add further statements about
+#'   the property.
 #' @details Currently the language has a choose a default, \code{"en"}, for
 #'   cases where the user-chosen language return empty labels and descriptions.
 #'   This feature may be elaborated or changed later. The function receives
@@ -10,13 +10,24 @@
 #'   as aliases themselves can break the tidiness of the returned data.
 #' @param pid The PID of the property in the Wikibase instance (or Wikidata
 #'   itself).
-#' @param wikibase_api_url Defaults to
-#'   \code{"https://www.wikidata.org/w/api.php"}, may be replaced with a similar
-#'   API address of a Wikibase instance. Private instances may require an
-#'   authenticated session.
-#' @param return_type Defaults to \code{"data.frame"} that is suitable for receiving
-#'   the information in stand-alone use. The \code{"JSON"} passes on a JSON
-#'   string in the format that you may need it in further Wikibase API calls.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. In this case it defaults to
+#'   \code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no CSRF
+#'   is needed.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}, not needed if
+#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults to
+#'   \code{NULL}.
+#' @param return_type Defaults to \code{"data.frame"} that is suitable for
+#'   receiving the information in stand-alone use. The \code{"JSON"} passes on a
+#'   JSON string in the format that you may need it in further Wikibase API
+#'   calls.
+#' @param language Defaults to \code{c("en", "nl", "hu")}. A character string of
+#'   the languages in which the users wants to receive the labels and
+#'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+#'   47}-compliant language tags (e.g., "en" for English, and "hu"
+#'   for Hungarian.)
 #' @return A data.frame of the \code{PID} with the labels and descriptions of
 #'   the property in the selected languages. Alternatively, when
 #'   \code{return_type="JSON"}, the same data prepared for use in a subsequent
@@ -30,14 +41,16 @@
 #' get_property_definition(pid = "P2047", return_type = "data.frame")
 #'
 #' # Receive JSON for copying with wbeditidentiy
-#' get_property_definition(pid = "P2047", languages = c("en", "hu"))
+#' get_property_definition(pid = "P2047", language = c("en", "hu"))
 #' @export
 
 get_property_definition <- function(
     pid,
     language = c("en", "nl", "hu"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    return_type = "JSON") {
+    return_type = "JSON",
+    csrf = NULL) {
+
   ## Ensure that the pid is a character string starting with P followed by
   ## numbers.
   pid <- as.character(pid)
@@ -74,9 +87,10 @@ get_property_definition <- function(
   safely_post <- purrr::safely(httr::POST, NULL)
 
   recevied_claim <- safely_post(
-    "https://www.wikidata.org/w/api.php",
+    wikibase_api_url,
     body = claim_body,
-    encode = "form"
+    encode = "form",
+    handle = csrf
   )
 
   if (!is.null(recevied_claim$error)) {
@@ -97,12 +111,30 @@ get_property_definition <- function(
     )
   }
 
-  if (!is_response_success(response)) { # internal assertion for susccessful response
+
+  pid_is_missing <- ifelse(!is.null(response[[1]][[1]]$missing), TRUE, FALSE)
+
+
+  if (!is_response_success(response)) {
+    # internal assertion for successful response
     # Exception: retrieval of the property was not successful, even though we
     # did not get an explicit error before.
     message("Could not access ", pid)
     message(response$error$messages[[1]]) # print the error message for debugging
+    if (return_type == "data.frame") {
+      return(error_data_frame)
+    }
+    if (return_type != "data.frame") { # in any other case send JSON
+      return(error_json)
+    }
+  }
+
+  if (pid_is_missing) {
+    # No such property
+    message("Property does not exist ", pid)
+    message(response$error$messages[[1]]) # print the error message for debugging
     if (return_type == "data.frame") { # if the user needs a data.frame
+      error_data_frame$success <- TRUE
       return(error_data_frame)
     }
     if (return_type != "data.frame") { # in any other case send JSON
@@ -178,6 +210,7 @@ get_property_definition <- function(
         data.frame(
           language = names(descriptions_vector),
           description = as.character(descriptions_vector),
+          datatype = rep(response$entities[[1]]$datatype, length(descriptions_vector)),
           success = TRUE
         ),
         by = "language"
@@ -193,3 +226,4 @@ get_property_definition <- function(
     )
   }
 }
+

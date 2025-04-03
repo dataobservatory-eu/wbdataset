@@ -6,29 +6,37 @@
 \usage{
 get_property_definition(
   pid,
-  languages = c("en", "nl", "hu"),
+  language = c("en", "nl", "hu"),
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
-  return_type = "JSON"
+  return_type = "JSON",
+  csrf = NULL
 )
 }
 \arguments{
 \item{pid}{The PID of the property in the Wikibase instance (or Wikidata
 itself).}
 
-\item{languages}{Defaults to \code{c("en", "nl", "hu")}. A character string
-of the languages in which the users wants to receive the labels and
-descriptions of the property. The vector of languages must use BCP
-47-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
-ofr Hungarian.)}
+\item{language}{Defaults to \code{c("en", "nl", "hu")}. A character string of
+the languages in which the users wants to receive the labels and
+descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+47}-compliant language tags (e.g., "en" for English, and "hu"
+for Hungarian.)}
 
-\item{wikibase_api_url}{Defaults to
-\code{"https://www.wikidata.org/w/api.php"}, may be replaced with a similar
-API address of a Wikibase instance. Private instances may require an
-authenticated session.}
+\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
+address that the \code{wbdataset} R client sends requests to when
+interacting with the knowledge base. In this case it defaults to
+\code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no CSRF
+is needed.}
 
-\item{return_type}{Defaults to \code{"data.frame"} that is suitable for receiving
-the information in stand-alone use. The \code{"JSON"} passes on a JSON
-string in the format that you may need it in further Wikibase API calls.}
+\item{return_type}{Defaults to \code{"data.frame"} that is suitable for
+receiving the information in stand-alone use. The \code{"JSON"} passes on a
+JSON string in the format that you may need it in further Wikibase API
+calls.}
+
+\item{csrf}{The CSRF token of your session, received with
+\code{\link{get_csrf}}, not needed if
+\code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults to
+\code{NULL}.}
 }
 \value{
 A data.frame of the \code{PID} with the labels and descriptions of
@@ -42,16 +50,17 @@ its PID from a Wikibase instance. It will not add further statements about
 the property.
 }
 \details{
-Currently the languages choose a default, "en", for cases where the
-user-chosen language return empty labels and descriptions. This feature may
-be elaborated or changed later. The function receives aliases (alternative
-labels), too, but does not return them; the format of aliases needs to be
-decided in view of how other functions will use them, as aliases themselves
-can break the tidiness of the returned data.
+Currently the language has a choose a default, \code{"en"}, for
+cases where the user-chosen language return empty labels and descriptions.
+This feature may be elaborated or changed later. The function receives
+aliases (alternative labels), too, but does not return them; the format of
+aliases needs to be decided in view of how other functions will use them,
+as aliases themselves can break the tidiness of the returned data.
 }
 \examples{
 # Receive a data.frame for further use
 get_property_definition(pid = "P2047", return_type = "data.frame")
+
 # Receive JSON for copying with wbeditidentiy
-get_property_definition(pid = "P2047", languages = c("en", "hu"))
+get_property_definition(pid = "P2047", language = c("en", "hu"))
 }

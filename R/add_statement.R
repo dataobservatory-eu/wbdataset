@@ -28,13 +28,13 @@ add_statement <- function(
     add_item_statement(
       qid = qid, pid = pid, o = o,
       wikibase_type == "string",
-      wikibase_api_url = wikibase_api_url, csrf_token = csrf_token
+      wikibase_api_url = wikibase_api_url, csrf = csrf
     )
   } else if (wikibase_type == "item") {
     add_item_statement(
       qid = qid, pid = pid, o = o,
       wikibase_type == "item",
-      wikibase_api_url = wikibase_api_url, csrf_token = csrf_token
+      wikibase_api_url = wikibase_api_url, csrf = csrf
     )
   } else if (wikibase_type == "numeric") {
 

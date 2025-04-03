@@ -1,8 +1,7 @@
 #' @title Check if a label already has an property.
-#' @description
-#' Avoid failed writing attempts by checking if a label already matches an item.
-#' @details
-#' A wrapper around
+#' @description Avoid failed writing attempts by checking if a label already
+#' matches an item.
+#' @details A wrapper around
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 #' action=wbsearchentities}.
 #' @param action Defaults to \code{"create_property"}.
@@ -10,23 +9,38 @@
 #'   of property. Defaults to \code{NA_character} when not used.
 #' @param classification_id The QID of the class. Defaults to
 #'   \code{NA_character} when not used.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. In this case it defaults to
+#'   \code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
+#'   CSRF is needed.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}, not needed if
+#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
+#'   to \code{NULL}.
 #' @param search_term A label in the given language, for example, "Estonia".
 #' @inheritParams create_property
 #' @return A data.frame or NULL.
+#' @examples
+#' # No CSRF needed for Wikidata, but you will need it for Wikibase Suit
+#' check_existing_property(
+#'     search_term="instance of",
+#'     language = "en",
+#'     wikibase_api_url="https://www.wikidata.org/w/api.php")
 #' @export
 
 check_existing_property <- function(
-    action = "create_property",
     search_term,
     language,
     equivalence_property = NA_character_,
     equivalence_id = NA_character_,
     classification_property = NA_character_,
     classification_id = NA_character_,
+    action = "create_property",
     log_file_name = NA_character_,
     data_curator = person("Unknown", "Person"),
-    wikibase_api_url,
-    csrf) {
+    wikibase_api_url="https://www.wikidata.org/w/api.php",
+    csrf=NULL) {
 
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
@@ -46,7 +60,9 @@ check_existing_property <- function(
     handle = csrf
   )
 
-  search_response <- httr::content(get_search, as = "parsed", type = "application/json")
+  search_response <- httr::content(get_search,
+                                   as = "parsed",
+                                   type = "application/json")
 
   if (!is.null(search_response$error)) {
     stop(paste(search_response$error$code, ": ", search_response$error$info))
@@ -79,8 +95,13 @@ check_existing_property <- function(
 
   matching_property_data <- search_response$search[[which(exact_match)]]
 
+
+
   if (action %in% c("create_property", "copy_property")) {
-    datatype <- "property"
+    datatype <- get_property_definition(matching_property_data$id, "en",
+                                        wikibase_api_url = wikibase_api_url,
+                                        return_type =  "data.frame",
+                                        csrf= csrf)$datatype
     comment_text <- glue::glue("A property with the label ", search_term, " already exists in this Wikibase.")
   }
 
@@ -163,7 +184,10 @@ check_existing_property <- function(
     )
   )
 
-  return_ds$rowid <- defined(paste0("wbi:", as.character(return_ds$id_on_target)),
+  prefix <- ifelse(wikibase_api_url=="https://www.wikidata.org/w/api.php",
+                   "wd:", "wbi:")
+
+  return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
     namespace = wikibase_api_url
   )
 

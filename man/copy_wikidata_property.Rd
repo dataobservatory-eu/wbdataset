@@ -9,6 +9,8 @@ copy_wikidata_property(
   pid_equivalence_property = "P2",
   language = c("en", "hu"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  classification_property = NA_character_,
+  classification_id = NA_character_,
   data_curator = NULL,
   log_file_name = NULL,
   csrf,
@@ -35,6 +37,12 @@ interacting with the knowledge base. For example,
 \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
 api.php.}
 
+\item{classification_property}{The instance of, or subclass of, or superclass
+of property. Defaults to \code{NA_character} when not used.}
+
+\item{classification_id}{The QID of the class. Defaults to
+\code{NA_character} when not used.}
+
 \item{data_curator}{The name of the data curator who runs the function and
 creates the log file, created with \link[utils]{person}.}
 
@@ -49,12 +57,6 @@ will be created.}
 parameters \code{qid_equivalence_property}, \code{language},
 \code{wikibase_api_url}, \code{data_curator}, and \code{csrf} (for repeated
 use in a session.)}
-
-\item{classification_property}{The instance of, or subclass of, or superclass
-of property. Defaults to \code{NA_character} when not used.}
-
-\item{classification_id}{The QID of the class. Defaults to
-\code{NA_character} when not used.}
 }
 \value{
 Returns a \code{\link[dataset]{dataset_df}} object. The columns
