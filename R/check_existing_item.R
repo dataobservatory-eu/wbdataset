@@ -22,10 +22,11 @@
 #' @return A data.frame or NULL.
 #' @examples
 #' check_existing_item(
-#'     search_term="Estonian National Museum",
-#'     language = "en",
-#'     wikibase_api_url="https://www.wikidata.org/w/api.php",
-#'     csrf=NULL)
+#'   search_term = "Estonian National Museum",
+#'   language = "en",
+#'   wikibase_api_url = "https://www.wikidata.org/w/api.php",
+#'   csrf = NULL
+#' )
 #' @export
 
 check_existing_item <- function(search_term,
@@ -39,7 +40,6 @@ check_existing_item <- function(search_term,
                                 data_curator = person("Unknown", "Person"),
                                 wikibase_api_url = "https://www.wikidata.org/w/api.php",
                                 csrf = NULL) {
-
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
@@ -76,9 +76,11 @@ check_existing_item <- function(search_term,
     this_display$label$value == search_term && this_display$label$language == language
   }
 
-  matching_items <- vapply(1:length(search_response$search),
-                           function(x) search_response$search[[x]]$id,
-                           character(1))
+  matching_items <- vapply(
+    1:length(search_response$search),
+    function(x) search_response$search[[x]]$id,
+    character(1)
+  )
 
 
   exact_match <- vapply(
@@ -87,14 +89,22 @@ check_existing_item <- function(search_term,
     logical(1)
   )
 
-  if (sum(exact_match)>1) {
-    stop("Multiple items [", paste(matching_items, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
+  if (sum(exact_match) > 1) {
+    stop("Multiple items [", paste(matching_items, collapse = ", "), "] are matching '", search_term, "' in language='", language, "'.")
   }
 
-  if (! any(exact_match)) { return(NULL) }
-  if ( is.null(search_response$search[[1]])) { return(NULL) }
-  if ( ! is.list(search_response$search[[1]])) { return(NULL) }
-  if ( is.null(search_response$search[[which(exact_match)]])) { return(NULL)}
+  if (!any(exact_match)) {
+    return(NULL)
+  }
+  if (is.null(search_response$search[[1]])) {
+    return(NULL)
+  }
+  if (!is.list(search_response$search[[1]])) {
+    return(NULL)
+  }
+  if (is.null(search_response$search[[which(exact_match)]])) {
+    return(NULL)
+  }
 
   matching_items[exact_match]
 
@@ -181,7 +191,7 @@ check_existing_item <- function(search_term,
     )
   )
 
-  prefix <- ifelse(wikibase_api_url=="https://www.wikidata.org/w/api.php", "wbi:", "wd:")
+  prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php", "wbi:", "wd:")
   return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
     namespace = wikibase_api_url
   )

@@ -50,7 +50,6 @@ get_property_definition <- function(
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     return_type = "JSON",
     csrf = NULL) {
-
   ## Ensure that the pid is a character string starting with P followed by
   ## numbers.
   pid <- as.character(pid)
@@ -226,4 +225,3 @@ get_property_definition <- function(
     )
   }
 }
-

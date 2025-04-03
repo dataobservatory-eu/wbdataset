@@ -78,7 +78,6 @@ copy_wikidata_item <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
-
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -388,7 +387,6 @@ copy_wikidata_item <- function(
       time = action_timestamp,
       logfile = log_file_name
     )
-
   } else if (
     # Case when we have clear message about a label conflict
     any(c(
@@ -552,11 +550,11 @@ copy_wikidata_item <- function(
     namespace = wikibase_api_url
   )
 
-  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+  if (!is.null(log_file_name) && nchar(log_file_name) > 0) {
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   }
   return_ds

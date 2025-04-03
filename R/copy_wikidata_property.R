@@ -80,7 +80,6 @@ copy_wikidata_property <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
-
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -377,7 +376,6 @@ copy_wikidata_property <- function(
       time = action_timestamp,
       logfile = log_file_name
     )
-
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     # Unwrap error message and send it to terminal
     message_strings <- unlist(created_property_response$error$messages)
@@ -438,7 +436,6 @@ copy_wikidata_property <- function(
       time = action_timestamp,
       logfile = log_file_name
     )
-
   } else {
     # Return an emptier data.frame if there was some error
 
@@ -539,11 +536,11 @@ copy_wikidata_property <- function(
     namespace = wikibase_api_url
   )
 
-  if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
+  if (!is.null(log_file_name) && nchar(log_file_name) > 0) {
     write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+      file = log_file_name,
+      na = "NA",
+      append = TRUE
     )
   }
 

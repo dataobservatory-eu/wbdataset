@@ -21,7 +21,6 @@ add_id_statement <- function(
     wikibase_type = "external-id",
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
-
   datavalue <- paste0('"', o, '"')
   datavalue
 

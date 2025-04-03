@@ -24,11 +24,12 @@ agya_wikibase_session <- list(
 )
 
 digital_record_class <- create_item(
-  label="digital record",
-  description="a subclass of the record, a record in the collection of the Andrássy Gyula Foundation.",
+  label = "digital record",
+  description = "a subclass of the record, a record in the collection of the Andrássy Gyula Foundation.",
   language = "en",
-  classification_property = "P137", #subclass of
-  classification_id = "Q584", #record
+  classification_property = "P137", # subclass of
+  classification_id = "Q584", # record
   wikibase_api_url = agya_wikibase_api_url,
   csrf = agya_wikibase_session$csrf,
-  wikibase_session = agya_wikibase_session)
+  wikibase_session = agya_wikibase_session
+)

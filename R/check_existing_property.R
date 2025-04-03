@@ -24,9 +24,10 @@
 #' @examples
 #' # No CSRF needed for Wikidata, but you will need it for Wikibase Suit
 #' check_existing_property(
-#'     search_term="instance of",
-#'     language = "en",
-#'     wikibase_api_url="https://www.wikidata.org/w/api.php")
+#'   search_term = "instance of",
+#'   language = "en",
+#'   wikibase_api_url = "https://www.wikidata.org/w/api.php"
+#' )
 #' @export
 
 check_existing_property <- function(
@@ -39,9 +40,8 @@ check_existing_property <- function(
     action = "create_property",
     log_file_name = NA_character_,
     data_curator = person("Unknown", "Person"),
-    wikibase_api_url="https://www.wikidata.org/w/api.php",
-    csrf=NULL) {
-
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    csrf = NULL) {
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
@@ -61,8 +61,9 @@ check_existing_property <- function(
   )
 
   search_response <- httr::content(get_search,
-                                   as = "parsed",
-                                   type = "application/json")
+    as = "parsed",
+    type = "application/json"
+  )
 
   if (!is.null(search_response$error)) {
     stop(paste(search_response$error$code, ": ", search_response$error$info))
@@ -87,14 +88,22 @@ check_existing_property <- function(
     logical(1)
   )
 
-  if (sum(exact_match)>1) {
-    stop("Multiple items [", paste(matching_props, collapse=", "),  "] are matching '", search_term, "' in language='", language, "'." )
+  if (sum(exact_match) > 1) {
+    stop("Multiple items [", paste(matching_props, collapse = ", "), "] are matching '", search_term, "' in language='", language, "'.")
   }
 
-  if (! any(exact_match)) { return(NULL) }
-  if ( is.null(search_response$search[[1]])) { return(NULL) }
-  if ( ! is.list(search_response$search[[1]])) { return(NULL) }
-  if ( is.null(search_response$search[[which(exact_match)]])) { return(NULL)}
+  if (!any(exact_match)) {
+    return(NULL)
+  }
+  if (is.null(search_response$search[[1]])) {
+    return(NULL)
+  }
+  if (!is.list(search_response$search[[1]])) {
+    return(NULL)
+  }
+  if (is.null(search_response$search[[which(exact_match)]])) {
+    return(NULL)
+  }
 
   matching_props[exact_match]
 
@@ -102,9 +111,10 @@ check_existing_property <- function(
 
   if (action %in% c("create_property", "copy_property")) {
     datatype <- get_property_definition(matching_property_data$id, "en",
-                                        wikibase_api_url = wikibase_api_url,
-                                        return_type =  "data.frame",
-                                        csrf= csrf)$datatype
+      wikibase_api_url = wikibase_api_url,
+      return_type = "data.frame",
+      csrf = csrf
+    )$datatype
     comment_text <- glue::glue("A property with the label ", search_term, " already exists in this Wikibase.")
   }
 
@@ -187,8 +197,9 @@ check_existing_property <- function(
     )
   )
 
-  prefix <- ifelse(wikibase_api_url=="https://www.wikidata.org/w/api.php",
-                   "wd:", "wbi:")
+  prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php",
+    "wd:", "wbi:"
+  )
 
   return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
     namespace = wikibase_api_url

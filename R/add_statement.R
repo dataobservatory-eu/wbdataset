@@ -23,7 +23,6 @@ add_statement <- function(
     wikibase_type,
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
-
   if (wikibase_type == "string") {
     add_item_statement(
       qid = qid, pid = pid, o = o,
