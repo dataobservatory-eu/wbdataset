@@ -123,6 +123,7 @@ create_property <- function(label,
 
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Person", "Unknown")
+  if (is.null(log_file_name)) log_file_name <- ""
 
   assertthat::assert_that(
     inherits(data_curator, "person"),

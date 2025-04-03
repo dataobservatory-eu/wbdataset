@@ -78,6 +78,7 @@ copy_wikidata_item <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
+
   if (!is.null(wikibase_session)) {
     # For repeated queries you can add your variables directly or in a list
 
@@ -115,6 +116,7 @@ copy_wikidata_item <- function(
   # Assertions for correct inputs ------------------------------------------------
 
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
+  if (is.null(log_file_name)) log_file_name <- ""
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
