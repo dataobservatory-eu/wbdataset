@@ -112,10 +112,6 @@ create_property <- function(label,
       wikibase_api_url <-  wikibase_session$wikibase_api_url
     }
 
-    if(!is.null(wikibase_session$log_path)) {
-      log_path <-  wikibase_session$log_path
-    }
-
     if (!is.null(wikibase_session$log_file_name)) {
       log_file_name <- wikibase_session$log_file_name
     }
@@ -138,7 +134,7 @@ create_property <- function(label,
   action_timestamp <- action_timestamp_create()
 
   if (is.null(log_file_name)) {
-    log_file_name <- here(log_path, paste0("wbdataset_create_property_", action_timestamp, ".csv"))
+    log_file_name <- ""
   }
 
   if ( !is.na(equivalence_id) ) {
