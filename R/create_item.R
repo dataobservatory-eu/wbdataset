@@ -128,6 +128,9 @@ create_item <- function(label,
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
   if (is.null(log_file_name)) log_file_name <- ""
+  if (is.null(description)) description <- ""
+  if (is.na(description)) description <- ""
+
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
@@ -228,7 +231,7 @@ create_item <- function(label,
       )
     }
 
-    if (!is.na(classification_property)) {
+    if (!is.na(classification_property) && !is.na(classification_id)) {
       wikidata_classification_df <- add_item_statement(
         qid = created_item_response$entity$id,
         pid = classification_property,
@@ -238,12 +241,20 @@ create_item <- function(label,
       )
     }
 
+    new_description_text <- ""
+    new_descriptions <- created_item_response$entity$descriptions
+    if ( length(new_descriptions)==0 ) {
+      new_description_text <- ""
+    } else {
+      new_description_text <- created_item_response$entity$descriptions[[1]]$language
+    }
+
     return_dataframe <- data.frame(
       action = "create_item",
       id_on_target = created_item_response$entity$id,
       label = label,
-      description =  created_item_response$entity$descriptions[[1]]$value,
-      language =  created_item_response$entity$descriptions[[1]]$language,
+      description =  new_description_text,
+      language =  created_item_response$entity$labels[[1]]$language,
       datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
@@ -298,7 +309,7 @@ create_item <- function(label,
     error_comments <- paste(
       unlist(
         lapply(created_item_response$error$messages, function(x) x$name)
-        ), collapse="|")
+      ), collapse="|")
 
     return_dataframe <- data.frame(
       action = "create_item",

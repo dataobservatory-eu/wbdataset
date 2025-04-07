@@ -177,13 +177,14 @@ copy_wikidata_property <- function(
     # there was no error
     response <- httr::content(
       get_claim$result,
-      as = "parsed", type = "application/json"
+      as = "parsed",
+      type = "application/json"
     )
   }
 
   if (!is_response_success(response)) {
-    # Exception: retrieval of the property was not successful, even though we did not
-    # get an explicit error before.
+    # Exception: retrieval of the property was not successful,
+    # even though we did not get an explicit error before.
     message("Could not access ", pid_on_wikidata)
 
     error_comments <- paste(

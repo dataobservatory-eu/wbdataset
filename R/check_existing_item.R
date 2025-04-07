@@ -40,8 +40,13 @@ check_existing_item <- function(search_term,
                                 data_curator = person("Unknown", "Person"),
                                 wikibase_api_url = "https://www.wikidata.org/w/api.php",
                                 csrf = NULL) {
+
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
+
+  if ( length(search_term)!=1) {
+    stop("check_existing_item(search_term, ...): length of search term must be 1.")
+  }
 
   get_search <- httr::POST(
     wikibase_api_url,
@@ -58,7 +63,9 @@ check_existing_item <- function(search_term,
     handle = csrf
   )
 
-  search_response <- httr::content(get_search, as = "parsed", type = "application/json")
+  search_response <- httr::content(get_search,
+                                   as = "parsed",
+                                   type = "application/json")
 
   if (!is.null(search_response$error)) {
     stop(paste(search_response$error$code, ": ", search_response$error$info))
@@ -72,8 +79,8 @@ check_existing_item <- function(search_term,
     }
   }
 
-  is_display_match <- function(this_display) {
-    this_display$label$value == search_term && this_display$label$language == language
+  is_label_language_match <- function(sr) {
+    sr$match$language == language && sr$label == search_term
   }
 
   matching_items <- vapply(
@@ -82,10 +89,9 @@ check_existing_item <- function(search_term,
     character(1)
   )
 
-
   exact_match <- vapply(
     1:length(search_response$search),
-    function(x) is_display_match(search_response$search[[x]]$display),
+    function(x) is_label_language_match(search_response$search[[x]]),
     logical(1)
   )
 
@@ -109,23 +115,22 @@ check_existing_item <- function(search_term,
   matching_items[exact_match]
 
   matching_item_data <- search_response$search[[which(exact_match)]]
-  datatype <- "wikibase-item"
   comment_text <- glue::glue("An item with the label ", search_term, " already exists in this Wikibase.")
 
   return_dataframe <- data.frame(
     action = action,
     id_on_target = matching_item_data$id,
     label = matching_item_data$label,
-    description = matching_item_data$description,
+    description = ifelse(is.null(matching_item_data$description), "", matching_item_data$description),
     language = language,
-    datatype = datatype,
+    datatype = "wikibase-item",
     wikibase_api_url = wikibase_api_url,
     equivalence_property = equivalence_property,
     equivalence_id = equivalence_id,
     classification_property = classification_property,
     classification_id = classification_id,
     success = FALSE,
-    comment = comment_text,
+    comment = as.character(comment_text),
     time = action_timestamp,
     logfile = ifelse(is.null(log_file_name), "", log_file_name)
   )
@@ -193,8 +198,9 @@ check_existing_item <- function(search_term,
 
   prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php", "wbi:", "wd:")
   return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
-    namespace = wikibase_api_url
+                             namespace = wikibase_api_url
   )
 
   return_ds
 }
+

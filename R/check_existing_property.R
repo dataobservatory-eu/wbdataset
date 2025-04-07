@@ -42,8 +42,13 @@ check_existing_property <- function(
     data_curator = person("Unknown", "Person"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     csrf = NULL) {
+
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
+
+  if ( length(search_term)!=1) {
+    stop("check_existing_item(search_term, ...): length of search term must be 1.")
+  }
 
   get_search <- httr::POST(
     wikibase_api_url,
@@ -61,14 +66,13 @@ check_existing_property <- function(
   )
 
   search_response <- httr::content(get_search,
-    as = "parsed",
-    type = "application/json"
+                                   as = "parsed",
+                                   type = "application/json"
   )
 
   if (!is.null(search_response$error)) {
     stop(paste(search_response$error$code, ": ", search_response$error$info))
   }
-
 
   if (search_response$success == 1) {
     if (length(search_response$search) == 0) {
@@ -77,14 +81,19 @@ check_existing_property <- function(
     }
   }
 
-  is_display_match <- function(this_display) {
-    this_display$label$value == search_term && this_display$label$language == language
+  is_label_language_match <- function(sr) {
+    sr$match$language == language && sr$label == search_term
   }
 
-  matching_props <- vapply(1:length(search_response$search), function(x) search_response$search[[x]]$id, character(1))
+  matching_props <- vapply(
+    1:length(search_response$search),
+    function(x) search_response$search[[x]]$id,
+    character(1)
+  )
 
   exact_match <- vapply(
-    1:length(search_response$search), function(x) is_display_match(search_response$search[[x]]$display),
+    1:length(search_response$search),
+    function(x) is_label_language_match(search_response$search[[x]]),
     logical(1)
   )
 
@@ -109,29 +118,23 @@ check_existing_property <- function(
 
   matching_property_data <- search_response$search[[which(exact_match)]]
 
-  if (action %in% c("create_property", "copy_property")) {
-    datatype <- get_property_definition(matching_property_data$id, "en",
-      wikibase_api_url = wikibase_api_url,
-      return_type = "data.frame",
-      csrf = csrf
-    )$datatype
-    comment_text <- glue::glue("A property with the label ", search_term, " already exists in this Wikibase.")
-  }
+  comment_text <- glue::glue("A property with the label ", search_term, " already exists in this Wikibase.")
 
   return_dataframe <- data.frame(
     action = action,
     id_on_target = matching_property_data$id,
     label = matching_property_data$label,
-    description = matching_property_data$description,
+    description = ifelse(is.null(matching_property_data$description),
+                         "", matching_property_data$description),
     language = language,
-    datatype = datatype,
+    datatype = matching_property_data$datatype,
     wikibase_api_url = wikibase_api_url,
     equivalence_property = equivalence_property,
     equivalence_id = equivalence_id,
     classification_property = classification_property,
     classification_id = classification_id,
     success = FALSE,
-    comment = comment_text,
+    comment = as.character(comment_text),
     time = action_timestamp,
     logfile = ifelse(is.null(log_file_name), "", log_file_name)
   )
@@ -198,11 +201,11 @@ check_existing_property <- function(
   )
 
   prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php",
-    "wd:", "wbi:"
+                   "wd:", "wbi:"
   )
 
   return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
-    namespace = wikibase_api_url
+                             namespace = wikibase_api_url
   )
 
   return_ds

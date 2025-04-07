@@ -77,7 +77,8 @@ action=wbsearchentities}.
 \examples{
 # No CSRF needed for Wikidata, but you will need it for Wikibase Suit
 check_existing_property(
-    search_term="instance of",
-    language = "en",
-    wikibase_api_url="https://www.wikidata.org/w/api.php")
+  search_term = "instance of",
+  language = "en",
+  wikibase_api_url = "https://www.wikidata.org/w/api.php"
+)
 }

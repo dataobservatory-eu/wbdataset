@@ -124,6 +124,9 @@ create_property <- function(label,
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Person", "Unknown")
   if (is.null(log_file_name)) log_file_name <- ""
+  if (is.null(description)) description <- ""
+  if (is.na(description)) description <- ""
+
 
   assertthat::assert_that(
     inherits(data_curator, "person"),
@@ -231,12 +234,20 @@ create_property <- function(label,
       )
     }
 
+    new_description_text <- ""
+    new_descriptions <- created_item_response$entity$descriptions
+    if ( length(new_descriptions)==0 ) {
+      new_description_text <- ""
+    } else {
+      new_description_text <- created_item_response$entity$descriptions[[1]]$language
+    }
+
     return_dataframe <- data.frame(
       action = "create_property",
       id_on_target = created_property_response$entity$id,
       label = label,
-      description =  created_property_response$entity$descriptions[[1]]$value,
-      language =  created_property_response$entity$descriptions[[1]]$language,
+      description =  new_description_text,
+      language =  created_item_response$entity$labels[[1]]$language,
       datatype = created_property_response$entity$datatype,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,

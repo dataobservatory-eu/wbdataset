@@ -76,8 +76,9 @@ action=wbsearchentities}.
 }
 \examples{
 check_existing_item(
-    search_term="Estonian National Museum",
-    language = "en",
-    wikibase_api_url="https://www.wikidata.org/w/api.php",
-    csrf=NULL)
+  search_term = "Estonian National Museum",
+  language = "en",
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf = NULL
+)
 }

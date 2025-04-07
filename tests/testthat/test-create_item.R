@@ -1,6 +1,7 @@
 test_that("multiplication works", {
   expect_equal(2 * 2, 4)
 })
+library(keyring)
 jekyll_anna <- "Reprexba jekyll@MesterannaBot"
 jekyll_daniel <- "Reprexba jekyll@AntaldanielBot"
 agya_wikibase_api_url <- "https://reprexbase.eu/jekyll/api.php" # temporary
@@ -12,6 +13,7 @@ my_csrf <- get_csrf(
   ),
   agya_wikibase_api_url
 )
+
 
 agya_wikibase_session <- list(
   csrf = my_csrf,
