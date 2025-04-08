@@ -235,11 +235,12 @@ create_property <- function(label,
     }
 
     new_description_text <- ""
-    new_descriptions <- created_item_response$entity$descriptions
+    new_descriptions <- created_property_response$entity$descriptions
+
     if ( length(new_descriptions)==0 ) {
       new_description_text <- ""
     } else {
-      new_description_text <- created_item_response$entity$descriptions[[1]]$language
+      new_description_text <- created_property_response$entity$descriptions[[1]]$language
     }
 
     return_dataframe <- data.frame(
@@ -247,7 +248,7 @@ create_property <- function(label,
       id_on_target = created_property_response$entity$id,
       label = label,
       description =  new_description_text,
-      language =  created_item_response$entity$labels[[1]]$language,
+      language =  created_property_response$entity$labels[[1]]$language,
       datatype = created_property_response$entity$datatype,
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,

@@ -97,6 +97,8 @@ check_existing_property <- function(
     logical(1)
   )
 
+  if (!is.logical(exact_match)) message (matching_props[exact_match])
+
   if (sum(exact_match) > 1) {
     stop("Multiple items [", paste(matching_props, collapse = ", "), "] are matching '", search_term, "' in language='", language, "'.")
   }
@@ -118,7 +120,8 @@ check_existing_property <- function(
 
   matching_property_data <- search_response$search[[which(exact_match)]]
 
-  comment_text <- glue::glue("A property with the label ", search_term, " already exists in this Wikibase.")
+  comment_text <- glue::glue("A property with the label ",
+                             search_term, " already exists in this Wikibase.")
 
   return_dataframe <- data.frame(
     action = action,
@@ -204,7 +207,8 @@ check_existing_property <- function(
                    "wd:", "wbi:"
   )
 
-  return_ds$rowid <- defined(paste0(prefix, as.character(return_ds$id_on_target)),
+  return_ds$rowid <- defined(paste0(prefix,
+                                    as.character(return_ds$id_on_target)),
                              namespace = wikibase_api_url
   )
 

@@ -191,8 +191,8 @@ create_item <- function(label,
                           msg = "You do not have a CSRF token"
   )
 
-  assertthat::assert_that(nchar(csrf_token) == 42,
-                          msg = "Your CSRF token should have 42 characters."
+  assertthat::assert_that(nchar(csrf_token) > 10,
+                          msg = "Your CSRF token usually should have 42 characters."
   )
 
   # Posting the new property ----------------------------------------------

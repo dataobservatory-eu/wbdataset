@@ -95,8 +95,11 @@ check_existing_item <- function(search_term,
     logical(1)
   )
 
+  if (!is.logical(exact_match)) message (matching_props[exact_match])
+
   if (sum(exact_match) > 1) {
-    stop("Multiple items [", paste(matching_items, collapse = ", "), "] are matching '", search_term, "' in language='", language, "'.")
+    stop("Multiple items [", paste(matching_items, collapse = ", "),
+         "] are matching '", search_term, "' in language='", language, "'.")
   }
 
   if (!any(exact_match)) {
@@ -121,7 +124,9 @@ check_existing_item <- function(search_term,
     action = action,
     id_on_target = matching_item_data$id,
     label = matching_item_data$label,
-    description = ifelse(is.null(matching_item_data$description), "", matching_item_data$description),
+    description = ifelse(is.null(matching_item_data$description),
+                         "",
+                         matching_item_data$description),
     language = language,
     datatype = "wikibase-item",
     wikibase_api_url = wikibase_api_url,
