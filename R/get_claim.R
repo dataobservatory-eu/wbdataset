@@ -54,6 +54,15 @@ get_claim <- function(qid = "Q528626",
                       wikibase_api_url = "https://www.wikidata.org/w/api.php",
                       csrf = NULL,
                       first = TRUE) {
+
+  if (!is_qid(qid)) {
+    stop(sprintf("Invalid QID: '%s'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').", qid))
+  }
+
+  if (!is_pid(property)) {
+    stop(sprintf("Invalid property ID: '%s'. Properties must begin with 'P' followed by digits (e.g., 'P31').", property))
+  }
+
   response <- httr::POST(
     wikibase_api_url,
     body = list(

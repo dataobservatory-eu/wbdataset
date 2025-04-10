@@ -2,17 +2,17 @@
 % Please edit documentation in R/is_qid_is_pid.R
 \name{is_pid}
 \alias{is_pid}
-\title{Check if a string looks like a PID}
+\title{Validate Wikidata Property IDs (PIDs)}
 \usage{
 is_pid(x)
 }
 \arguments{
-\item{x}{A string}
+\item{x}{A character vector to be validated.}
 }
 \value{
-A logical vector, \code{TRUE} where the string has a \code{"P[:digits:]"} structure,
-FALSE otherwise.
+A logical vector indicating whether each element matches the PID format.
 }
 \description{
-Check if a string looks like a PID
+Checks if each element in a character vector conforms to the Wikidata Property ID format,
+which starts with 'P' followed by one or more digits (e.g., 'P31').
 }

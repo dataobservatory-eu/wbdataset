@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_existing_item.R
 \name{check_existing_item}
 \alias{check_existing_item}
-\title{Check if a label already has an item.}
+\title{Check for Existing Items in Wikibase}
 \usage{
 check_existing_item(
   search_term,
@@ -19,11 +19,11 @@ check_existing_item(
 )
 }
 \arguments{
-\item{search_term}{A label in the given language, for example, "Estonia".}
+\item{search_term}{A character string representing the label to search for
+in the Wikibase. For example, \code{"Estonian National Museum"}.}
 
-\item{language}{A single language code that indicates the language of the
-label and description, using BCP 47-compliant language tags (e.g., "en" for
-English, "fr" for French). Defaults to \code{"en"} for English.}
+\item{language}{A character string specifying the language code of the label,
+adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to \code{"en"}.}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new
@@ -42,35 +42,42 @@ of property. Defaults to \code{NA_character} when not used.}
 \item{classification_id}{The QID of the class. Defaults to
 \code{NA_character} when not used.}
 
-\item{action}{Defaults to \code{"create_item"}.}
+\item{action}{A character string indicating the action being performed.
+Defaults to \code{"create_item"}.}
 
-\item{log_file_name}{An explicitly stated full path to a possible CSV log
-file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
-will be created.}
+\item{log_file_name}{A character string specifying the name of the log file.
+Defaults to \code{NA_character_}.}
 
-\item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.}
+\item{data_curator}{An object of class \code{person} representing the data curator.
+Defaults to \code{person("Unknown", "Person")}.}
 
 \item{wikibase_api_url}{The full URL of the Wikibase API, which is the
 address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. In this case it defaults to
-\code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
-CSRF is needed.}
+interacting with the knowledge base. For example,
+\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
+api.php.}
 
 \item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}, not needed if
-\code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
-to \code{NULL}.}
+\code{\link{get_csrf}}.}
 }
 \value{
+A \code{dataset_df} object containing information about the matching item(s),
+including action performed, item ID, label, description, language, and other
+metadata. Returns \code{NULL} if no matching items are found.
+
 A data.frame or NULL.
 }
 \description{
-Avoid failed writing attempts by checking if a label already
-matches an item.
+This function searches for existing items in a specified Wikibase instance
+that match a given label in a specified language. It helps prevent duplicate
+item creation by identifying existing matches.
 }
 \details{
-A wrapper around
+The function interfaces with the Wikibase API's \code{wbsearchentities} action to
+perform a search based on the provided label (\code{search_term}) and language.
+It returns information about matching items, facilitating the management of
+data consistency within the Wikibase.
+See:
 \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 action=wbsearchentities}.
 }

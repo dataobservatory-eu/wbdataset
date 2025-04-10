@@ -46,9 +46,18 @@ check_existing_property <- function(
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
-  if ( length(search_term)!=1) {
-    stop("check_existing_item(search_term, ...): length of search term must be 1.")
+  if (!is.character(search_term) || length(search_term) != 1 || nchar(search_term) == 0) {
+    stop("Invalid input in check_existing_property(): 'search_term' must be a non-empty character string.")
   }
+
+  if (!is.character(language) || length(language) != 1 || nchar(language) == 0) {
+    stop("Invalid input in check_existing_property(): 'language' must be a non-empty character string.")
+  }
+
+  if (!is.character(wikibase_api_url) || length(wikibase_api_url) != 1 || !grepl("^https?://", wikibase_api_url)) {
+    stop("Invalid input in check_existing_property(): 'wikibase_api_url' must be a valid URL string.")
+  }
+
 
   get_search <- httr::POST(
     wikibase_api_url,

@@ -5,6 +5,23 @@ test_that("get_claim() throws error for missing property", {
   )
 })
 
+test_that("get_claim() throws an error for invalid QID", {
+  expect_error(
+    get_claim(qid = "invalidQID", property = "P31"),
+    "Invalid QID: 'invalidQID'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').",
+    fixed = TRUE
+  )
+})
+
+test_that("get_claim() throws an error for invalid property ID", {
+  expect_error(
+    get_claim(qid = "Q42", property = "invalidPID"),
+    "Invalid property ID: 'invalidPID'. Properties must begin with 'P' followed by digits (e.g., 'P31').",
+    fixed = TRUE
+  )
+})
+
+
 test_that("get_claim(): wikibase-item value correctly returned", {
   expect_equal(
     get_claim(qid = "Q28104185", property = "P1889")$P1889,
@@ -36,10 +53,10 @@ test_that("get_claim(): time value correctly returned", {
               wikibase_api_url = "https://www.wikidata.org/w/api.php")$P1889,
     "Q234138")
   expect_equal(
-  get_claim(qid = "Q28104185",
-            property = "P1889",
-            wikibase_api_url = "https://www.wikidata.org/w/api.php")$type,
-  "wikibase-item")
+    get_claim(qid = "Q28104185",
+              property = "P1889",
+              wikibase_api_url = "https://www.wikidata.org/w/api.php")$type,
+    "wikibase-item")
 })
 
 test_that("get_claim(): external-id value correctly returned", {

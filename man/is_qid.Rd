@@ -2,17 +2,17 @@
 % Please edit documentation in R/is_qid_is_pid.R
 \name{is_qid}
 \alias{is_qid}
-\title{Check if a string looks like a QID}
+\title{Validate Wikidata Item IDs (QIDs)}
 \usage{
 is_qid(x)
 }
 \arguments{
-\item{x}{A string}
+\item{x}{A character vector to be validated.}
 }
 \value{
-A logical vector, \code{TRUE} where the string has a \code{"P[:digits:]"} structure,
-FALSE otherwise.
+A logical vector indicating whether each element matches the QID format.
 }
 \description{
-Check if a string looks like a QID
+Checks if each element in a character vector conforms to the Wikidata Item ID format,
+which starts with 'Q' followed by one or more digits (e.g., 'Q42').
 }

@@ -1,23 +1,30 @@
-#' @title Check if a label already has an item.
-#' @description Avoid failed writing attempts by checking if a label already
-#' matches an item.
-#' @details A wrapper around
+#' @title Check for Existing Items in Wikibase
+#'
+#' @description This function searches for existing items in a specified
+#' Wikibase instance that match a given label in a specified language. It helps
+#' prevent duplicate item creation by identifying existing matches.
+#'
+#' @details The function interfaces with the Wikibase API's `wbsearchentities`
+#' action to perform a search based on the provided label (`search_term`) and
+#' language. It returns information about matching items, facilitating the
+#' management of data consistency within the Wikibase. See:
 #' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 #' action=wbsearchentities}.
-#' @param action Defaults to \code{"create_item"}.
-#' @param search_term A label in the given language, for example, "Estonia".
-#' @param language A single language code that indicates the language of the
-#'   label and description, using BCP 47-compliant language tags (e.g., "en" for
-#'   English, "fr" for French). Defaults to \code{"en"} for English.
-#' @param wikibase_api_url The full URL of the Wikibase API, which is the
-#'   address that the \code{wbdataset} R client sends requests to when
-#'   interacting with the knowledge base. In this case it defaults to
-#'   \code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
-#'   CSRF is needed.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}, not needed if
-#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
-#'   to \code{NULL}.
+#'
+#' @param search_term A character string representing the label to search for in
+#'   the Wikibase. For example, `"Estonian National Museum"`.
+#' @param language A character string specifying the language code of the label,
+#'   adhering to BCP 47 standards (e.g., `"en"` for English). Defaults to
+#'   `"en"`.
+#' @param action A character string indicating the action being performed.
+#'   Defaults to `"create_item"`.
+#' @param log_file_name A character string specifying the name of the log file.
+#'   Defaults to `NA_character_`.
+#' @param data_curator An object of class `person` representing the data
+#'   curator. Defaults to `person("Unknown", "Person")`.
+#' @return A `dataset_df` object containing information about the matching
+#' item(s), including action performed, item ID, label, description, language,
+#' and other metadata. Returns `NULL` if no matching items are found.
 #' @inheritParams create_item
 #' @return A data.frame or NULL.
 #' @examples
@@ -44,8 +51,17 @@ check_existing_item <- function(search_term,
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
-  if ( length(search_term)!=1) {
-    stop("check_existing_item(search_term, ...): length of search term must be 1.")
+
+  if (!is.character(search_term) || length(search_term) != 1 || nchar(search_term) == 0) {
+    stop("Invalid input in check_existing_item(): 'search_term' must be a non-empty character string.")
+  }
+
+  if (!is.character(language) || length(language) != 1 || nchar(language) == 0) {
+    stop("Invalid input in check_existing_item(): 'language' must be a non-empty character string.")
+  }
+
+  if (!is.character(wikibase_api_url) || length(wikibase_api_url) != 1 || !grepl("^https?://", wikibase_api_url)) {
+    stop("Invalid input in check_existing_item(): 'wikibase_api_url' must be a valid URL string.")
   }
 
   get_search <- httr::POST(
