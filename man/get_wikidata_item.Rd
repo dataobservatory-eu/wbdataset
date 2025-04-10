@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_wikidata_item.R
 \name{get_wikidata_item}
 \alias{get_wikidata_item}
-\title{Get item definitions}
+\title{Retrieve Wikidata item metadata (labels and descriptions)}
 \usage{
 get_wikidata_item(
   qid_on_wikidata,
@@ -14,35 +14,35 @@ get_wikidata_item(
 )
 }
 \arguments{
-\item{qid_on_wikidata}{A single qid_on_wikidata or a vector of qid_on_wikidatas on a Wikibase instance (or
-Wikidata itself.)}
+\item{qid_on_wikidata}{A character vector of Wikidata QIDs (e.g.,
+\code{"Q42"}).}
 
-\item{language}{Defaults to \code{c("en", "nl", "hu")}. A character string of
-the languages in which the users wants to receive the labels and
-descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
-47}-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
-for Hungarian.)}
-
-\item{prefix}{The prefix to use before the qid_on_wikidata, for example, defaults to
-\code{"http://www.wikidata.org/entity/"}.}
-
-\item{wikibase_api_url}{Defaults to
-\code{"https://www.wikidata.org/w/api.php"}.}
-
-\item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.}
-
-\item{title}{The title of the dataset.}
+\item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end
+with \code{api.php}).}
 }
 \value{
-A Returns a \code{\link[dataset]{dataset_df}} object with the
-qid_on_wikidatas, labels, description, and the language codes of the labels
-and descriptions.
+A data frame with one row per QID, including columns \code{qid},
+\code{label}, and \code{description}, as well as optional language-specific
+metadata.
 }
 \description{
-Get item definitions by qid_on_wikidata from a Wikibase instance or
-Wikidata.
+Retrieves basic metadata (labels and descriptions) for one or
+more Wikidata items, given their QIDs. Supports multiple languages and
+returns results in a tidy format.
+}
+\details{
+This function queries the Wikidata API to retrieve the \code{label}
+and \code{description} for each item specified in \code{qid_on_wikidata}.
+The metadata is returned in a consistent tabular format and can be used for
+display, annotation, or joining with other datasets.
+
+By default, the function retrieves metadata in multiple languages,
+including English, French, German, Italian, and Spanish.
 }
 \examples{
 get_wikidata_item("Q42", language = c("en", "nl"))
+}
+\seealso{
+\code{\link{get_claim}} to retrieve claims (properties) for Wikidata
+items.
 }

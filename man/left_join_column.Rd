@@ -2,44 +2,50 @@
 % Please edit documentation in R/left_join_column.R
 \name{left_join_column}
 \alias{left_join_column}
-\title{Join a new column by property}
+\title{Join Wikidata claims to a dataset by QID}
 \usage{
 left_join_column(
   ds,
   property,
-  label = NULL,
-  unit = NULL,
-  definition = NULL,
-  namespace = NULL,
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
-  silent = FALSE,
   csrf = NULL
 )
 }
 \arguments{
-\item{ds}{A dataset object that contains the observations (by QIDs).}
+\item{ds}{A data frame that includes a column named \code{qid} with Wikidata
+QIDs.}
 
-\item{property}{The property}
+\item{property}{A property ID (e.g., \code{"P569"}) to retrieve for each QID.}
 
-\item{label}{A short, human-readable description of the vector or \code{NULL}.}
+\item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end
+with \code{api.php}). Defaults to the Wikidata API.}
 
-\item{unit}{A character string of length one containing the unit of measure
-or \code{NULL}.}
-
-\item{definition}{A character string of length one containing a linked
-definition or \code{NULL}.}
-
-\item{namespace}{A namespace for individual observations or categories or
-\code{NULL}.}
-
-\item{wikibase_api_url}{The URL of the Wikibase API.}
-
-\item{silent}{If the function should send messages about individual requests
-to the API or not. Defaults to \code{FALSE}.}
-
-\item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}.}
+\item{csrf}{A CSRF token, not required for read-only operations.}
+}
+\value{
+A data frame with the original data and a new column containing the
+property value for each QID. Rows where no claim is found will contain
+\code{NA}.
 }
 \description{
-Get the claims (statements) related to an item.
+For each item in a data frame containing Wikidata QIDs, this
+function retrieves the value of a specified property using the Wikibase API,
+and joins it back to the input data.
+}
+\details{
+This function queries the Wikibase API for claims (statements)
+related to a given property for each QID in the dataset. It returns only the
+preferred or first available value for each item (see \code{get_claim(first =
+TRUE)} for details).
+
+Errors such as missing properties or API issues are gracefully handled, and
+NA values are returned where no claim is available. If the dataset already
+contains a column with the same name as the property, it will be replaced in
+the joined output.
+
+This function is useful for enriching tabular data with values stored in
+Wikidata or another Wikibase-compatible knowledge base.
+}
+\seealso{
+\code{\link{get_claim}} for underlying claim retrieval logic.
 }

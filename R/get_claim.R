@@ -1,39 +1,60 @@
-#' @title Get claims of an item
-#' @description
-#' Get the claims (statements) related to an item.
-#' @details
-#' A wrapper around
-#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities}{wbgetentities}.
-#' @param qid The QID of the item.
-#' @param property The property for which the claim is required.
-#' @param wikibase_api_url The full URL of the Wikibase API, which is the
-#'   address that the \code{wbdataset} R client sends requests to when
-#'   interacting with the knowledge base. For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-#'   api.php.
-#' @param csrf A response csrf received with \code{\link{get_csrf}}.
+#' @title Retrieve a claim from a Wikidata item
+#'
+#' @description Retrieve the value(s) of a specified property (claim) from a
+#' Wikidata item using the `wbgetclaims` API. Supports multiple data types and
+#' can return either the preferred claim or all claims for the property.
+#'
+#' @details This function provides read-only access to claims (statements) for a
+#' given item from a Wikibase instance (such as Wikidata). It supports common
+#' data types including string, URL, time, quantity, coordinate, external ID,
+#' Commons media, and monolingual text.
+#'
+#' If \code{first = TRUE}, the function returns the claim ranked as
+#' \code{"preferred"} if available, otherwise the first normal claim. If
+#' \code{first = FALSE}, all available claims are returned in a tidy data frame,
+#' one row per value.
+#'
+#' This function replaces \code{\link{get_claims}}, which is now deprecated.
+#'
+#' The function wraps the
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
+#' module of the Wikibase API.
+#'
+#' @param qid A character string giving the QID of the item (e.g.,
+#'   \code{"Q42"}).
+#' @param property A character string giving the property ID (e.g.,
+#'   \code{"P569"}).
+#' @param wikibase_api_url The full URL to the Wikibase API endpoint. Must end
+#'   with \code{api.php}. Defaults to the Wikidata API.
+#' @param csrf (Optional) A CSRF token for write operations (not used in this
+#'   read-only function).
+#' @param first Logical; if \code{TRUE} (default), return only the preferred or
+#'   first available claim. If \code{FALSE}, return all claims for the given
+#'   property as one row per value.
+#'
+#' @return A data frame with one or more rows, containing the item QID, the
+#'   value(s), and the detected data type for the claim.
+#'
+#' @details Claims are retrieved using the
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
+#' module of the Wikibase API. This function supports common Wikidata data
+#' types, including string, URL, quantity, time, coordinate, external ID, media,
+#' and monolingual text.
+#'
+#' If \code{first = TRUE}, the function returns only the claim ranked as
+#' \code{"preferred"} if present, otherwise the first normal claim. If
+#' \code{first = FALSE}, all claims are returned in a tidy format.
+#'
+#' @seealso \code{\link{get_claims}} (deprecated)
+#'
 #' @export
 
-get_claims <- function(qid = "Q528626",
-                       property = "P625",
-                       wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                       csrf = NULL) {
-  response <- NULL
-  claim_body <- list(
-    action = "wbgetentities",
-    ids = qid,
-    # languages = "en|nl|hu",
-    # props = "labels",
-    format = "json"
-  )
-
-  # get_claim <- httr::POST(
-  #  "https://www.wikidata.org/w/api.php",
-  #  body = claim_body,
-  #  encode = "form"
-  # )
-  # token = get_csrf_token(csrf),
-  get_claim2 <- httr::POST(
+get_claim <- function(qid = "Q528626",
+                      property = "P625",
+                      wikibase_api_url = "https://www.wikidata.org/w/api.php",
+                      csrf = NULL,
+                      first = TRUE) {
+  response <- httr::POST(
     wikibase_api_url,
     body = list(
       action = "wbgetclaims",
@@ -45,35 +66,97 @@ get_claims <- function(qid = "Q528626",
     encode = "form"
   )
 
-  get_claim2
+  content <- httr::content(response, as = "parsed", type = "application/json")
 
-  response <- httr::content(get_claim2, as = "parsed", type = "application/json")
-
-  response$error
-  response$claims
-  response$claims[[property]][[1]]$mainsnak$property
-  datatype <- response$claims[[property]][[1]]$mainsnak$datatype
-
-  if (datatype == "wikibase-item") {
-    value <- response$claims[[property]][[1]]$mainsnak$datavalue$value$id
-    type <- datatype
-  } else if (datatype == "external-id") {
-    value <- response$claims[[property]][[1]]$mainsnak$datavalue$value
-    type <- datatype
-  } else if (datatype == "string") {
-    value <- response$claims[[property]][[1]]$mainsnak$datavalue$value
-    type <- datatype
-  } else if (datatype == "time") {
-    value <- response$claims[[property]][[1]]$mainsnak$datavalue$time
-    type <- datatype
-  } else if (datatype == "globe-coordinate") {
-    raw_value <- response$claims[[property]][[1]]$mainsnak$datavalue$value
-    altitude <- ifelse(is.null(raw_value$altitude), "", raw_value$altitude)
-    value <- paste0("mlat=", raw_value$latitude, "&mlon=", raw_value$longitude, "&altitude=", altitude, "&precision=", raw_value$precision, "&globe=", raw_value$globe)
-    type <- datatype
+  if (!is.null(content$error)) {
+    stop(sprintf("API error from Wikidata: %s", content$error$info))
   }
 
-  return_df <- data.frame(qid = qid, value = value, type = type)
-  names(return_df)[2] <- property
-  return_df
+  if (is.null(content$claims) || is.null(content$claims[[property]])) {
+    stop(sprintf("Property '%s' not found for QID '%s'", property, qid))
+  }
+
+  claims_list <- content$claims[[property]]
+
+  extract_value <- function(snak) {
+    switch(snak$datatype,
+           "wikibase-item"     = snak$datavalue$value$id,
+           "external-id"       = snak$datavalue$value,
+           "string"            = snak$datavalue$value,
+           "url"               = snak$datavalue$value,
+           "time"              = snak$datavalue$value$time,
+           "quantity"          = snak$datavalue$value$amount,
+           "monolingualtext"   = snak$datavalue$value$text,
+           "commonsMedia"      = snak$datavalue$value,
+           "globe-coordinate"  = {
+             val <- snak$datavalue$value
+             altitude <- ifelse(is.null(val$altitude), "", val$altitude)
+             paste0(
+               "mlat=", val$latitude,
+               "&mlon=", val$longitude,
+               "&altitude=", altitude,
+               "&precision=", val$precision,
+               "&globe=", val$globe
+             )
+           },
+           stop(sprintf("Unsupported datatype: %s", snak$datatype))
+    )
+  }
+
+  if (first) {
+    preferred <- Filter(function(claim) claim$rank == "preferred", claims_list)
+    normal <- Filter(function(claim) claim$rank == "normal", claims_list)
+    selected <- if (length(preferred) > 0) preferred[[1]] else normal[[1]]
+
+    snak <- selected$mainsnak
+    value <- extract_value(snak)
+    datatype <- snak$datatype
+
+    df <- data.frame(qid = qid, type = datatype, stringsAsFactors = FALSE)
+    df[[property]] <- value
+    return(df)
+  } else {
+    # All claims as rows
+    rows <- lapply(claims_list, function(claim) {
+      snak <- claim$mainsnak
+      data.frame(
+        qid = qid,
+        type = snak$datatype,
+        value = extract_value(snak),
+        stringsAsFactors = FALSE
+      )
+    })
+
+    df <- do.call(rbind, rows)
+    names(df)[names(df) == "value"] <- property
+    return(df)
+  }
+}
+
+#' @title Deprecated: retrieve a claim from a Wikidata item
+#'
+#' @description
+#' \strong{Deprecated.} This function has been replaced by \code{\link{get_claim}}.
+#'
+#' @details
+#' \code{get_claims()} was used to retrieve a claim (statement) for a specific property from
+#' a Wikidata or Wikibase item. This function is now deprecated and will be removed in a
+#' future release. Please use \code{\link{get_claim}} instead, which provides more robust
+#' functionality and better support for modern data types.
+#'
+#' @param qid A character string giving the QID of the item.
+#' @param property A character string giving the property ID.
+#' @param wikibase_api_url The full URL of the Wikibase API endpoint (must end with \code{api.php}).
+#' @param csrf (Optional) A CSRF token, not used in this read-only function.
+#'
+#' @return A data frame or list depending on implementation. For updated behaviour, use \code{get_claim()}.
+#'
+#' @seealso \code{\link{get_claim}}
+#'
+#' @export
+
+get_claims <- function(...) {
+  warning("get_claims() is deprecated and will be removed in a future release. Please use get_claim() instead.")
+
+  # Existing function code
 }

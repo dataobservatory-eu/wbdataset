@@ -1,119 +1,80 @@
-#' @title Join a new column by property
-#' @description Get the claims (statements) related to an item.
-#' @param ds A dataset object that contains the observations (by QIDs).
-#' @param property The property
-#' @param label A short, human-readable description of the vector or `NULL`.
-#' @param unit A character string of length one containing the unit of measure
-#'   or `NULL`.
-#' @param definition A character string of length one containing a linked
-#'   definition or `NULL`.
-#' @param namespace A namespace for individual observations or categories or
-#'   `NULL`.
-#' @param silent If the function should send messages about individual requests
-#'   to the API or not. Defaults to \code{FALSE}.
-#' @param wikibase_api_url The URL of the Wikibase API.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}.
-#' @importFrom dplyr left_join select
-#' @importFrom dataset dataset_df as_dataset_df defined creator dataset_title
-#' @importFrom purrr safely
+#' @title Join Wikidata claims to a dataset by QID
+#'
+#' @description For each item in a data frame containing Wikidata QIDs, this
+#' function retrieves the value of a specified property using the Wikibase API,
+#' and joins it back to the input data.
+#'
+#' @details This function queries the Wikibase API for claims (statements)
+#' related to a given property for each QID in the dataset. It returns only the
+#' preferred or first available value for each item (see \code{get_claim(first =
+#' TRUE)} for details).
+#'
+#' Errors such as missing properties or API issues are gracefully handled, and
+#' NA values are returned where no claim is available. If the dataset already
+#' contains a column with the same name as the property, it will be replaced in
+#' the joined output.
+#'
+#' This function is useful for enriching tabular data with values stored in
+#' Wikidata or another Wikibase-compatible knowledge base.
+#'
+#' @param ds A data frame that includes a column named \code{qid} with Wikidata
+#'   QIDs.
+#' @param property A property ID (e.g., \code{"P569"}) to retrieve for each QID.
+#' @param wikibase_api_url The full URL of the Wikibase API endpoint (must end
+#'   with \code{api.php}). Defaults to the Wikidata API.
+#' @param csrf A CSRF token, not required for read-only operations.
+#'
+#' @return A data frame with the original data and a new column containing the
+#'   property value for each QID. Rows where no claim is found will contain
+#'   \code{NA}.
+#'
+#' @seealso \code{\link{get_claim}} for underlying claim retrieval logic.
+#'
 #' @export
 
-left_join_column <- function(
-    ds,
-    property,
-    label = NULL,
-    unit = NULL,
-    definition = NULL,
-    namespace = NULL,
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    silent = FALSE,
-    csrf = NULL) {
-  # Initialise a data.frame to return the data.
+left_join_column <- function(ds,
+                             property,
+                             wikibase_api_url = "https://www.wikidata.org/w/api.php",
+                             csrf = NULL) {
+  safely_get_claim <- purrr::safely(get_claim, NULL)
 
-  new_column <- data.frame(
-    qid = vector("character"),
-    property = vector("character"),
-    type = vector("character")
-  )
-  names(new_column)[2] <- property
+  result_df <- vector("list", length = nrow(ds))
 
-  return_df <- new_column
-
-  safely_get_claims <- purrr::safely(get_claims, NULL)
-
-  items <- seq_along(ds$qid)
-  max_item <- max(items)
-
-  for (q in items) {
-    if (!silent) message("Left join claims: ", q, "/", max_item, ": ", ds$qid[q], " ", property)
-    these_claims <- safely_get_claims(ds$qid[q], property = property, csrf = csrf)
+  for (q in seq_len(nrow(ds))) {
+    these_claims <- safely_get_claim(
+      qid = ds$qid[q],
+      property = property,
+      wikibase_api_url = wikibase_api_url,
+      csrf = csrf,
+      first = TRUE
+    )
 
     if (is.null(these_claims$error)) {
       these_claims <- these_claims$result
     } else {
       error_item <- these_claims$error
-      if ("message" %in% names(error_item)) {
-        error_label <- ifelse(error_item$message == "argument is of length zero",
-          "missing", "error"
-        )
+      error_label <- if ("message" %in% names(error_item) &&
+                         error_item$message == "argument is of length zero") {
+        "missing"
       } else {
-        error_label <- "error"
+        "error"
       }
+
       these_claims <- data.frame(qid = ds$qid[q], property = property, type = error_label)
-      names(these_claims)[2] <- these_claims[[2]][1]
+      names(these_claims)[2] <- property
       these_claims[[2]][1] <- NA_character_
     }
 
-    return_df <- rbind(return_df, these_claims)
+    result_df[[q]] <- these_claims
   }
 
-  column_type <- "error"
-  potential_type <- unique(return_df$type)[!unique(return_df$type) %in% c("error", "missing")]
-  if (length(potential_type) == 1) column_type <- potential_type
+  result_df <- dplyr::bind_rows(result_df)
 
-  original_prov <- attributes(ds)$Provenance
-
-  return_df <- return_df[, which(!names(return_df) %in% "type")]
-
-  if (!all(
-    c(is.null(label), is.null(unit), is.null(definition), is.null(namespace))
-  )) {
-    return_df[, 2] <- defined(return_df[, 2],
-      label = label,
-      unit = unit,
-      definition = definition,
-      namespace = namespace
-    )
+  if (property %in% names(ds)) {
+    ds <- ds |>
+      dplyr::select(-dplyr::all_of(property))
   }
 
-  new_column_ds <- as_dataset_df(
-    df = return_df,
-    reference = list(
-      author = creator(ds),
-      title = dataset_title(ds)
-    )
-  )
-  newcol_prov <- attributes(new_column_ds)
-
-  new_ds <- invisible(
-    left_join(ds, new_column_ds,
-      by = intersect(names(ds), names(new_column_ds))
-    )
-  )
-
-  attr(new_ds, "Provenance") <- list(
-    started_at = original_prov$started_at,
-    ended_at = newcol_prov$Provenance$ended_at,
-    wasAssocitatedWith = original_prov$wasAssocitatedWith
-  )
-
-  new_property_definition <- c("property" = column_type)
-  names(new_property_definition) <- property
-
-  attr(new_ds, "wikibase_type") <- c(
-    attr(ds, "wikibase_type"),
-    new_property_definition
-  )
-  new_ds
+  result_df <- dplyr::left_join(ds, result_df, by = "qid")
+  return(result_df)
 }

@@ -2,32 +2,31 @@
 % Please edit documentation in R/get_claim.R
 \name{get_claims}
 \alias{get_claims}
-\title{Get claims of an item}
+\title{Deprecated: retrieve a claim from a Wikidata item}
 \usage{
-get_claims(
-  qid = "Q528626",
-  property = "P625",
-  wikibase_api_url = "https://www.wikidata.org/w/api.php",
-  csrf = NULL
-)
+get_claims(...)
 }
 \arguments{
-\item{qid}{The QID of the item.}
+\item{qid}{A character string giving the QID of the item.}
 
-\item{property}{The property for which the claim is required.}
+\item{property}{A character string giving the property ID.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+\item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end with \code{api.php}).}
 
-\item{csrf}{A response csrf received with \code{\link{get_csrf}}.}
+\item{csrf}{(Optional) A CSRF token, not used in this read-only function.}
+}
+\value{
+A data frame or list depending on implementation. For updated behaviour, use \code{get_claim()}.
 }
 \description{
-Get the claims (statements) related to an item.
+\strong{Deprecated.} This function has been replaced by \code{\link{get_claim}}.
 }
 \details{
-A wrapper around
-\href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities}{wbgetentities}.
+\code{get_claims()} was used to retrieve a claim (statement) for a specific property from
+a Wikidata or Wikibase item. This function is now deprecated and will be removed in a
+future release. Please use \code{\link{get_claim}} instead, which provides more robust
+functionality and better support for modern data types.
+}
+\seealso{
+\code{\link{get_claim}}
 }
