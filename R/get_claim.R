@@ -54,7 +54,6 @@ get_claim <- function(qid = "Q528626",
                       wikibase_api_url = "https://www.wikidata.org/w/api.php",
                       csrf = NULL,
                       first = TRUE) {
-
   if (!is_qid(qid)) {
     stop(sprintf("Invalid QID: '%s'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').", qid))
   }
@@ -89,26 +88,26 @@ get_claim <- function(qid = "Q528626",
 
   extract_value <- function(snak) {
     switch(snak$datatype,
-           "wikibase-item"     = snak$datavalue$value$id,
-           "external-id"       = snak$datavalue$value,
-           "string"            = snak$datavalue$value,
-           "url"               = snak$datavalue$value,
-           "time"              = snak$datavalue$value$time,
-           "quantity"          = snak$datavalue$value$amount,
-           "monolingualtext"   = snak$datavalue$value$text,
-           "commonsMedia"      = snak$datavalue$value,
-           "globe-coordinate"  = {
-             val <- snak$datavalue$value
-             altitude <- ifelse(is.null(val$altitude), "", val$altitude)
-             paste0(
-               "mlat=", val$latitude,
-               "&mlon=", val$longitude,
-               "&altitude=", altitude,
-               "&precision=", val$precision,
-               "&globe=", val$globe
-             )
-           },
-           stop(sprintf("Unsupported datatype: %s", snak$datatype))
+      "wikibase-item" = snak$datavalue$value$id,
+      "external-id" = snak$datavalue$value,
+      "string" = snak$datavalue$value,
+      "url" = snak$datavalue$value,
+      "time" = snak$datavalue$value$time,
+      "quantity" = snak$datavalue$value$amount,
+      "monolingualtext" = snak$datavalue$value$text,
+      "commonsMedia" = snak$datavalue$value,
+      "globe-coordinate" = {
+        val <- snak$datavalue$value
+        altitude <- ifelse(is.null(val$altitude), "", val$altitude)
+        paste0(
+          "mlat=", val$latitude,
+          "&mlon=", val$longitude,
+          "&altitude=", altitude,
+          "&precision=", val$precision,
+          "&globe=", val$globe
+        )
+      },
+      stop(sprintf("Unsupported datatype: %s", snak$datatype))
     )
   }
 

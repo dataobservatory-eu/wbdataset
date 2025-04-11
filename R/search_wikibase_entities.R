@@ -54,4 +54,3 @@ search_wikibase_entities <- function(search_term,
   # Return the search results
   content$search
 }
-

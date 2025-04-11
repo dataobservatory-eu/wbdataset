@@ -1,6 +1,6 @@
 test_that("get_claim() throws error for missing property", {
   expect_error(
-    get_claim(qid = "Q42", property = "P99999999"),  # unlikely fake property
+    get_claim(qid = "Q42", property = "P99999999"), # unlikely fake property
     "Property 'P99999999' not found for QID 'Q42'"
   )
 })
@@ -48,15 +48,21 @@ test_that("get_claim() returns correct time value for date of birth", {
 
 test_that("get_claim(): time value correctly returned", {
   expect_equal(
-    get_claim(qid = "Q28104185",
-              property = "P1889",
-              wikibase_api_url = "https://www.wikidata.org/w/api.php")$P1889,
-    "Q234138")
+    get_claim(
+      qid = "Q28104185",
+      property = "P1889",
+      wikibase_api_url = "https://www.wikidata.org/w/api.php"
+    )$P1889,
+    "Q234138"
+  )
   expect_equal(
-    get_claim(qid = "Q28104185",
-              property = "P1889",
-              wikibase_api_url = "https://www.wikidata.org/w/api.php")$type,
-    "wikibase-item")
+    get_claim(
+      qid = "Q28104185",
+      property = "P1889",
+      wikibase_api_url = "https://www.wikidata.org/w/api.php"
+    )$type,
+    "wikibase-item"
+  )
 })
 
 test_that("get_claim(): external-id value correctly returned", {
@@ -110,5 +116,5 @@ test_that("get_claim() returns monolingualtext for 'Notre-Dame de Paris' title",
 test_that("get_claim() returns commonsMedia image for 'Notre-Dame de Paris'", {
   result <- get_claim(qid = "Q191380", property = "P18", first = TRUE)
   expect_equal(result$type, "commonsMedia")
-  expect_match(result$P18, "\\.jpg$")  # Assuming the image is in JPG format
+  expect_match(result$P18, "\\.jpg$") # Assuming the image is in JPG format
 })

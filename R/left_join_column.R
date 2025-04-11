@@ -54,7 +54,7 @@ left_join_column <- function(ds,
     } else {
       error_item <- these_claims$error
       error_label <- if ("message" %in% names(error_item) &&
-                         error_item$message == "argument is of length zero") {
+        error_item$message == "argument is of length zero") {
         "missing"
       } else {
         "error"

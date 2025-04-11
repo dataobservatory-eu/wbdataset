@@ -12,7 +12,7 @@ is_qid <- function(x) {
   if (!is.character(x)) {
     stop("Input must be a character vector.")
   }
-  x_upper <- toupper(x)  # Convert input to uppercase
+  x_upper <- toupper(x) # Convert input to uppercase
   grepl("^Q\\d+$", x_upper)
 }
 
@@ -30,6 +30,6 @@ is_pid <- function(x) {
   if (!is.character(x)) {
     stop("Input must be a character vector.")
   }
-  x_upper <- toupper(x)  # Convert input to uppercase
+  x_upper <- toupper(x) # Convert input to uppercase
   grepl("^P\\d+$", x_upper)
 }

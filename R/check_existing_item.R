@@ -54,7 +54,6 @@ check_existing_item <- function(search_term,
                                 wikibase_api_url = "https://www.wikidata.org/w/api.php",
                                 csrf = NULL,
                                 ambiguity_handling = "return_null") {
-
   # Validate inputs
   if (!is.character(search_term) || length(search_term) != 1 || nchar(search_term) == 0) {
     stop("Invalid input: 'search_term' must be a non-empty character string.")
@@ -175,12 +174,16 @@ check_existing_item <- function(search_term,
   )
 
   prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php",
-                   "wbi:",
-                   "wd:")
+    "wbi:",
+    "wd:"
+  )
 
-  return_ds$rowid <- defined(paste0(prefix,
-                                    as.character(return_ds$id_on_target)),
-                             namespace = wikibase_api_url
+  return_ds$rowid <- defined(
+    paste0(
+      prefix,
+      as.character(return_ds$id_on_target)
+    ),
+    namespace = wikibase_api_url
   )
 
   return_ds

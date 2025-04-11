@@ -24,8 +24,9 @@ test_that("handle_search_term_ambiguity returns first match when prefer_first is
   )
 
   result <- handle_search_term_ambiguity(search_results,
-                                         "Orange", "en",
-                                         strategy = "return_first")
+    "Orange", "en",
+    strategy = "return_first"
+  )
   expect_equal(result$id, "Q1")
 })
 
@@ -36,7 +37,8 @@ test_that("handle_search_term_ambiguity returns NULL when multiple matches and p
   )
 
   result <- handle_search_term_ambiguity(search_results, "Orange",
-                                         "en",
-                                         strategy = "return_null")
+    "en",
+    strategy = "return_null"
+  )
   expect_null(result)
 })

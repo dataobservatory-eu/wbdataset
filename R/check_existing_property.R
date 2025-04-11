@@ -44,7 +44,6 @@ check_existing_property <- function(
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     ambiguity_handling = "return_first",
     csrf = NULL) {
-
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
@@ -89,15 +88,18 @@ check_existing_property <- function(
   # Extract matching property data
   matching_property_data <- resolved_property
 
-  comment_text <- glue::glue("A property with the label ",
-                             search_term, " already exists in this Wikibase.")
+  comment_text <- glue::glue(
+    "A property with the label ",
+    search_term, " already exists in this Wikibase."
+  )
 
   return_dataframe <- data.frame(
     action = action,
     id_on_target = matching_property_data$id,
     label = matching_property_data$label,
     description = ifelse(is.null(matching_property_data$description),
-                         "", matching_property_data$description),
+      "", matching_property_data$description
+    ),
     language = language,
     datatype = matching_property_data$datatype,
     wikibase_api_url = wikibase_api_url,
@@ -122,7 +124,8 @@ check_existing_property <- function(
     id_on_target = matching_property_data$id,
     label = matching_property_data$label,
     description = ifelse(is.null(matching_property_data$description),
-                         "", matching_property_data$description),
+      "", matching_property_data$description
+    ),
     language = language,
     datatype = matching_property_data$datatype,
     wikibase_api_url = wikibase_api_url,
@@ -198,12 +201,15 @@ check_existing_property <- function(
   )
 
   prefix <- ifelse(wikibase_api_url == "https://www.wikidata.org/w/api.php",
-                   "wd:", "wbi:"
+    "wd:", "wbi:"
   )
 
-  return_ds$rowid <- defined(paste0(prefix,
-                                    as.character(return_ds$id_on_target)),
-                             namespace = wikibase_api_url
+  return_ds$rowid <- defined(
+    paste0(
+      prefix,
+      as.character(return_ds$id_on_target)
+    ),
+    namespace = wikibase_api_url
   )
 
   return_ds
