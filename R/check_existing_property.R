@@ -1,28 +1,29 @@
-#' @title Check if a label already has an property.
+#' @title Check if a label already has a property.
 #' @description Avoid failed writing attempts by checking if a label already
-#' matches an item.
+#'   matches a property.
 #' @details A wrapper around
-#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
-#' action=wbsearchentities}.
-#' @param action Defaults to \code{"create_property"}.
-#' @param classification_property The instance of, or subclass of, or superclass
-#'   of property. Defaults to \code{NA_character} when not used.
-#' @param classification_id The QID of the class. Defaults to
-#'   \code{NA_character} when not used.
-#' @param wikibase_api_url The full URL of the Wikibase API, which is the
-#'   address that the \code{wbdataset} R client sends requests to when
-#'   interacting with the knowledge base. In this case it defaults to
-#'   \code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
-#'   CSRF is needed.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}, not needed if
-#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
-#'   to \code{NULL}.
-#' @param search_term A label in the given language, for example, "Estonia".
-#' @inheritParams create_property
-#' @return A data.frame or NULL.
+#'   \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
+#'   action=wbsearchentities}.
+#' @param search_term A character string specifying the label to search for. For
+#'   example, "instance of".
+#' @param language A character string specifying the language code of the label,
+#'   adhering to BCP 47 standards (e.g., `"en"` for English). Defaults to
+#'   `"en"`.
+#' @param wikibase_api_url The full URL of the Wikibase API. Defaults to
+#'   `'https://www.wikidata.org/w/api.php'`, which is Wikidata's API endpoint.
+#' @param csrf The CSRF token of your session, obtained with
+#'   \code{\link{get_csrf}}. Not needed if
+#'   \code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults to
+#'   \code{NULL}.
+#' @param ambiguity_handling A character string specifying how to handle cases
+#'   where multiple properties match the search term. Options are
+#'   \code{"return_first"} (default) to return the first match, or
+#'   \code{"return_null"} to return \code{NULL} when multiple matches are found.
+#' @return A data frame containing details of the matching property, or
+#'   \code{NULL} if no match is found or if multiple matches are found and
+#'   \code{ambiguity_handling} is set to \code{"return_null"}.
 #' @examples
-#' # No CSRF needed for Wikidata, but you will need it for Wikibase Suit
+#' # No CSRF needed for Wikidata
 #' check_existing_property(
 #'   search_term = "instance of",
 #'   language = "en",
@@ -41,96 +42,80 @@ check_existing_property <- function(
     log_file_name = NA_character_,
     data_curator = person("Unknown", "Person"),
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    ambiguity_handling = "return_first",
     csrf = NULL) {
 
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 
+  # Match the ambiguity handling strategy
+  ambiguity_handling <- match.arg(ambiguity_handling)
+
+  # Input validations
   if (!is.character(search_term) || length(search_term) != 1 || nchar(search_term) == 0) {
     stop("Invalid input in check_existing_property(): 'search_term' must be a non-empty character string.")
   }
-
   if (!is.character(language) || length(language) != 1 || nchar(language) == 0) {
     stop("Invalid input in check_existing_property(): 'language' must be a non-empty character string.")
   }
-
   if (!is.character(wikibase_api_url) || length(wikibase_api_url) != 1 || !grepl("^https?://", wikibase_api_url)) {
     stop("Invalid input in check_existing_property(): 'wikibase_api_url' must be a valid URL string.")
   }
 
+  action_timestamp <- action_timestamp_create()
+  action_time <- Sys.time()
 
-  get_search <- httr::POST(
-    wikibase_api_url,
-    body = list(
-      action = "wbsearchentities",
-      search = search_term,
-      language = language,
-      formatversion = 2,
-      format = "json",
-      type = "property",
-      strictlanguage = "true"
-    ),
-    encode = "form",
-    handle = csrf
+  # Perform the search
+  search_results <- search_wikibase_entities(
+    search_term = search_term,
+    language = language,
+    wikibase_api_url = wikibase_api_url,
+    type = "property",
+    csrf = csrf
   )
 
-  search_response <- httr::content(get_search,
-                                   as = "parsed",
-                                   type = "application/json"
+  # Handle ambiguity
+  resolved_property <- handle_search_term_ambiguity(
+    search_results = search_results,
+    search_term = search_term,
+    language = language,
+    strategy = ambiguity_handling
   )
 
-  if (!is.null(search_response$error)) {
-    stop(paste(search_response$error$code, ": ", search_response$error$info))
-  }
-
-  if (search_response$success == 1) {
-    if (length(search_response$search) == 0) {
-      # No match was found
-      return(NULL)
-    }
-  }
-
-  is_label_language_match <- function(sr) {
-    sr$match$language == language && sr$label == search_term
-  }
-
-  matching_props <- vapply(
-    1:length(search_response$search),
-    function(x) search_response$search[[x]]$id,
-    character(1)
-  )
-
-  exact_match <- vapply(
-    1:length(search_response$search),
-    function(x) is_label_language_match(search_response$search[[x]]),
-    logical(1)
-  )
-
-  if (!is.logical(exact_match)) message (matching_props[exact_match])
-
-  if (sum(exact_match) > 1) {
-    stop("Multiple items [", paste(matching_props, collapse = ", "), "] are matching '", search_term, "' in language='", language, "'.")
-  }
-
-  if (!any(exact_match)) {
-    return(NULL)
-  }
-  if (is.null(search_response$search[[1]])) {
-    return(NULL)
-  }
-  if (!is.list(search_response$search[[1]])) {
-    return(NULL)
-  }
-  if (is.null(search_response$search[[which(exact_match)]])) {
+  if (is.null(resolved_property)) {
     return(NULL)
   }
 
-  matching_props[exact_match]
-
-  matching_property_data <- search_response$search[[which(exact_match)]]
+  # Extract matching property data
+  matching_property_data <- resolved_property
 
   comment_text <- glue::glue("A property with the label ",
                              search_term, " already exists in this Wikibase.")
+
+  return_dataframe <- data.frame(
+    action = action,
+    id_on_target = matching_property_data$id,
+    label = matching_property_data$label,
+    description = ifelse(is.null(matching_property_data$description),
+                         "", matching_property_data$description),
+    language = language,
+    datatype = matching_property_data$datatype,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = classification_property,
+    classification_id = classification_id,
+    success = FALSE,
+    comment = as.character(comment_text),
+    time = action_timestamp,
+    logfile = ifelse(is.null(log_file_name), "", log_file_name)
+  )
+
+  description_text <- paste0(
+    "Failed property creation on Wikibase to ",
+    wikibase_api_url, " with wbdataset:", action, "() at ",
+    substr(as.character(action_time), 1, 19)
+  )
 
   return_dataframe <- data.frame(
     action = action,

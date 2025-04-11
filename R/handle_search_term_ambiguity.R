@@ -11,7 +11,8 @@
 handle_search_term_ambiguity <- function(search_results,
                                          search_term,
                                          language,
-                                         strategy = c("return_null", "return_first"),
+                                         strategy = c("return_null",
+                                                      "return_first"),
                                          csrf = NULL) {
   strategy <- match.arg(strategy)
 

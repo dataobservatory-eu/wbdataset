@@ -15,15 +15,18 @@ check_existing_item(
   log_file_name = NA_character_,
   data_curator = person("Unknown", "Person"),
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
-  csrf = NULL
+  csrf = NULL,
+  ambiguity_handling = "return_null"
 )
 }
 \arguments{
-\item{search_term}{A character string representing the label to search for
-in the Wikibase. For example, \code{"Estonian National Museum"}.}
+\item{search_term}{A character string representing the label to search for in
+the Wikibase. For example, \code{"Estonian National Museum"}.}
 
 \item{language}{A character string specifying the language code of the label,
-adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to \code{"en"}.}
+adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to
+\code{"en"}. For more details, see \href{https://tools.ietf.org/html/bcp47}{BCP
+47}.}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new
@@ -48,8 +51,8 @@ Defaults to \code{"create_item"}.}
 \item{log_file_name}{A character string specifying the name of the log file.
 Defaults to \code{NA_character_}.}
 
-\item{data_curator}{An object of class \code{person} representing the data curator.
-Defaults to \code{person("Unknown", "Person")}.}
+\item{data_curator}{An object of class \code{person} representing the data
+curator. Defaults to \code{person("Unknown", "Person")}.}
 
 \item{wikibase_api_url}{The full URL of the Wikibase API, which is the
 address that the \code{wbdataset} R client sends requests to when
@@ -59,25 +62,28 @@ api.php.}
 
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
+
+\item{ambiguity_handling}{A character string indicating how to handle
+ambiguous results: "return_null" or "return_first". Defaults to
+"return_null".}
 }
 \value{
-A \code{dataset_df} object containing information about the matching item(s),
-including action performed, item ID, label, description, language, and other
-metadata. Returns \code{NULL} if no matching items are found.
+A \code{dataset_df} object containing information about the matching
+item(s), including action performed, item ID, label, description, language,
+and other metadata. Returns \code{NULL} if no matching items are found.
 
 A data.frame or NULL.
 }
 \description{
-This function searches for existing items in a specified Wikibase instance
-that match a given label in a specified language. It helps prevent duplicate
-item creation by identifying existing matches.
+This function searches for existing items in a specified
+Wikibase instance that match a given label in a specified language. It
+helps prevent duplicate item creation by identifying existing matches.
 }
 \details{
-The function interfaces with the Wikibase API's \code{wbsearchentities} action to
-perform a search based on the provided label (\code{search_term}) and language.
-It returns information about matching items, facilitating the management of
-data consistency within the Wikibase.
-See:
+The function interfaces with the Wikibase API's \code{wbsearchentities}
+action to perform a search based on the provided label (\code{search_term}) and
+language. It returns information about matching items, facilitating the
+management of data consistency within the Wikibase. See:
 \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
 action=wbsearchentities}.
 }

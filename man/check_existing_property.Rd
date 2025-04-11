@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_existing_property.R
 \name{check_existing_property}
 \alias{check_existing_property}
-\title{Check if a label already has an property.}
+\title{Check if a label already has a property.}
 \usage{
 check_existing_property(
   search_term,
@@ -15,59 +15,39 @@ check_existing_property(
   log_file_name = NA_character_,
   data_curator = person("Unknown", "Person"),
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  ambiguity_handling = "return_first",
   csrf = NULL
 )
 }
 \arguments{
-\item{search_term}{A label in the given language, for example, "Estonia".}
+\item{search_term}{A character string specifying the label to search for. For
+example, "instance of".}
 
-\item{language}{A single language code that indicates the language of the
-label and description, using BCP 47-compliant language tags (e.g., "en" for
-English, "fr" for French).}
+\item{language}{A character string specifying the language code of the label,
+adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to
+\code{"en"}.}
 
-\item{equivalence_property}{An optional PID of a property already defined in
-the same Wikibase instance that records the equivalence of this new
-property with a property defined elsewhere, for example, on Wikidata or
-CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
-equivalence relations is will be claimed.}
+\item{wikibase_api_url}{The full URL of the Wikibase API. Defaults to
+\code{'https://www.wikidata.org/w/api.php'}, which is Wikidata's API endpoint.}
 
-\item{equivalence_id}{An optional PID or other identifier in Wikibase that
-records the equivalence of the property. An external ID. Defaults to
-\code{NA_character_}; if left missing, no equivalence relations is will be
-claimed.}
+\item{ambiguity_handling}{A character string specifying how to handle cases
+where multiple properties match the search term. Options are
+\code{"return_first"} (default) to return the first match, or
+\code{"return_null"} to return \code{NULL} when multiple matches are found.}
 
-\item{classification_property}{The instance of, or subclass of, or superclass
-of property. Defaults to \code{NA_character} when not used.}
-
-\item{classification_id}{The QID of the class. Defaults to
-\code{NA_character} when not used.}
-
-\item{action}{Defaults to \code{"create_property"}.}
-
-\item{log_file_name}{An explicitly stated full path to a possible CSV log
-file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
-will be created.}
-
-\item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.}
-
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. In this case it defaults to
-\code{'https://www.wikidata.org/w/api.php'}, Wikidata itself, where no
-CSRF is needed.}
-
-\item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}, not needed if
-\code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults
-to \code{NULL}.}
+\item{csrf}{The CSRF token of your session, obtained with
+\code{\link{get_csrf}}. Not needed if
+\code{wikibase_api_url="https://www.wikidata.org/w/api.php"}. Defaults to
+\code{NULL}.}
 }
 \value{
-A data.frame or NULL.
+A data frame containing details of the matching property, or
+\code{NULL} if no match is found or if multiple matches are found and
+\code{ambiguity_handling} is set to \code{"return_null"}.
 }
 \description{
 Avoid failed writing attempts by checking if a label already
-matches an item.
+matches a property.
 }
 \details{
 A wrapper around
@@ -75,7 +55,7 @@ A wrapper around
 action=wbsearchentities}.
 }
 \examples{
-# No CSRF needed for Wikidata, but you will need it for Wikibase Suit
+# No CSRF needed for Wikidata
 check_existing_property(
   search_term = "instance of",
   language = "en",

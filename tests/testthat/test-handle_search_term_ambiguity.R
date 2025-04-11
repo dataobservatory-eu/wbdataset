@@ -23,7 +23,9 @@ test_that("handle_search_term_ambiguity returns first match when prefer_first is
     list(label = "Orange", match = list(language = "en"), id = "Q2")
   )
 
-  result <- handle_search_term_ambiguity(search_results, "Orange", "en", prefer_first = TRUE)
+  result <- handle_search_term_ambiguity(search_results,
+                                         "Orange", "en",
+                                         strategy = "return_first")
   expect_equal(result$id, "Q1")
 })
 
@@ -33,6 +35,8 @@ test_that("handle_search_term_ambiguity returns NULL when multiple matches and p
     list(label = "Orange", match = list(language = "en"), id = "Q2")
   )
 
-  result <- handle_search_term_ambiguity(search_results, "Orange", "en", prefer_first = FALSE)
+  result <- handle_search_term_ambiguity(search_results, "Orange",
+                                         "en",
+                                         strategy = "return_null")
   expect_null(result)
 })
