@@ -77,10 +77,14 @@ will be created.}
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 
-\item{wikibase_session}{An optional list that contains any of the values of
-parameters \code{qid_equivalence_property}, \code{language},
-\code{wikibase_api_url}, \code{data_curator},\code{log_path} and
-\code{csrf} (for repeated use in a session.)}
+\item{wikibase_session}{An optional named list of default values to reuse
+across multiple function calls. If any of the main parameters (such as
+\code{language}, \code{data_curator}, \code{log_file_name},
+\code{equivalence_propeert}, \code{classification_property}
+\code{wikibase_api_url}, or \code{csrf}) are missing from the function
+call, their values will be taken from this list if available. This is
+useful in interactive workflows or scripts where the same context is
+reused.}
 }
 \value{
 Returns a \code{\link[dataset]{dataset_df}} object.

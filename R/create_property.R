@@ -42,10 +42,14 @@
 #' @param log_file_name An explicitly stated full path to a possible CSV log
 #'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 #'   will be created.
-#' @param wikibase_session An optional list that contains any of the values of
-#'   \code{language},
-#'   \code{wikibase_api_url}, \code{data_curator}, and
-#'   \code{csrf} (for repeated use in a session.)
+#' @param wikibase_session An optional named list of default values to reuse
+#'   across multiple function calls. If any of the main parameters (such as
+#'   \code{language}, \code{data_curator}, \code{log_file_name},
+#'   \code{equivalence_propeert}, \code{classification_property}
+#'   \code{wikibase_api_url}, or \code{csrf}) are missing from the function
+#'   call, their values will be taken from this list if available. This is
+#'   useful in interactive workflows or scripts where the same context is
+#'   reused.
 #' @export
 #' @return Returns a \code{\link[dataset]{dataset_df}} object.
 #' The columns are:\cr
@@ -96,43 +100,24 @@ create_property <- function(label,
                             csrf,
                             wikibase_session = NULL) {
 
-  if (!is.null(wikibase_session)) {
-    # For repeated queries you can add your variables directly or in a list
+  language <- resolve_from_session("language", language, wikibase_session)
+  data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
+  log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
+  wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
+  equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
+   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 
-    if(!is.null(wikibase_session$language)) {
-      # overwrite session default if it does not exist
-      if (is.null(language)) language <- wikibase_session$language
-    }
-    if(!is.null(wikibase_session$data_curator)) {
-      # overwrite session default if it does not exist
-      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
-    }
-
-    if(!is.null(wikibase_session$wikibase_api_url)) {
-      wikibase_api_url <-  wikibase_session$wikibase_api_url
-    }
-
-    if (!is.null(wikibase_session$log_file_name)) {
-      log_file_name <- wikibase_session$log_file_name
-    }
-
-    if(!is.null(wikibase_session$csrf)) {
-      csrf <-  wikibase_session$csrf
-    }
-  }
-
-  # Credit the person who curates the data
-  if (is.null(data_curator)) data_curator <- person("Person", "Unknown")
-  if (is.null(log_file_name)) log_file_name <- ""
-  if (is.null(description)) description <- ""
-  if (is.na(description)) description <- ""
-
-
-  assertthat::assert_that(
-    inherits(data_curator, "person"),
-    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
-
-
+  validate_create_entity_args(
+    label = label,
+    description = description,
+    language = language,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    csrf = csrf,
+    data_curator = data_curator,
+    validated_action = "create_property()"
+  )
   # Save the time of running the code
   action_time <- Sys.time()
   action_timestamp <- action_timestamp_create()

@@ -38,10 +38,14 @@
 #'   will be created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
-#' @param wikibase_session An optional list that contains any of the values of
-#'   parameters \code{qid_equivalence_property}, \code{language},
-#'   \code{wikibase_api_url}, \code{data_curator},\code{log_path} and
-#'   \code{csrf} (for repeated use in a session.)
+#' @param wikibase_session An optional named list of default values to reuse
+#'   across multiple function calls. If any of the main parameters (such as
+#'   \code{language}, \code{data_curator}, \code{log_file_name},
+#'   \code{equivalence_propeert}, \code{classification_property}
+#'   \code{wikibase_api_url}, or \code{csrf}) are missing from the function
+#'   call, their values will be taken from this list if available. This is
+#'   useful in interactive workflows or scripts where the same context is
+#'   reused.
 #' @importFrom assertthat assert_that
 #' @importFrom utils person
 #' @return Returns a \code{\link[dataset]{dataset_df}} object.
@@ -78,48 +82,22 @@ copy_wikidata_item <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
-  if (!is.null(wikibase_session)) {
-    # For repeated queries you can add your variables directly or in a list
+  language <- resolve_from_session("language", language, wikibase_session)
+  data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
+  log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
+  wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
+  equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
+  classification_property <- resolve_from_session("wikibase_api_url", classification_property, wikibase_session)
+  csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 
-    if (!is.null(wikibase_session$qid_equivalence_property)) {
-      qid_equivalence_property <- wikibase_session$qid_equivalence_property
-    }
-
-    if (!is.null(wikibase_session$classification_property)) {
-      classification_property <- wikibase_session$classification_property
-    }
-
-    if (!is.null(wikibase_session$language)) {
-      # overwrite session default if it does not exist
-      if (is.null(language)) language <- wikibase_session$language
-    }
-
-    if (!is.null(wikibase_session$data_curator)) {
-      # overwrite session default if it does not exist
-      if (is.null(data_curator)) data_curator <- wikibase_session$data_curator
-    }
-
-    if (!is.null(wikibase_session$wikibase_api_url)) {
-      wikibase_api_url <- wikibase_session$wikibase_api_url
-    }
-
-    if (!is.null(wikibase_session$log_file_name)) {
-      log_file_name <- wikibase_session$log_file_name
-    }
-
-    if (!is.null(wikibase_session$csrf)) {
-      csrf <- wikibase_session$csrf
-    }
-  }
-
-  # Assertions for correct inputs ------------------------------------------------
-
-  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
-  if (is.null(log_file_name)) log_file_name <- ""
-
-  assertthat::assert_that(
-    inherits(data_curator, "person"),
-    msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
+  validate_create_entity_args(
+    language = language,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    csrf = csrf,
+    data_curator = data_curator,
+    validated_action = "copy_wikidata_property()"
   )
 
   if (is.null(qid_equivalence_property)) qid_equivalence_property <- NA_character_
@@ -313,10 +291,10 @@ copy_wikidata_item <- function(
   ## See get_csrf, get_csrf_token.
   csrf_token <- get_csrf_token(csrf)
 
-  assertthat::assert_that(!is.null(csrf_token),
-    msg = "You do not have a CSRF token; perhaps your session has expired.
-    Try get_csrf() with your credentials."
-  )
+
+  if (!is_valid_csrf(csrf_token)) {
+    stop(validated_action, ": the csrf appears to be invalid.")
+  }
 
   # Posting the new item  ---------------------------------------------------
   new_item <- httr::POST(

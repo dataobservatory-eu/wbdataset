@@ -16,6 +16,10 @@
 #'   \code{"Q42"}).
 #' @param wikibase_api_url The full URL of the Wikibase API endpoint (must end
 #'   with \code{api.php}).
+#' @param fallback_language A BCP 47 language code (e.g., "en") used as a fallback
+#'   when no label is available in the requested language(s). If a label is missing
+#'   in one or more specified languages, this fallback will be used instead when available.
+#'   Defaults to \code{"en"}.
 #'
 #' @return A data frame with one row per QID, including columns \code{qid},
 #'   \code{label}, and \code{description}, as well as optional language-specific
@@ -27,7 +31,9 @@
 #' @importFrom tibble tibble
 #' @importFrom dataset dataset_df defined dublincore
 #' @examples
-#' get_wikidata_item("Q42", language = c("en", "nl"))
+#' \dontrun{
+#' get_wikidata_item("Q42", language = c("hu"), fallback_language = "en")
+#' }
 #' @export
 
 get_wikidata_item <- function(
@@ -36,7 +42,12 @@ get_wikidata_item <- function(
     prefix = "http://www.wikidata.org/entity/",
     wikibase_api_url = "https://www.wikidata.org/w/api.php",
     data_curator = NULL,
-    title = "Dataset title") {
+    title = "Dataset title",
+    fallback_language = "en") {
+  if (!is.character(language) || length(language) == 0 || anyNA(language)) {
+    stop("get_wikidata_item(): 'language' must be a non-empty character vector.")
+  }
+
   # Credit the person who curates the data
   if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
 
@@ -56,13 +67,13 @@ get_wikidata_item <- function(
     for (i in seq_along(qid_on_wikidata)) {
       if (i == 1) {
         # Initialise the return_df
-        return_df <- get_singe_item(
+        return_df <- get_single_item(
           qid_on_wikidata = qid_on_wikidata[i],
           language = language,
           wikibase_api_url = wikibase_api_url
         )
       } else {
-        tmp <- get_singe_item(
+        tmp <- get_single_item(
           qid_on_wikidata = qid_on_wikidata[i],
           language = language,
           wikibase_api_url = wikibase_api_url
@@ -73,7 +84,7 @@ get_wikidata_item <- function(
   } else {
     # No loop is needed if there is only a single item that needs to be
     # fetched by QID.
-    return_df <- get_singe_item(
+    return_df <- get_single_item(
       qid_on_wikidata = qid_on_wikidata,
       language = language,
       wikibase_api_url = wikibase_api_url
@@ -103,9 +114,10 @@ get_wikidata_item <- function(
 }
 
 #' @keywords internal
-get_singe_item <- function(qid_on_wikidata,
-                           language = c("en", "nl", "hu"),
-                           wikibase_api_url = "https://www.wikidata.org/w/api.php") {
+get_single_item <- function(qid_on_wikidata,
+                            language = c("en", "nl", "hu"),
+                            fallback_language = "en",
+                            wikibase_api_url = "https://www.wikidata.org/w/api.php") {
   default_label <- ""
   claim_body <- list(
     action = "wbgetentities",
@@ -150,7 +162,12 @@ get_singe_item <- function(qid_on_wikidata,
   if ("en" %in% names(response$entities[[1]]$labels)) {
     default_label <- response$entities[[1]]$labels$en$value
   } else {
-    default_label <- response$entities[[1]]$sitelinks$enwiki$title
+    default_label <- tryCatch(
+      {
+        response$entities[[1]]$sitelinks$enwiki$title
+      },
+      error = function(e) NA_character_
+    )
   }
 
   labels_missing_list <- list()

@@ -10,7 +10,8 @@ get_wikidata_item(
   prefix = "http://www.wikidata.org/entity/",
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
   data_curator = NULL,
-  title = "Dataset title"
+  title = "Dataset title",
+  fallback_language = "en"
 )
 }
 \arguments{
@@ -19,6 +20,11 @@ get_wikidata_item(
 
 \item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end
 with \code{api.php}).}
+
+\item{fallback_language}{A BCP 47 language code (e.g., "en") used as a fallback
+when no label is available in the requested language(s). If a label is missing
+in one or more specified languages, this fallback will be used instead when available.
+Defaults to \code{"en"}.}
 }
 \value{
 A data frame with one row per QID, including columns \code{qid},
@@ -40,7 +46,9 @@ By default, the function retrieves metadata in multiple languages,
 including English, French, German, Italian, and Spanish.
 }
 \examples{
-get_wikidata_item("Q42", language = c("en", "nl"))
+\dontrun{
+get_wikidata_item("Q42", language = c("hu"), fallback_language = "en")
+}
 }
 \seealso{
 \code{\link{get_claim}} to retrieve claims (properties) for Wikidata

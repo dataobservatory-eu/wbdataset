@@ -32,3 +32,16 @@ get_return_ds_structure <- function() {
     "logfile"
   )
 }
+
+
+#' @title Check if a CSRF token appears valid
+#' @description Validates the basic structure of a MediaWiki-style CSRF token.
+#' @param csrf A single character string representing the token.
+#' @return Logical \code{TRUE} or \code{FALSE}.
+#' @keywords internal
+is_valid_csrf <- function(csrf) {
+  if (!is.character(csrf) || length(csrf) != 1 || is.na(csrf)) {
+    return(FALSE)
+  }
+  grepl("^\\+\\|.{10,}$", csrf, perl = TRUE)
+}

@@ -11,8 +11,6 @@ test_that("left_join_column() works", {
   expect_equal(add_one_col$P297, c(NA_character_, "LI", NA_character_, "XK"))
 })
 
-
-
 test_that("left_join_column() works", {
   skip("Waiting on API support for this property type.")
   ds <- wikidata_countries_df

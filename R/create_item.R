@@ -42,10 +42,14 @@
 #'   will be created.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
-#' @param wikibase_session An optional list that contains any of the values of
-#'   \code{language},
-#'   \code{wikibase_api_url}, \code{data_curator}, and
-#'   \code{csrf} (for repeated use in a session.)
+#' @param wikibase_session An optional named list of default values to reuse
+#'   across multiple function calls. If any of the main parameters (such as
+#'   \code{language}, \code{data_curator}, \code{log_file_name},
+#'   \code{equivalence_propeert}, \code{classification_property}
+#'   \code{wikibase_api_url}, or \code{csrf}) are missing from the function
+#'   call, their values will be taken from this list if available. This is
+#'   useful in interactive workflows or scripts where the same context is
+#'   reused.
 #' @export
 #' @return Returns a \code{\link[dataset]{dataset_df}} object.
 #' The columns are:\cr
@@ -68,13 +72,14 @@
 #' }
 #' @examples
 #' \dontrun{
-#' # Only works with authentication
-#' your_csrf <- get_csrf(
-#'    username  = your_username,
-#'    password = your_password,
-#'    wikibase_api_url = "https://reprexbase.eu/demowiki/api.php"
-#'    )
-#'
+#' # Define a reusable session
+#' my_session <- list(
+#'   language = "en",
+#'   csrf = get_csrf("username", "password",
+#'   wikibase_api_url = "https://example.org/w/api.php"),
+#'   data_curator = person("Jane", "Doe"),
+#'   wikibase_api_url = "https://example.org/w/api.php"
+#' )
 #' create_item(
 #'    label = "biological object"
 #'    language = "en"
@@ -82,7 +87,7 @@
 #'     which live, have lived or are natural products of or from living organisms.",
 #'    equivalence_property = "P37"  # property for equivalent CIDOC definitions
 #'    equivalence_id = "E20"  # CIDOC-CRM identifier of this concept
-#'    csrf = your_csrf)
+#'    wikibase_session = my_session)
 #' }
 #' @export
 
@@ -99,43 +104,27 @@ create_item <- function(label,
                         csrf,
                         wikibase_session=NULL) {
 
-  if (!is.null(wikibase_session)) {
-    # For repeated queries you can add your variables directly or in a list
+  language <- resolve_from_session("language", language, wikibase_session)
+  data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
+  log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
+  wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
+  equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
+  classification_property <- resolve_from_session("wikibase_api_url", classification_property , wikibase_session)
+  csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 
-    if(!is.null(wikibase_session$language)) {
-      # overwrite session default if it does not exist
-      if (is.null(language)) language <- wikibase_session$language
-    }
-
-    if(!is.null(wikibase_session$data_curator)) {
-      # overwrite session default if it does not exist
-      if( is.null(data_curator)) data_curator <- wikibase_session$data_curator
-    }
-
-    if(!is.null(wikibase_session$wikibase_api_url)) {
-      wikibase_api_url <-  wikibase_session$wikibase_api_url
-    }
-
-    if (!is.null(wikibase_session$log_file_name)) {
-      log_file_name <- wikibase_session$log_file_name
-    }
-
-    if(!is.null(wikibase_session$csrf)) {
-      csrf <-  wikibase_session$csrf
-    }
-  }
-
-  # Credit the person who curates the data
-  if (is.null(data_curator)) data_curator <- person("Jane", "Doe")
-  if (is.null(log_file_name)) log_file_name <- ""
-  if (is.null(description)) description <- ""
-  if (is.na(description)) description <- ""
-
-
-  assertthat::assert_that(
-    inherits(data_curator, "person"),
-    msg='copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").')
-
+  validate_create_entity_args(
+    label = label,
+    description = description,
+    language = language,
+    wikibase_api_url = wikibase_api_url,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id,
+    classification_property = classification_property,
+    classification_id = classification_id,
+    csrf = csrf,
+    data_curator = data_curator,
+    validated_action = "create_item()"
+  )
 
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
@@ -187,27 +176,27 @@ create_item <- function(label,
   # See get_csrf, get_csrf_token.
   csrf_token <- get_csrf_token(csrf)
 
-  assertthat::assert_that(!is.null(csrf_token),
-                          msg = "You do not have a CSRF token"
-  )
+  if(!is_valid_csrf(csrf_token)) {
+    stop("create_item(, csrf): csfr does not seem to be valid.")
+  }
 
-  assertthat::assert_that(nchar(csrf_token) > 10,
-                          msg = "Your CSRF token usually should have 42 characters."
-  )
+  safe_edit <- purrr::safely(call_wbeditentity)
 
   # Posting the new property ----------------------------------------------
-  new_item <- httr::POST(
-    wikibase_api_url,
-    body = list(
-      action = "wbeditentity",
-      new    = "item",
-      data   = datastring,
-      token  = csrf_token,
-      format = "json"
-    ),
-    encode = "form",
-    handle = csrf
+  new_item <-safe_edit(
+    csrf_token = csrf,
+    wikibase_api_url = wikibase_api_url,
+    entity_data = json_data,
+    new_entity_type = "item",
+    csrf_handle = csrf,
+    bot = TRUE,
+    summary = glue::glue("Creating item for '{label}'")
   )
+
+  if (!is.null(new_item$error)) {
+    warning("create_item(): Failed to create item — ", new_item$error$message)
+    return(NULL)  # or structured error return
+  }
 
   # See if the created POST via wbeditentity was successful
   created_item_response <- httr::content(new_item,

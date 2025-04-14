@@ -5,7 +5,7 @@
 \alias{add_id_statement}
 \alias{add_item_statement}
 \alias{add_statement}
-\title{Add statements}
+\title{Add statements to an item}
 \usage{
 add_id_statement(
   qid,
@@ -29,39 +29,34 @@ add_statement(
   qid,
   pid,
   o,
-  wikibase_type,
+  wikibase_type = c("item", "string", "numeric", "external-id"),
   wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
   csrf
 )
 }
 \arguments{
-\item{qid}{The QID of the item in the Wikibase instance that you use.}
+\item{qid}{The QID of the item in the Wikibase instance.}
 
-\item{pid}{The PID of the equivalent Wikidata (or reference Wikibase) URI.}
+\item{pid}{The PID of the property to be added.}
 
-\item{o}{The object of the semantic statement.}
+\item{o}{The object of the statement (either a QID, string, or number).}
 
-\item{wikibase_type}{A \code{'item'}, \code{'numeric'}, or \code{'string'}.}
+\item{wikibase_type}{One of \code{"item"}, \code{"string"} (or \code{"external-id"}), or \code{"numeric"}.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+\item{wikibase_api_url}{The full URL of the Wikibase API (must end with \code{api.php}).}
 
 \item{csrf}{The CSRF token of your session, received with
 \code{\link{get_csrf}}.}
 }
 \value{
-A data.frame with four columns:
-\code{id} containing the statement ID, \code{qid} with the QID,
-\code{o} with the PID, and \code{p} with the  wikidata_uri.
+A data.frame describing the created statement.
 }
 \description{
 See
 \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
 API help}
 
+Adds a claim (statement) to a Wikibase item via \code{wbcreateclaim}.
 See
 \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
 API help}
