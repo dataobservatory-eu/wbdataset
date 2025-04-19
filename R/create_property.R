@@ -20,7 +20,7 @@
 #' @param datatype A single character string defining the datatype of this
 #'   property, for example, \code{"string"}, \code{"wikibase-item"},
 #'   \code{"quantity"}, \code{"commonsMedia"}, \code{"url"}, \code{"external-id"},
-#'   \code{"globe-coordinate"}.
+#'   \code{"globe-coordinate"}, \code{"time"}, \code{"monolingualtext"}.
 #' @param equivalence_property An optional PID of a property already defined in
 #'   the same Wikibase instance that records the equivalence of this new
 #'   property with a property defined elsewhere, for example, on Wikidata or
@@ -105,7 +105,11 @@ create_property <- function(label,
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
   wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
   equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
-   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
+  csrf <- resolve_from_session("csrf", csrf, wikibase_session)
+
+  if(!is_valid_wikibase_datatype(datatype)) {
+    stop ("create_property(..., datatype): ", datatype, " is not a valid Wikibase property type.")
+  }
 
   validate_create_entity_args(
     label = label,
@@ -114,10 +118,15 @@ create_property <- function(label,
     wikibase_api_url = wikibase_api_url,
     equivalence_property = equivalence_property,
     equivalence_id = equivalence_id,
+    classification_property = NA_character_, # not used in this function
+    classification_id = NA_character_, # not used in this function
     csrf = csrf,
     data_curator = data_curator,
     validated_action = "create_property()"
   )
+
+
+
   # Save the time of running the code
   action_time <- Sys.time()
   action_timestamp <- action_timestamp_create()

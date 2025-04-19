@@ -93,6 +93,7 @@ copy_wikidata_property <- function(
   wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
   classification_property <- resolve_from_session("classification_property", classification_property, wikibase_session)
   equivalence_property <- resolve_from_session("equivalence_property", equivalence_property, wikibase_session)
+  pid_equivalence_property <- resolve_from_session("pid_equivalence_property", pid_equivalence_property, wikibase_session)
 
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 

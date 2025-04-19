@@ -90,6 +90,8 @@ copy_wikidata_item <- function(
   equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
   classification_property <- resolve_from_session("wikibase_api_url", classification_property, wikibase_session)
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
+  qid_equivalence_property <- resolve_from_session("qid_equivalence_property", qid_equivalence_property, wikibase_session)
+
 
   validate_copy_entity_args(
     language = language,

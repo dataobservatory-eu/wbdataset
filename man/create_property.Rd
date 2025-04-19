@@ -36,7 +36,7 @@ English, "fr" for French).}
 \item{datatype}{A single character string defining the datatype of this
 property, for example, \code{"string"}, \code{"wikibase-item"},
 \code{"quantity"}, \code{"commonsMedia"}, \code{"url"}, \code{"external-id"},
-\code{"globe-coordinate"}.}
+\code{"globe-coordinate"}, \code{"time"}, \code{"monolingualtext"}.}
 
 \item{equivalence_property}{An optional PID of a property already defined in
 the same Wikibase instance that records the equivalence of this new
