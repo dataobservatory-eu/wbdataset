@@ -1,5 +1,8 @@
 # wbdataset
 
+# 0.1.1048
+* Improved `get_claims()`.
+
 # 0.1.1035
 * `get_property_definition()` works with CSRF, `check_existing_property()` returns
 correct datatype. Improved documentation and unit tests.

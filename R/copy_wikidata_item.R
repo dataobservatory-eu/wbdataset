@@ -82,6 +82,7 @@ copy_wikidata_item <- function(
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
+
   language <- resolve_from_session("language", language, wikibase_session)
   data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
@@ -90,9 +91,11 @@ copy_wikidata_item <- function(
   classification_property <- resolve_from_session("wikibase_api_url", classification_property, wikibase_session)
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 
-  validate_create_entity_args(
+  validate_copy_entity_args(
     language = language,
     wikibase_api_url = wikibase_api_url,
+    classification_property = classification_property,
+    classification_id = classification_id,
     equivalence_property = equivalence_property,
     equivalence_id = equivalence_id,
     csrf = csrf,
@@ -292,7 +295,7 @@ copy_wikidata_item <- function(
   csrf_token <- get_csrf_token(csrf)
 
 
-  if (!is_valid_csrf(csrf_token)) {
+  if (!is_valid_csrf_token(csrf_token)) {
     stop(validated_action, ": the csrf appears to be invalid.")
   }
 

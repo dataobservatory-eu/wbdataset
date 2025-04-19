@@ -22,7 +22,7 @@
 #'
 #' @param qid A character string giving the QID of the item (e.g.,
 #'   \code{"Q42"}).
-#' @param property A character string giving the property ID (e.g.,
+#' @param pid A character string giving the property ID (e.g.,
 #'   \code{"P569"}).
 #' @param wikibase_api_url The full URL to the Wikibase API endpoint. Must end
 #'   with \code{api.php}. Defaults to the Wikidata API.
@@ -50,7 +50,7 @@
 #' @export
 
 get_claim <- function(qid = "Q528626",
-                      property = "P625",
+                      pid = "P625",
                       wikibase_api_url = "https://www.wikidata.org/w/api.php",
                       csrf = NULL,
                       first = TRUE) {
@@ -58,33 +58,44 @@ get_claim <- function(qid = "Q528626",
     stop(sprintf("Invalid QID: '%s'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').", qid))
   }
 
-  if (!is_pid(property)) {
-    stop(sprintf("Invalid property ID: '%s'. Properties must begin with 'P' followed by digits (e.g., 'P31').", property))
+  if (!is_pid(pid)) {
+    stop(sprintf("Invalid property ID: '%s'. Properties must begin with 'P' followed by digits (e.g., 'P31').", pid))
   }
 
-  response <- httr::POST(
-    wikibase_api_url,
-    body = list(
-      action = "wbgetclaims",
-      entity = qid,
-      property = property,
-      formatversion = 2,
-      format = "json"
-    ),
-    encode = "form"
+  claim_body <- list(
+    action = "wbgetclaims",
+    entity = qid,
+    property = pid,
+    format = "json"
   )
 
-  content <- httr::content(response, as = "parsed", type = "application/json")
+  safely_post <- purrr::safely(httr::POST)
+
+  get_claim <- safely_post(
+    url = wikibase_api_url,
+    body = claim_body,
+    encode = "form",
+    csrf_handle = csrf
+  )
+
+  if (is.null(get_claim$result)) {
+    message("get_claim (", qid, ", ", pid, ", '", wikibase_api_url , "') resulted in: ", get_claim$error)
+    return(NULL)
+  } else {
+    content <- httr::content(get_claim$result,
+                             as = "parsed",
+                             type = "application/json")
+  }
 
   if (!is.null(content$error)) {
     stop(sprintf("API error from Wikidata: %s", content$error$info))
   }
 
-  if (is.null(content$claims) || is.null(content$claims[[property]])) {
-    stop(sprintf("Property '%s' not found for QID '%s'", property, qid))
+  if (is.null(content$claims) || is.null(content$claims[[pid]])) {
+    stop(sprintf("Property '%s' not found for QID '%s'", pid, qid))
   }
 
-  claims_list <- content$claims[[property]]
+  claims_list <- content$claims[[pid]]
 
   extract_value <- function(snak) {
     switch(snak$datatype,
@@ -120,8 +131,11 @@ get_claim <- function(qid = "Q528626",
     value <- extract_value(snak)
     datatype <- snak$datatype
 
-    df <- data.frame(qid = qid, type = datatype, stringsAsFactors = FALSE)
-    df[[property]] <- value
+    df <- data.frame(qid = qid,
+                     pid = pid,
+                     value = value,
+                     datatype = datatype,
+                     stringsAsFactors = FALSE)
     return(df)
   } else {
     # All claims as rows
@@ -129,14 +143,14 @@ get_claim <- function(qid = "Q528626",
       snak <- claim$mainsnak
       data.frame(
         qid = qid,
-        type = snak$datatype,
+        pid = pid,
+        datatype = snak$datatype,
         value = extract_value(snak),
         stringsAsFactors = FALSE
       )
     })
 
     df <- do.call(rbind, rows)
-    names(df)[names(df) == "value"] <- property
     return(df)
   }
 }

@@ -7,7 +7,7 @@ test_that("get_wikidata_item() works with single qid_on_wikidata", {
 
 test_that("get_wikidata_item() throws an error for invalid QID", {
   expect_error(
-    get_wikidata_item("invalid_qid"),
+    get_wikidata_item("invalid_qid", language="en"),
     "do not appear to look like QIDs"
   )
 })

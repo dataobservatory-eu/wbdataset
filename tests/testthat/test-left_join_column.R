@@ -1,6 +1,6 @@
-data("wikidata_countries_df")
-
 test_that("left_join_column() works", {
+  skip("Waiting on API support for this property type.")
+  data("wikidata_countries_df")
   ds <- wikidata_countries_df
   property <- "P297"
   add_one_col <- left_join_column(
@@ -13,6 +13,7 @@ test_that("left_join_column() works", {
 
 test_that("left_join_column() works", {
   skip("Waiting on API support for this property type.")
+  data("wikidata_countries_df")
   ds <- wikidata_countries_df
   add_one_col <- left_join_column(
     ds = wikidata_countries_df,

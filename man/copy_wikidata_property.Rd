@@ -7,10 +7,12 @@
 copy_wikidata_property(
   pid_on_wikidata,
   pid_equivalence_property = "P2",
-  language = c("en", "hu"),
+  language = "en",
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
   classification_property = NA_character_,
   classification_id = NA_character_,
+  equivalence_property = NA_character_,
+  equivalence_id = NA_character_,
   data_curator = NULL,
   log_file_name = NULL,
   csrf,
@@ -25,7 +27,7 @@ non-authenticated sources, this should be changed.)}
 \item{pid_equivalence_property}{The PID in Wikibase that records the
 equivalent Wikidata PID as an external ID.}
 
-\item{language}{Defaults to \code{c("en", "nl", "hu")}. A character string of
+\item{language}{Defaults to \code{c("en")}. A character string of
 the languages in which the users wants to receive the labels and
 descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
 47}-compliant language tags (e.g., "en" for English, and "hu"

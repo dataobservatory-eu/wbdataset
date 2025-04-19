@@ -1,13 +1,13 @@
 test_that("get_claim() throws error for missing property", {
   expect_error(
-    get_claim(qid = "Q42", property = "P99999999"), # unlikely fake property
+    get_claim(qid = "Q42", pid = "P99999999"), # unlikely fake property
     "Property 'P99999999' not found for QID 'Q42'"
   )
 })
 
 test_that("get_claim() throws an error for invalid QID", {
   expect_error(
-    get_claim(qid = "invalidQID", property = "P31"),
+    get_claim(qid = "invalidQID", pid = "P31"),
     "Invalid QID: 'invalidQID'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').",
     fixed = TRUE
   )
@@ -15,7 +15,7 @@ test_that("get_claim() throws an error for invalid QID", {
 
 test_that("get_claim() throws an error for invalid property ID", {
   expect_error(
-    get_claim(qid = "Q42", property = "invalidPID"),
+    get_claim(qid = "Q42", pid = "invalidPID"),
     "Invalid property ID: 'invalidPID'. Properties must begin with 'P' followed by digits (e.g., 'P31').",
     fixed = TRUE
   )
@@ -24,75 +24,77 @@ test_that("get_claim() throws an error for invalid property ID", {
 
 test_that("get_claim(): wikibase-item value correctly returned", {
   expect_equal(
-    get_claim(qid = "Q28104185", property = "P1889")$P1889,
+    get_claim(qid = "Q28104185", pid = "P1889")$value,
     "Q234138"
   )
   expect_equal(
-    get_claim(qid = "Q28104185", property = "P1889")$type,
+    get_claim(qid = "Q28104185", pid = "P1889")$datatype,
     "wikibase-item"
   )
 })
 
 test_that("get_claim() returns multiple rows for multi-value properties", {
-  df <- get_claim(qid = "Q243", property = "P2048", first = FALSE)
+  df <- get_claim(qid = "Q243", pid = "P2048", first = FALSE)
   expect_true(nrow(df) > 1)
-  expect_equal(unique(df$type), "quantity")
+  expect_equal(unique(df$datatype), "quantity")
 })
 
 
 test_that("get_claim() returns correct time value for date of birth", {
-  result <- get_claim(qid = "Q42", property = "P569")
-  expect_equal(result$P569, "+1952-03-11T00:00:00Z")
-  expect_equal(result$type, "time")
+  result <- get_claim(qid = "Q42", pid = "P569")
+  expect_equal(result$value, "+1952-03-11T00:00:00Z")
+  expect_equal(result$datatype, "time")
 })
 
 test_that("get_claim(): time value correctly returned", {
   expect_equal(
     get_claim(
       qid = "Q28104185",
-      property = "P1889",
+      pid = "P1889",
       wikibase_api_url = "https://www.wikidata.org/w/api.php"
-    )$P1889,
+    )$value,
     "Q234138"
   )
   expect_equal(
     get_claim(
       qid = "Q28104185",
-      property = "P1889",
+      pid = "P1889",
       wikibase_api_url = "https://www.wikidata.org/w/api.php"
-    )$type,
+    )$datatype,
     "wikibase-item"
   )
 })
 
 test_that("get_claim(): external-id value correctly returned", {
   expect_equal(
-    get_claim(qid = "Q28104185", property = "P1902")$P1902,
+    get_claim(qid = "Q28104185", pid = "P1902")$value,
     "7MoIc5s9KXolCBH1fy9kkw"
   )
   expect_equal(
-    get_claim(qid = "Q28104185", property = "P1902")$type,
+    get_claim(qid = "Q28104185", pid = "P1902")$datatype,
     "external-id"
   )
 })
 
 
 test_that("get_claim() returns correct height for the Eiffel Tower", {
-  result <- get_claim(qid = "Q243", property = "P2048", first = TRUE)
-  expect_equal(result$P2048, "+330")
-  expect_equal(result$type, "quantity")
-  result_2 <- get_claim(qid = "Q243", property = "P2048", first = FALSE)
+  result <- get_claim(qid = "Q243", pid = "P2048", first = TRUE)
+  expect_equal(result$value, "+330")
+  expect_equal(result$datatype, "quantity")
+  result_2 <- get_claim(qid = "Q243", pid = "P2048", first = FALSE)
   expect_true(inherits(result_2, "data.frame"))
   expect_equal(nrow(result_2), 3)
-  expect_setequal(result_2$P2048, c("+324", "+300", "+330"))
+  expect_setequal(result_2$value, c("+324", "+300", "+330"))
 })
 
 test_that("get_claim() correctly retrieves coordinate location for the Eiffel Tower", {
-  result <- get_claim(qid = "Q243", property = "P625", first = TRUE)
-  expect_equal(result$type, "globe-coordinate")
+  result <- get_claim(qid = "Q243",
+                      pid = "P625",
+                      first = TRUE)
+  expect_equal(result$datatype, "globe-coordinate")
 
   # Parse coordinate string
-  coord_string <- result$P625
+  coord_string <- result$value
   parts <- strsplit(coord_string, "&")[[1]]
   kv_pairs <- setNames(
     sapply(parts, function(x) strsplit(x, "=")[[1]][2]),
@@ -108,13 +110,13 @@ test_that("get_claim() correctly retrieves coordinate location for the Eiffel To
 })
 
 test_that("get_claim() returns monolingualtext for 'Notre-Dame de Paris' title", {
-  result <- get_claim(qid = "Q191380", property = "P1476", first = TRUE)
-  expect_equal(result$type, "monolingualtext")
-  expect_equal(result$P1476, "Notre-Dame de Paris")
+  result <- get_claim(qid = "Q191380", pid = "P1476", first = TRUE)
+  expect_equal(result$datatype, "monolingualtext")
+  expect_equal(result$value, "Notre-Dame de Paris")
 })
 
 test_that("get_claim() returns commonsMedia image for 'Notre-Dame de Paris'", {
-  result <- get_claim(qid = "Q191380", property = "P18", first = TRUE)
-  expect_equal(result$type, "commonsMedia")
-  expect_match(result$P18, "\\.jpg$") # Assuming the image is in JPG format
+  result <- get_claim(qid = "Q191380", pid = "P18", first = TRUE)
+  expect_equal(result$datatype, "commonsMedia")
+  expect_match(result$value, "\\.jpg$") # Assuming the image is in JPG format
 })

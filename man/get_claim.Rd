@@ -6,7 +6,7 @@
 \usage{
 get_claim(
   qid = "Q528626",
-  property = "P625",
+  pid = "P625",
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
   csrf = NULL,
   first = TRUE
@@ -16,7 +16,7 @@ get_claim(
 \item{qid}{A character string giving the QID of the item (e.g.,
 \code{"Q42"}).}
 
-\item{property}{A character string giving the property ID (e.g.,
+\item{pid}{A character string giving the property ID (e.g.,
 \code{"P569"}).}
 
 \item{wikibase_api_url}{The full URL to the Wikibase API endpoint. Must end

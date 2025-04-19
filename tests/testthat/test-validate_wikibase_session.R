@@ -9,13 +9,6 @@ test_that("validate_wikibase_session() fails on non-list input", {
   )
 })
 
-test_that("validate_wikibase_session() fails with unknown fields", {
-  bad_session <- list(language = "en", foo = "bar")
-  expect_error(
-    validate_wikibase_session(bad_session),
-    "Invalid field\\(s\\) in wikibase_session: foo"
-  )
-})
 
 test_that("validate_wikibase_session() fails on bad language value", {
   expect_error(

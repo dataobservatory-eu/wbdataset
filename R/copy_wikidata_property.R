@@ -23,7 +23,7 @@
 #'   of property. Defaults to \code{NA_character} when not used.
 #' @param classification_id The QID of the class. Defaults to
 #'   \code{NA_character} when not used.
-#' @param language Defaults to \code{c("en", "nl", "hu")}. A character string of
+#' @param language Defaults to \code{c("en")}. A character string of
 #'   the languages in which the users wants to receive the labels and
 #'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
 #'   47}-compliant language tags (e.g., "en" for English, and "hu"
@@ -76,39 +76,36 @@
 copy_wikidata_property <- function(
     pid_on_wikidata,
     pid_equivalence_property = "P2",
-    language = c("en", "hu"),
+    language = "en",
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     classification_property = NA_character_,
     classification_id = NA_character_,
+    equivalence_property = NA_character_,
+    equivalence_id = NA_character_,
     data_curator = NULL,
     log_file_name = NULL,
     csrf,
     wikibase_session = NULL) {
+
   language <- resolve_from_session("language", language, wikibase_session)
   data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
   wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
   classification_property <- resolve_from_session("classification_property", classification_property, wikibase_session)
+  equivalence_property <- resolve_from_session("equivalence_property", equivalence_property, wikibase_session)
+
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
 
-  validate_create_entity_args(
+  validate_copy_entity_args(
     language = language,
     wikibase_api_url = wikibase_api_url,
     classification_property = classification_property,
     classification_id = classification_id,
+    equivalence_property = equivalence_property,
+    equivalence_id = equivalence_id, # not used in this function
     csrf = csrf,
     data_curator = data_curator,
     validated_action = "copy_wikidata_property()"
-  )
-
-
-  if (!is_valid_csrf(csrf)) {
-    stop(validated_action, ": the csrf appears to be invalid.")
-  }
-
-  assertthat::assert_that(
-    inherits(data_curator, "person"),
-    msg = 'copy_wikidata_item(..., data_curator): data_curator must be a person, like person("Jane, "Doe").'
   )
 
   property_wikibase_datatype <- "<not retrieved>" # set default value
@@ -367,7 +364,7 @@ copy_wikidata_property <- function(
       success = TRUE,
       comment = "",
       time = action_timestamp,
-      logfile = log_file_name
+      logfile = ifelse(is.null(log_file_name), "", log_file_name)
     )
   } else if ("wikibase-validator-label-conflict" %in% unlist(created_property_response$error$messages)) {
     # Unwrap error message and send it to terminal
@@ -427,7 +424,7 @@ copy_wikidata_property <- function(
       success = FALSE,
       comment = "Wikibase validator label conflict: label-language pair already exists.",
       time = action_timestamp,
-      logfile = log_file_name
+      logfile = ifelse(is.null(log_file_name), "", log_file_name)
     )
   } else {
     # Return an emptier data.frame if there was some error
@@ -458,7 +455,7 @@ copy_wikidata_property <- function(
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
-      logfile = log_file_name
+      logfile = ifelse(is.null(log_file_name), "", log_file_name)
     )
   }
 
