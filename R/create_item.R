@@ -233,7 +233,7 @@ create_item <- function(label,
     if ( length(new_descriptions)==0 ) {
       new_description_text <- ""
     } else {
-      new_description_text <- created_item_response$entity$descriptions[[1]]$language
+      new_description_text <- created_item_response$entity$descriptions[[language]]$value
     }
 
     return_dataframe <- data.frame(
@@ -241,7 +241,7 @@ create_item <- function(label,
       id_on_target = created_item_response$entity$id,
       label = label,
       description =  new_description_text,
-      language =  created_item_response$entity$labels[[1]]$language,
+      language =  created_item_response$entity$labels[[language]]$language,
       datatype = "wikibase-item",
       wikibase_api_url = wikibase_api_url,
       equivalence_property =  equivalence_property,
@@ -251,7 +251,7 @@ create_item <- function(label,
       success = TRUE,
       comment = NA_character_,
       time = action_timestamp,
-      logfile = log_file_name
+      logfile = ifelse(is.null(log_file_name), "", log_file_name)
     )
     return_dataframe
   } else if (
@@ -287,7 +287,7 @@ create_item <- function(label,
       success = FALSE,
       comment = "wikibase-validator-label-conflict, the label-language pair already exists.",
       time = action_timestamp,
-      logfile = log_file_name
+      logfile =  ifelse(is.null(log_file_name), "", log_file_name)
     )
   } else {
     # Return an empty data.frame if there was some error, with trying to log
@@ -313,7 +313,7 @@ create_item <- function(label,
       success = FALSE,
       comment = error_comments,
       time = action_timestamp,
-      logfile = log_file_name
+      logfile =  ifelse(is.null(log_file_name), "", log_file_name)
     )
   }
 

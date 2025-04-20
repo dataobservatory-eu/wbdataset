@@ -6,9 +6,9 @@
 \usage{
 copy_wikidata_property(
   pid_on_wikidata,
-  pid_equivalence_property = "P2",
+  pid_equivalence_property,
   language = "en",
-  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  wikibase_api_url,
   classification_property = NA_character_,
   classification_id = NA_character_,
   equivalence_property = NA_character_,

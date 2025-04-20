@@ -8,12 +8,12 @@
 \title{Copy a Wikidata item(s)}
 \usage{
 copy_wikidata_item(
-  qid_on_wikidata = "Q4",
-  qid_equivalence_property = "P35",
-  language = c("en", "nl", "hu"),
+  qid_on_wikidata,
+  qid_equivalence_property,
+  language = "en",
   classification_property = NA_character_,
   classification_id = NA_character_,
-  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+  wikibase_api_url,
   data_curator = NULL,
   log_file_name = NULL,
   csrf,
