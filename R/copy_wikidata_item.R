@@ -72,12 +72,12 @@
 #' @export
 
 copy_wikidata_item <- function(
-    qid_on_wikidata = "Q4",
-    qid_equivalence_property = "P35",
-    language = c("en", "nl", "hu"),
+    qid_on_wikidata,
+    qid_equivalence_property,
+    language = "en",
     classification_property = NA_character_,
     classification_id = NA_character_,
-    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
+    wikibase_api_url,
     data_curator = NULL,
     log_file_name = NULL,
     csrf,
@@ -87,7 +87,6 @@ copy_wikidata_item <- function(
   data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
   wikibase_api_url <- resolve_from_session("wikibase_api_url", wikibase_api_url, wikibase_session)
-  equivalence_property <- resolve_from_session("wikibase_api_url", equivalence_property, wikibase_session)
   classification_property <- resolve_from_session("wikibase_api_url", classification_property, wikibase_session)
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
   qid_equivalence_property <- resolve_from_session("qid_equivalence_property", qid_equivalence_property, wikibase_session)
@@ -98,8 +97,8 @@ copy_wikidata_item <- function(
     wikibase_api_url = wikibase_api_url,
     classification_property = classification_property,
     classification_id = classification_id,
-    equivalence_property = equivalence_property,
-    equivalence_id = equivalence_id,
+    equivalence_property = NA_character_,
+    equivalence_id = NA_character_,
     csrf = csrf,
     data_curator = data_curator,
     validated_action = "copy_wikidata_property()"

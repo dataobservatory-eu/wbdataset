@@ -33,7 +33,6 @@ get_return_ds_structure <- function() {
   )
 }
 
-
 #' @title Check if a CSRF token appears valid
 #' @description Validates the basic structure of a MediaWiki-style CSRF token.
 #' @param csrf_token A single character string representing the token.
@@ -44,4 +43,30 @@ is_valid_csrf_token <- function(csrf_token) {
     return(FALSE)
   }
   ifelse(nchar(csrf_token)>10, TRUE, FALSE)
+}
+
+#' @keywords internal
+is_valid_wikibase_datatype <- function(x) {
+  valid_datatypes <- c(
+    "wikibase-item",
+    "wikibase-property",
+    "external-id",
+    "url",
+    "commonsMedia",
+    "string",
+    "monolingualtext",
+    "quantity",
+    "time",
+    "globe-coordinate",
+    "math",
+    "geo-shape",
+    "tabular-data",
+    "musical-notation",
+    "wikibase-lexeme",
+    "wikibase-form",
+    "wikibase-sense"
+  )
+
+  x <- as.character(x)
+  x %in% valid_datatypes
 }

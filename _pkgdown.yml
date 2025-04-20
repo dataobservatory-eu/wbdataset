@@ -39,6 +39,7 @@ reference:
     contents:
       - get_wikidata_item
       - get_property_definition
+      - get_claim
       - get_claims
       - left_join_column
   - title: "Writing"
@@ -49,6 +50,7 @@ reference:
      - create_property
      - add_statement
      - add_id_statement
+     - new_wikibase_session
   - title: "Copying"
     desc: >
      Copying from a Wikibase instance to another one. Currently only copying from

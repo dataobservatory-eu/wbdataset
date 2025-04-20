@@ -20,7 +20,7 @@ validate_create_entity_args <- function(label,
     stop(validated_action, ": 'label' must be a non-empty character string.")
   }
 
-  if (is.na(language) || !is.character(language) || length(language) < 1 || any(nchar(language))==0 ) {
+  if (any(is.na(language)) || !any(is.character(language)) || length(language) < 1 || any(nchar(language))<0 ) {
     stop(validated_action, ": 'language' must be a non-empty character vector.")
   }
 
@@ -83,7 +83,7 @@ validate_copy_entity_args <- function(language,
     stop("validate_copy_entity_args(..., validated_action) : 'validated_action' must be a non-empty character string.")
   }
 
-  if (is.na(language) || !is.character(language) || length(language) < 1 || any(nchar(language))==0 ) {
+  if (any(is.na(language)) || !any(is.character(language)) || length(language) < 1 || any(nchar(language))<0 ) {
     stop(validated_action, ": 'language' must be a non-empty character vector.")
   }
 

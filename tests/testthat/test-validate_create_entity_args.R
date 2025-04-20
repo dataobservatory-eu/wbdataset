@@ -55,7 +55,7 @@ test_that("validate_create_entity_args(..., csrf)", {
 
 
 test_that("validate_copy_entity_args(..., validated_action)", {
-  expect_error(validate_copy_entity_args(language="en",
+  expect_error(validate_copy_entity_args(language=c("en", "hu", "nl"),
                                          "https://reprexbase.eu/jekyll/api.php",
                                          equivalence_property = "P11",
                                          equivalence_id =  "Q12",

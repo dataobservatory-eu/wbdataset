@@ -176,27 +176,25 @@ create_item <- function(label,
   # See get_csrf, get_csrf_token.
   csrf_token <- get_csrf_token(csrf)
 
-  if(!is_valid_csrf(csrf_token)) {
+  if(!is_valid_csrf_token(csrf_token)) {
     stop("create_item(, csrf): csfr does not seem to be valid.")
   }
 
-  safe_edit <- purrr::safely(call_wbeditentity)
+  # safe_edit <- purrr::safely(call_wbeditentity)
 
   # Posting the new property ----------------------------------------------
-  new_item <-safe_edit(
-    csrf_token = csrf,
-    wikibase_api_url = wikibase_api_url,
-    entity_data = json_data,
-    new_entity_type = "item",
-    csrf_handle = csrf,
-    bot = TRUE,
-    summary = glue::glue("Creating item for '{label}'")
+  new_item <- httr::POST(
+    wikibase_api_url,
+    body = list(
+      action = "wbeditentity",
+      new    = "item",
+      data   = datastring,
+      token  = csrf_token,
+      format = "json"
+    ),
+    encode = "form",
+    handle = csrf
   )
-
-  if (!is.null(new_item$error)) {
-    warning("create_item(): Failed to create item — ", new_item$error$message)
-    return(NULL)  # or structured error return
-  }
 
   # See if the created POST via wbeditentity was successful
   created_item_response <- httr::content(new_item,

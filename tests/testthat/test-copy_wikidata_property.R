@@ -11,6 +11,7 @@ test_that("copy_wikidata_property() fails when CSRF token is missing or invalid"
 test_that("copy_wikidata_property() fails when data curator is not a person", {
   expect_error(copy_wikidata_property(
     pid_on_wikidata = "P31",
+    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     csrf = NULL,
     data_curator = 123
   ), regexp = "must be a person")

@@ -125,8 +125,6 @@ create_property <- function(label,
     validated_action = "create_property()"
   )
 
-
-
   # Save the time of running the code
   action_time <- Sys.time()
   action_timestamp <- action_timestamp_create()
@@ -185,13 +183,9 @@ create_property <- function(label,
   # See get_csrf, get_csrf_token.
   csrf_token <- get_csrf_token(csrf)
 
-  assertthat::assert_that(!is.null(csrf_token),
-                          msg = "You do not have a CSRF token"
-  )
-
-  assertthat::assert_that(nchar(csrf_token) == 42,
-                          msg = "Your CSRF token should have 42 characters."
-  )
+  if(!is_valid_csrf_token(csrf_token)) {
+    stop("create_item(, csrf): csfr does not seem to be valid.")
+  }
 
   # Posting the new property ----------------------------------------------
   new_property <- httr::POST(
