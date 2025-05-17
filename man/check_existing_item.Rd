@@ -57,11 +57,13 @@ curator. Defaults to \code{person("Unknown", "Person")}.}
 \item{wikibase_api_url}{The full URL of the Wikibase API, which is the
 address that the \code{wbdataset} R client sends requests to when
 interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+\code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
+api.php. It is either given as a parameter or resolved from
+\code{wikibase_session}.}
 
 \item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}.}
+\code{\link{get_csrf}}. It is either given as a parameter or resolved
+from \code{wikibase_session}.}
 
 \item{ambiguity_handling}{A character string indicating how to handle
 ambiguous results: "return_null" or "return_first". Defaults to

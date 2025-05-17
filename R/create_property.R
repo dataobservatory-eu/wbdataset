@@ -35,13 +35,23 @@
 #'   interacting with the knowledge base. For example,
 #'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
 #'   api.php.
+#' @param wikibase_api_url The full URL of the Wikibase API, which is the
+#'   address that the \code{wbdataset} R client sends requests to when
+#'   interacting with the knowledge base. For example,
+#'   \code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
+#'   api.php. It is either given as a parameter or resolved from
+#'   \code{wikibase_session}.
 #' @param data_curator The name of the data curator who runs the function and
 #'   creates the log file, created with \link[utils]{person}.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}.
+#'   It is either given as a parameter or resolved from
+#'   \code{wikibase_session}. If no curator is given, then filled with
+#'   \code{person("Unknown", "Curator")}.
 #' @param log_file_name An explicitly stated full path to a possible CSV log
 #'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 #'   will be created.
+#' @param csrf The CSRF token of your session, received with
+#'   \code{\link{get_csrf}}. It is either given as a parameter or resolved
+#'   from \code{wikibase_session}.
 #' @param wikibase_session An optional named list of default values to reuse
 #'   across multiple function calls. If any of the main parameters (such as
 #'   \code{language}, \code{data_curator}, \code{log_file_name},
@@ -94,10 +104,10 @@ create_property <- function(label,
                             datatype,
                             equivalence_property = NA_character_,
                             equivalence_id = NA_character_,
-                            wikibase_api_url,
+                            wikibase_api_url = NULL,
                             data_curator = NULL,
                             log_file_name = NULL,
-                            csrf,
+                            csrf = NULL,
                             wikibase_session = NULL) {
 
   language <- resolve_from_session("language", language, wikibase_session)
@@ -109,6 +119,10 @@ create_property <- function(label,
 
   if(!is_valid_wikibase_datatype(datatype)) {
     stop ("create_property(..., datatype): ", datatype, " is not a valid Wikibase property type.")
+  }
+
+  if (is.null(data_curator)) {
+    data_curator <- person("Unknown", "Curator", role = "dtm")
   }
 
   validate_create_entity_args(

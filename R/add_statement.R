@@ -17,6 +17,7 @@ add_statement <- function(
     wikibase_type = c("item", "string", "numeric", "external-id"),
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
+
   if (!is.character(wikibase_type) || length(wikibase_type) != 1) {
     stop("add_statement(): 'wikibase_type' must be a single character string.")
   }

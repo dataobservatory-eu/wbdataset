@@ -12,10 +12,10 @@ create_item(
   equivalence_id = NA_character_,
   classification_property = NA_character_,
   classification_id = NA_character_,
-  wikibase_api_url,
+  wikibase_api_url = NULL,
   data_curator = NULL,
   log_file_name = NULL,
-  csrf,
+  csrf = NULL,
   wikibase_session = NULL
 )
 }
@@ -54,18 +54,23 @@ of property. Defaults to \code{NA_character} when not used.}
 \item{wikibase_api_url}{The full URL of the Wikibase API, which is the
 address that the \code{wbdataset} R client sends requests to when
 interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+\code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
+api.php. It is either given as a parameter or resolved from
+\code{wikibase_session}.}
 
 \item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.}
+creates the log file, created with \link[utils]{person}.
+It is either given as a parameter or resolved from
+\code{wikibase_session}. If no curator is given, then filled with
+\code{person("Unknown", "Curator")}.}
 
 \item{log_file_name}{An explicitly stated full path to a possible CSV log
 file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 will be created.}
 
 \item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}.}
+\code{\link{get_csrf}}. It is either given as a parameter or resolved
+from \code{wikibase_session}.}
 
 \item{wikibase_session}{An optional named list of default values to reuse
 across multiple function calls. If any of the main parameters (such as

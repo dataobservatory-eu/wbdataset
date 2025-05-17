@@ -31,15 +31,20 @@
 #' @param wikibase_api_url The full URL of the Wikibase API, which is the
 #'   address that the \code{wbdataset} R client sends requests to when
 #'   interacting with the knowledge base. For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-#'   api.php.
+#'   \code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
+#'   api.php. It is either given as a parameter or resolved from
+#'   \code{wikibase_session}.
 #' @param data_curator The name of the data curator who runs the function and
 #'   creates the log file, created with \link[utils]{person}.
+#'   It is either given as a parameter or resolved from
+#'   \code{wikibase_session}. If no curator is given, then filled with
+#'   \code{person("Unknown", "Curator")}.
 #' @param log_file_name An explicitly stated full path to a possible CSV log
 #'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 #'   will be created.
 #' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}.
+#'   \code{\link{get_csrf}}. It is either given as a parameter or resolved
+#'   from \code{wikibase_session}.
 #' @param wikibase_session An optional named list of default values to reuse
 #'   across multiple function calls. If any of the main parameters (such as
 #'   \code{language}, \code{data_curator}, \code{log_file_name},
@@ -77,14 +82,14 @@ copy_wikidata_property <- function(
     pid_on_wikidata,
     pid_equivalence_property,
     language = "en",
-    wikibase_api_url,
+    wikibase_api_url = NULL,
     classification_property = NA_character_,
     classification_id = NA_character_,
     equivalence_property = NA_character_,
     equivalence_id = NA_character_,
     data_curator = NULL,
     log_file_name = NULL,
-    csrf,
+    csrf = NULL,
     wikibase_session = NULL) {
 
   language <- resolve_from_session("language", language, wikibase_session)
@@ -96,6 +101,10 @@ copy_wikidata_property <- function(
   pid_equivalence_property <- resolve_from_session("pid_equivalence_property", pid_equivalence_property, wikibase_session)
 
   csrf <- resolve_from_session("csrf", csrf, wikibase_session)
+
+  if (is.null(data_curator)) {
+    data_curator <- person("Unknown", "Curator", role = "dtm")
+  }
 
   validate_copy_entity_args(
     language = language,
