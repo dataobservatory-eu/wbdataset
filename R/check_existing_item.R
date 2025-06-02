@@ -55,13 +55,19 @@ check_existing_item <- function(search_term,
                                 csrf = NULL,
                                 ambiguity_handling = "return_null") {
   # Validate inputs
-  if (!is.character(search_term) || length(search_term) != 1 || nchar(search_term) == 0) {
+  if (!is.character(search_term) ||
+      length(search_term) != 1 ||
+      nchar(search_term) == 0) {
     stop("Invalid input: 'search_term' must be a non-empty character string.")
   }
-  if (!is.character(language) || length(language) != 1 || nchar(language) == 0) {
+  if (!is.character(language) ||
+      length(language) != 1 ||
+      nchar(language) == 0) {
     stop("Invalid input: 'language' must be a non-empty character string.")
   }
-  if (!is.character(wikibase_api_url) || length(wikibase_api_url) != 1 || !grepl("^https?://", wikibase_api_url)) {
+  if (!is.character(wikibase_api_url) ||
+      length(wikibase_api_url) != 1 ||
+      !grepl("^https?://", wikibase_api_url)) {
     stop("Invalid input: 'wikibase_api_url' must be a valid URL string.")
   }
 
