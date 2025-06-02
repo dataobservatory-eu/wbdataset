@@ -92,6 +92,8 @@ copy_wikidata_property <- function(
     csrf = NULL,
     wikibase_session = NULL) {
 
+  # Resolve inputs from explicit parameters or session parameter list ---
+
   language <- resolve_from_session("language", language, wikibase_session)
   data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
@@ -105,6 +107,8 @@ copy_wikidata_property <- function(
   if (is.null(data_curator)) {
     data_curator <- person("Unknown", "Curator", role = "dtm")
   }
+
+  # Validate the parameters before API interaction -----------------
 
   validate_copy_entity_args(
     language = language,
@@ -120,8 +124,9 @@ copy_wikidata_property <- function(
 
   property_wikibase_datatype <- "<not retrieved>" # set default value
 
+  # If many PIDs are given, loop the interaction --------
+
   if (length(pid_on_wikidata) > 1) {
-    # Run this function in a loop if there are several PIDs to copy
 
     return_log_file <- copy_wikidata_properties(
       pid_on_wikidata = pid_on_wikidata,
@@ -147,12 +152,13 @@ copy_wikidata_property <- function(
   # Save the time of running the code
   action_timestamp <- action_timestamp_create()
 
-  # Assert that pid_on_wikidata makes sense
+  # Assert that pid_on_wikidata makes sense -------------------------
   pid_on_wikidata <- as.character(pid_on_wikidata)
   assertthat::assert_that(is_pid(pid_on_wikidata),
     msg = "pid_on_wikidata must start with P followed by digits."
   )
 
+  # Create a claim body to check if the property alrady exists
   claim_body <- list(
     action = "wbgetentities",
     ids = pid_on_wikidata,
@@ -181,11 +187,10 @@ copy_wikidata_property <- function(
     )
   }
 
+  # Exception: retrieval of the property was not successful,
+  # even though we did not get an explicit error before.
   if (!is_response_success(response)) {
-    # Exception: retrieval of the property was not successful,
-    # even though we did not get an explicit error before.
     message("Could not access ", pid_on_wikidata)
-
     error_comments <- paste(
       unlist(
         lapply(response$error$messages, function(x) x$name)
@@ -238,6 +243,10 @@ copy_wikidata_property <- function(
 
   message("Default label for ", pid_on_wikidata, ": ", default_label)
 
+
+  # Check if such a property exists on the target where you want to
+  # copy from Wikidata -------------------------------------------
+
   existing_property <- check_existing_property(
     action = "copy_property",
     search_term = default_label,
@@ -256,6 +265,8 @@ copy_wikidata_property <- function(
     # return existing item
     return(existing_property)
   }
+
+  # If the property does not exit, go on  ---------------------
 
   labels_missing_list <- list()
 
