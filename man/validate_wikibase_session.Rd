@@ -7,12 +7,15 @@
 validate_wikibase_session(wikibase_session)
 }
 \arguments{
-\item{session}{A list, typically created with \code{\link{new_wikibase_session}}.}
+\item{wikibase_session}{A list, typically created with
+\code{\link{new_wikibase_session}}.}
 }
 \value{
-\code{TRUE} if the session is valid, otherwise an informative error.
+\code{TRUE} if the session is valid, otherwise an informative
+error.
 }
 \description{
-Checks that the session object is a named list and its components are valid for reuse.
+Checks that the session object is a named list and its
+components are valid for reuse.
 }
 \keyword{internal}

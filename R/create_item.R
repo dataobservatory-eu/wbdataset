@@ -56,6 +56,7 @@
 #'   useful in interactive workflows or scripts where the same context is
 #'   reused.
 #' @export
+#' @importFrom utils write.table
 #' @return Returns a \code{\link[dataset]{dataset_df}} object.
 #' The columns are:\cr
 #' \describe{
@@ -392,10 +393,15 @@ create_item <- function(label,
   )
 
   if(!is.null(log_file_name) && nchar(log_file_name)>0 ) {
-    write_csv(return_dataframe,
-              file = log_file_name,
-              na = "NA",
-              append = TRUE
+    write.table(
+      return_dataframe,
+      file = log_file_name,
+      sep = ",",
+      row.names = FALSE,
+      col.names = !file.exists(log_file_name),
+      na = "NA",
+      append = TRUE,
+      quote = TRUE
     )
   }
 

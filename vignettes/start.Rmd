@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setupknitr, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -16,16 +16,17 @@ knitr::opts_chunk$set(
 
 It is a good idea to start with a fresh R session and empty environment in the memory. You will work with a session in R and an authenticated session on a Wikibase server. It may cause confusion if you have some variables, like passwords, tokens, from a previous session.
 
-```{r setup}
+```{r setup, eval=FALSE}
 library(wbdataset)
 # We asume that you store your bot password to a Wikibase instance
 # on keyring.
 library(keyring) 
 
-my_csrf <- get_csrf(username="Reprexba jekyll@AntaldanielBot",
-                    password = key_get(service = "https://reprexbase.eu/jekyll/api.php",
-                                       username = "Reprexba jekyll@AntaldanielBot"), 
-                    wikibase_api_url = "https://reprexbase.eu/jekyll/api.php")
+my_csrf <- get_csrf(
+  username="Reprexba jekyll@AntaldanielBot",
+  password = key_get(service = "https://reprexbase.eu/jekyll/api.php",
+                     username = "Reprexba jekyll@AntaldanielBot"), 
+  wikibase_api_url = "https://reprexbase.eu/jekyll/api.php")
 
 ```
 
@@ -81,7 +82,7 @@ paris_item <- copy_wikidata_item(
 ```
 You get a message with the default label (currently set for English):
 
-```{r, echo=FALSE}
+```{r showparis, echo=FALSE}
 message("Default abel for Q90: Paris")
 ```
 And if your credentials were validated on the Wikibase instance, and it does not have already an item with the label Paris, you get this message:
@@ -174,6 +175,7 @@ p21 <- copy_wikidata_property(
   csrf = my_csrf
 )
 ```
+
 You have copied the property, identified by PID=21 on Wikidata. In your system, it received the value stored in `p21$id_on_target`. This information is messaged on the screen, returned to your environment (you saved it in this case to the data.frame `p21`), and it can be found in your log_file directory, too, as a .csv file.
 
 Alternatively, just like with items, you can create a property manually. Still remember the `equivalence_property` that keeps your items aligned with Wikidata? Such equivalence can be defined with Wikidata, but also with any well defined conceptual model. This is how you define such an equivalence property with the *Records in Context* conceptual model and ontology:
@@ -229,10 +231,9 @@ p107 <- create_property(
 message("Successfully created item P47 (has current or former member (is current or former member of))")
 ```
 
-For repeated queries, you can place the repeating variables into a list, and 
-provide this parameters as a list with `wikibase_session`=`my_wikibase_session`.
+For repeated queries, you can place the repeating variables into a list, and provide this parameters as a list with `wikibase_session`=`my_wikibase_session`.
 
-```{r wikibasesession}
+```{r wikibasesession, eval=FALSE}
 my_wikibase_session <- list(
   language = c("en", "nl"),
   wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",

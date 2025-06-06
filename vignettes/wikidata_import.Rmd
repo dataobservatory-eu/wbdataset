@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-The wbdataset package is an extension of the dataset, which in turn is an R package that helps to exchange, publish and combine datasets more easily by improving their semantics. The wbdataset extends the usability of dataset by connecting the Wikibase API with the R statistical environment.
+The _wbdataset_ package is an extension of the dataset, which in turn is an R package that helps to exchange, publish and combine datasets more easily by improving their semantics. The wbdataset extends the usability of dataset by connecting the Wikibase API with the R statistical environment.
 
 Let us initialize a dataset from Wikidata.
 
@@ -48,7 +48,7 @@ And download the main identifiers of these data subject, i.e., the countries:
 
 ```{r get-data, eval=FALSE}
 # Retrieve their labels into a dataset called 'European countries':
-wikidata_countries_df <- get_item(
+wikidata_countries_df <- get_wikidata_item(
   qid = wikidata_countries,
   language = "en",
   title = "European countries",
@@ -70,21 +70,15 @@ Now let us add further columns, making sure that we include the precise definiti
 
 We add properties of these countries, or attributes/variables of these countries by reading statements about those variables or attributes. Our `left_join_column` tries to retrieve the attribute, for example, `ISO 3166-1 alpha-2 code (P297)` for every country identified by a QID, starting with `Q756617` as defined above.
 
-```{r addcols}
+```{r addcols, eval=FALSE}
 ds <- wikidata_countries_df %>%
   left_join_column(
     label = "ISO 3166-1 alpha-2 code",
     property = "P297"
   ) %>%
   left_join_column(
-    property = "P1566",
-    label = "Geonames ID",
-    namespace = "https://www.geonames.org/"
-  ) %>%
-  left_join_column(
-    label = "different from Wikipedia item",
-    property = "P1889"
-  )
+    property = "P1566"
+  ) 
 ```
 
 You can set the workflow to SILENT to avoid the progress report above, i.e.,  
@@ -106,29 +100,7 @@ ds <- wikidata_countries_df %>%
     property = "P1889", silent = TRUE
   )
 ```
-Let us see the results:
 
-```{r shownewcols}
-print(ds)
-```
-
-The metadata added to these columns (attributes):
-
-```{r}
-attributes(ds$P1566)
-```
-
-This resolves the third cell in the `P1566` column (Geonames ID of Galicia) to <https://www.geonames.org/3336902>. Galicia is not a sovereign state, therefore it has no `P297` value, i.e., it  has no ISO country code.
-
-```{r datasetmetadata}
-print(dataset::get_bibentry(ds), style = "bibtex")
-```
-
-Some provenance is recorded:
-
-```{r prov}
-dataset::provenance(ds)
-```
 
 ### Saving the data 
 

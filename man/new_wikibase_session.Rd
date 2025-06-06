@@ -11,7 +11,7 @@ new_wikibase_session(
   wikibase_api_url = NULL,
   log_file_name = NULL,
   pid_equivalence_property = NA_character_,
-  qid_quivalence_property = NA_character_,
+  qid_equivalence_property = NA_character_,
   classification_property = NA_character_,
   equivalence_property = NA_character_
 )
@@ -19,33 +19,40 @@ new_wikibase_session(
 \arguments{
 \item{language}{A BCP 47 language tag (e.g., \code{"en"}).}
 
-\item{csrf}{A CSRF token object, typically obtained from \code{\link{get_csrf}}.}
+\item{csrf}{A CSRF token object, typically obtained from
+\code{\link{get_csrf}}.}
 
-\item{data_curator}{A \code{person()} object identifying the user running the session.}
+\item{data_curator}{A \code{person()} object identifying the user running the
+session.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API (must end with \code{api.php}).}
+\item{wikibase_api_url}{The full URL of the Wikibase API (must end with
+\code{api.php}).}
 
-\item{log_file_name}{Optional. A path to a log file where edits should be recorded.}
+\item{log_file_name}{Optional. A path to a log file where edits should be
+recorded.}
 
 \item{pid_equivalence_property}{The PID in Wikibase that records the
 equivalent Wikidata PID as an external ID.}
 
-\item{classification_property}{The PID of a property like "instance of" or "subclass of"
-to classify items created during the session. Defaults to \code{NA_character_}.}
-
-\item{equivalence_property}{The PID of a property (e.g., \code{"P2"}) used to express
-equivalence with an external concept (e.g., from Wikidata or CIDOC-CRM).}
-
 \item{qid_equivalence_property}{The QID in Wikibase that records the
 equivalent Wikidata QID as an external ID.}
+
+\item{classification_property}{The PID of a property like "instance of" or
+"subclass of" to classify items created during the session. Defaults to
+\code{NA_character_}.}
+
+\item{equivalence_property}{The PID of a property (e.g., \code{"P2"}) used to
+express equivalence with an external concept (e.g., from Wikidata or
+CIDOC-CRM).}
 }
 \value{
-A named list that can be passed to the \code{wikibase_session} argument
-of various creation functions.
+A named list that can be passed to the \code{wikibase_session}
+argument of various creation functions.
 }
 \description{
-Creates a named list of commonly reused parameters for functions such as
-\code{create_item()} and \code{create_property()}, especially useful in batch workflows.
+Creates a named list of commonly reused parameters for functions
+such as \code{create_item()} and \code{create_property()}, especially
+useful in batch workflows.
 }
 \examples{
 \dontrun{

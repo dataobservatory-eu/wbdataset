@@ -19,8 +19,9 @@ handle_search_term_ambiguity(
 
 \item{language}{The language code used in the search.}
 
-\item{prefer_first}{Logical; if TRUE, returns the first match when multiple
-matches are found.}
+\item{strategy}{If \code{return_null} than a NULL value is returned if
+there are ambiguous results, if \code{return_first} then the first result
+is returned.}
 }
 \value{
 A single search result or NULL if ambiguity cannot be resolved.

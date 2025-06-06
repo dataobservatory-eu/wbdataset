@@ -1,8 +1,12 @@
 #' @title Validate a wikibase_session object
-#' @description Checks that the session object is a named list and its components are valid for reuse.
-#' @param session A list, typically created with \code{\link{new_wikibase_session}}.
-#' @return \code{TRUE} if the session is valid, otherwise an informative error.
+#' @description Checks that the session object is a named list and its
+#'   components are valid for reuse.
+#' @param wikibase_session A list, typically created with
+#'   \code{\link{new_wikibase_session}}.
+#' @return \code{TRUE} if the session is valid, otherwise an informative
+#' error.
 #' @keywords internal
+
 validate_wikibase_session <- function(wikibase_session) {
   if (is.null(wikibase_session)) {
     return(invisible(TRUE))
@@ -19,7 +23,7 @@ validate_wikibase_session <- function(wikibase_session) {
   }
 
   if (!is.null(wikibase_session$pid_equivalence_property) &&
-    (!is.character(wikibase_session$pid_equivalence_property) || length(pid_equivalence_property$language) != 1)) {
+    (!is.character(wikibase_session$pid_equivalence_property) || length(wikibase_session$pid_equivalence_property$language) != 1)) {
     stop("wikibase_session$pid_equivalence_property must be a single character string.")
   }
 
@@ -45,7 +49,7 @@ validate_wikibase_session <- function(wikibase_session) {
       stop("wikibase_session$csrf must be a single character string.")
     }
 
-    if (!is_valid_csrf(wikibase_session$csrf)) {
+    if (!is_valid_csrf_token(wikibase_session$csrf)) {
       warning("CSRF token format looks unusual. Check if this was retrieved via get_csrf().")
     }
   }

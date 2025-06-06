@@ -7,19 +7,14 @@
 get_claims(...)
 }
 \arguments{
-\item{qid}{A character string giving the QID of the item.}
-
-\item{property}{A character string giving the property ID.}
-
-\item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end with \code{api.php}).}
-
-\item{csrf}{(Optional) A CSRF token, not used in this read-only function.}
+\item{...}{Any parameters.}
 }
 \value{
 A data frame or list depending on implementation. For updated behaviour, use \code{get_claim()}.
 }
 \description{
-\strong{Deprecated.} This function has been replaced by \code{\link{get_claim}}.
+\strong{Deprecated.} This function has been replaced by
+\code{\link{get_claim}}.
 }
 \details{
 \code{get_claims()} was used to retrieve a claim (statement) for a specific property from

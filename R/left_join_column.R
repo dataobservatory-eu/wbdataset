@@ -73,7 +73,7 @@ left_join_column <- function(
   result_df <- dplyr::bind_rows(result_df)
 
   if (property %in% names(ds)) {
-    ds <- ds |>
+    ds <- ds %>%
       dplyr::select(-dplyr::all_of(property))
   }
 

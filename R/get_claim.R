@@ -49,11 +49,13 @@
 #'
 #' @export
 
-get_claim <- function(qid = "Q528626",
-                      pid = "P625",
-                      wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                      csrf = NULL,
-                      first = TRUE) {
+get_claim <- function(
+    qid = "Q528626",
+    pid = "P625",
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    csrf = NULL,
+    first = TRUE) {
+
   if (!is_qid(qid)) {
     stop(sprintf("Invalid QID: '%s'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').", qid))
   }
@@ -158,7 +160,8 @@ get_claim <- function(qid = "Q528626",
 #' @title Deprecated: retrieve a claim from a Wikidata item
 #'
 #' @description
-#' \strong{Deprecated.} This function has been replaced by \code{\link{get_claim}}.
+#' \strong{Deprecated.} This function has been replaced by
+#' \code{\link{get_claim}}.
 #'
 #' @details
 #' \code{get_claims()} was used to retrieve a claim (statement) for a specific property from
@@ -166,11 +169,7 @@ get_claim <- function(qid = "Q528626",
 #' future release. Please use \code{\link{get_claim}} instead, which provides more robust
 #' functionality and better support for modern data types.
 #'
-#' @param qid A character string giving the QID of the item.
-#' @param property A character string giving the property ID.
-#' @param wikibase_api_url The full URL of the Wikibase API endpoint (must end with \code{api.php}).
-#' @param csrf (Optional) A CSRF token, not used in this read-only function.
-#'
+#' @param ... Any parameters.
 #' @return A data frame or list depending on implementation. For updated behaviour, use \code{get_claim()}.
 #'
 #' @seealso \code{\link{get_claim}}

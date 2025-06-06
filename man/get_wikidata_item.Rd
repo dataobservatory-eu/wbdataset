@@ -18,8 +18,24 @@ get_wikidata_item(
 \item{qid_on_wikidata}{A character vector of Wikidata QIDs (e.g.,
 \code{"Q42"}).}
 
+\item{language}{Defaults to \code{c("en")}. A character string of
+the languages in which the users wants to receive the labels and
+descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
+47}-compliant language tags (e.g., "en" for English, and "hu"
+for Hungarian.)}
+
+\item{prefix}{The prefix to be used as a namespace for downloaded items.}
+
 \item{wikibase_api_url}{The full URL of the Wikibase API endpoint (must end
 with \code{api.php}).}
+
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.
+It is either given as a parameter or resolved from
+\code{wikibase_session}. If no curator is given, then filled with
+\code{person("Unknown", "Curator")}.}
+
+\item{title}{The title of the returned (log) dataset.}
 
 \item{fallback_language}{A BCP 47 language code (e.g., "en") used as a fallback
 when no label is available in the requested language(s). If a label is missing

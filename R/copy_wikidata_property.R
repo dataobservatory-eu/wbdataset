@@ -54,7 +54,7 @@
 #'   useful in interactive workflows or scripts where the same context is
 #'   reused.
 #' @importFrom assertthat assert_that
-#' @importFrom utils person
+#' @importFrom utils person write.table
 #' @return Returns a \code{\link[dataset]{dataset_df}} object. The columns
 #'   are:\cr
 #' \describe{
@@ -548,10 +548,15 @@ copy_wikidata_property <- function(
   )
 
   if (!is.null(log_file_name) && nchar(log_file_name) > 0) {
-    write_csv(return_dataframe,
+    write.table(
+      return_dataframe,
       file = log_file_name,
+      sep = ",",
+      row.names = FALSE,
+      col.names = !file.exists(log_file_name),
       na = "NA",
-      append = TRUE
+      append = TRUE,
+      quote = TRUE
     )
   }
 

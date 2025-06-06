@@ -87,6 +87,9 @@ copy_wikidata_item <- function(
     csrf = NULL,
     wikibase_session = NULL) {
 
+  if (is.null(qid_equivalence_property)) qid_equivalence_property <- NA_character_
+  validated_action <- "copy_wikidata_item()"
+
   language <- resolve_from_session("language", language, wikibase_session)
   data_curator <- resolve_from_session("data_curator", data_curator, wikibase_session)
   log_file_name <- resolve_from_session("log_file_name", log_file_name, wikibase_session)
@@ -108,11 +111,10 @@ copy_wikidata_item <- function(
     equivalence_id = NA_character_,
     csrf = csrf,
     data_curator = data_curator,
-    validated_action = "copy_wikidata_property()"
+    validated_action = validated_action
   )
 
-  if (is.null(qid_equivalence_property)) qid_equivalence_property <- NA_character_
-
+  # Case when multiple items need to be copied ------------
   if (length(qid_on_wikidata) > 1) {
     return_log_file <- copy_wikidata_items(
       qid_on_wikidata = qid_on_wikidata,
@@ -143,15 +145,13 @@ copy_wikidata_item <- function(
     log_file_name <- ""
   }
 
-
-  # Assert that qid_on_wikidata looks like a QID
+  # Assert that qid_on_wikidata looks like a QID ----------------------
   qid_on_wikidata <- as.character(qid_on_wikidata)
   assert_that(is_qid(qid_on_wikidata),
     msg = "qid_on_wikidata must start with Q followed by digits."
   )
 
   # Getting the data ---------------------------------------------------------
-
   claim_body <- list(
     action = "wbgetentities",
     ids = qid_on_wikidata,
@@ -162,6 +162,7 @@ copy_wikidata_item <- function(
   # it saves various error exceptions when using httr::POST
   safely_post <- purrr::safely(httr::POST, NULL)
 
+  # The data is always received from Wikidata -------------------
   get_claim <- safely_post(
     "https://www.wikidata.org/w/api.php",
     body = claim_body,
@@ -540,10 +541,15 @@ copy_wikidata_item <- function(
   )
 
   if (!is.null(log_file_name) && nchar(log_file_name) > 0) {
-    write_csv(return_dataframe,
+    write.table(
+      return_dataframe,
       file = log_file_name,
+      sep = ",",
+      row.names = FALSE,
+      col.names = !file.exists(log_file_name),
       na = "NA",
-      append = TRUE
+      append = TRUE,
+      quote = TRUE
     )
   }
   return_ds
