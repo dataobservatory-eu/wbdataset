@@ -16,11 +16,15 @@
 #' @importFrom httr POST content
 #' @importFrom glue glue
 #' @export
+
 add_id_statement <- function(
-    qid, pid, o,
+    qid,
+    pid,
+    o,
     wikibase_type = "external-id",
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
+
   datavalue <- paste0('"', o, '"')
   datavalue
 
@@ -53,7 +57,9 @@ add_id_statement <- function(
     handle = csrf
   )
 
-  response <- httr::content(new_claim, as = "parsed", type = "application/json")
+  response <- httr::content(new_claim,
+                            as = "parsed",
+                            type = "application/json")
 
   if ("error" %in% names(response)) {
     warning_message <- glue::glue("Error in 'wbcreateclaim' wrapper add_id_statement():\n", response$error$code, ": ", response$error$info)

@@ -355,6 +355,18 @@ copy_wikidata_item <- function(
       )
     }
 
+    if (is_pid(classification_property) && is_qid(classification_id)) {
+      ## If there is a classification property like instance of or
+      ## subclass of, then try to add a statement about it.
+      add_item_statement(
+        qid = created_item_response$entity$id,
+        pid = classification_property,
+        o = classification_id,
+        wikibase_api_url = wikibase_api_url,
+        csrf = csrf
+      )
+    }
+
     # Unwrap the newly created label from the response for checking...
     created_item_label <- created_item_response$entity$labels[1]
     # ... and the description, too.
