@@ -69,18 +69,17 @@ api.php. It is either given as a parameter or resolved from
 \code{wikibase_session}.}
 
 \item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}.
-It is either given as a parameter or resolved from
-\code{wikibase_session}. If no curator is given, then filled with
-\code{person("Unknown", "Curator")}.}
+creates the log file, created with \link[utils]{person}. It is either given
+as a parameter or resolved from \code{wikibase_session}. If no curator is
+given, then filled with \code{person("Unknown", "Curator")}.}
 
 \item{log_file_name}{An explicitly stated full path to a possible CSV log
 file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 will be created.}
 
 \item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}. It is either given as a parameter or resolved
-from \code{wikibase_session}.}
+\code{\link{get_csrf}}. It is either given as a parameter or resolved from
+\code{wikibase_session}.}
 
 \item{wikibase_session}{An optional named list of default values to reuse
 across multiple function calls. If any of the main parameters (such as
@@ -92,8 +91,8 @@ useful in interactive workflows or scripts where the same context is
 reused.}
 }
 \value{
-Returns a \code{\link[dataset]{dataset_df}} object.
-The columns are:\cr
+Returns a \code{\link[dataset]{dataset_df}} object. The columns
+are:\cr
 \describe{
 \item{\code{rowid}}{A row identifier. }
 \item{\code{action}}{\code{copy_wikidata_item}}

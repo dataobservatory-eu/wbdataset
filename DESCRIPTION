@@ -22,6 +22,7 @@ DOI: 10.5281/zenodo.14335287
 URL: https://wbdataset.dataobservatory.eu/
 BugReports: https://github.com/dataobservatory-eu/wbdataset/issues
 Suggests: 
+    httptest2,
     keyring,
     knitr,
     rmarkdown,

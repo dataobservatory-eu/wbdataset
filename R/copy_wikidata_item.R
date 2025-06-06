@@ -33,16 +33,15 @@
 #'   api.php. It is either given as a parameter or resolved from
 #'   \code{wikibase_session}.
 #' @param data_curator The name of the data curator who runs the function and
-#'   creates the log file, created with \link[utils]{person}.
-#'   It is either given as a parameter or resolved from
-#'   \code{wikibase_session}. If no curator is given, then filled with
-#'   \code{person("Unknown", "Curator")}.
+#'   creates the log file, created with \link[utils]{person}. It is either given
+#'   as a parameter or resolved from \code{wikibase_session}. If no curator is
+#'   given, then filled with \code{person("Unknown", "Curator")}.
 #' @param log_file_name An explicitly stated full path to a possible CSV log
 #'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
 #'   will be created.
 #' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}. It is either given as a parameter or resolved
-#'   from \code{wikibase_session}.
+#'   \code{\link{get_csrf}}. It is either given as a parameter or resolved from
+#'   \code{wikibase_session}.
 #' @param wikibase_session An optional named list of default values to reuse
 #'   across multiple function calls. If any of the main parameters (such as
 #'   \code{language}, \code{data_curator}, \code{log_file_name},
@@ -53,8 +52,8 @@
 #'   reused.
 #' @importFrom assertthat assert_that
 #' @importFrom utils person
-#' @return Returns a \code{\link[dataset]{dataset_df}} object.
-#' The columns are:\cr
+#' @return Returns a \code{\link[dataset]{dataset_df}} object. The columns
+#'   are:\cr
 #' \describe{
 #'  \item{\code{rowid}}{A row identifier. }
 #'  \item{\code{action}}{\code{copy_wikidata_item}}
@@ -73,7 +72,7 @@
 #'  \item{\code{time}}{The time when the action started.}
 #'  \item{\code{logfile}}{The name of the CSV logfile.}
 #' }
-#' The number of rows corresponds to the length of the qid_on_wikidata vector.
+#'   The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
 
 copy_wikidata_item <- function(

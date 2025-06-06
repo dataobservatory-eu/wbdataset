@@ -57,3 +57,8 @@ and the MediaWiki server. Only requests that have the correct "handshake"
 (the matching token) are considered legitimate. They are returned by
 \code{\link{get_csrf}}.
 }
+\examples{
+\dontrun{
+get_csrf("user", "pass", "https://example.org/api.php")
+}
+}

@@ -1,21 +1,21 @@
 #' @title Join Wikidata claims to a dataset by QID
 #'
 #' @description For each item in a data frame containing Wikidata QIDs, this
-#' function retrieves the value of a specified property using the Wikibase API,
-#' and joins it back to the input data.
+#'   function retrieves the value of a specified property using the Wikibase
+#'   API, and joins it back to the input data.
 #'
 #' @details This function queries the Wikibase API for claims (statements)
-#' related to a given property for each QID in the dataset. It returns only the
-#' preferred or first available value for each item (see \code{get_claim(first =
-#' TRUE)} for details).
+#'   related to a given property for each QID in the dataset. It returns only
+#'   the preferred or first available value for each item
+#'   (see \code{get_claim(first = TRUE)} for details).
 #'
-#' Errors such as missing properties or API issues are gracefully handled, and
-#' NA values are returned where no claim is available. If the dataset already
-#' contains a column with the same name as the property, it will be replaced in
-#' the joined output.
+#'   Errors such as missing properties or API issues are gracefully handled, and
+#'   NA values are returned where no claim is available. If the dataset already
+#'   contains a column with the same name as the property, it will be replaced
+#'   in the joined output.
 #'
-#' This function is useful for enriching tabular data with values stored in
-#' Wikidata or another Wikibase-compatible knowledge base.
+#'   This function is useful for enriching tabular data with values stored in
+#'   Wikidata or another Wikibase-compatible knowledge base.
 #'
 #' @param ds A data frame that includes a column named \code{qid} with Wikidata
 #'   QIDs.
@@ -32,10 +32,12 @@
 #'
 #' @export
 
-left_join_column <- function(ds,
-                             property,
-                             wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                             csrf = NULL) {
+left_join_column <- function(
+    ds,
+    property,
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    csrf = NULL) {
+
   safely_get_claim <- purrr::safely(get_claim, NULL)
 
   result_df <- vector("list", length = nrow(ds))

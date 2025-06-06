@@ -29,6 +29,10 @@
 #'   among other data.
 #' @importFrom httr handle GET POST content
 #' @export
+#' @examples
+#' \dontrun{
+#' get_csrf("user", "pass", "https://example.org/api.php")
+#' }
 
 get_csrf <- function(username, password, wikibase_api_url) {
   check_api_url(wikibase_api_url = wikibase_api_url) # check if ends with api.php
