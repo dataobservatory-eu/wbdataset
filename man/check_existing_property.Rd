@@ -27,6 +27,35 @@ example, "instance of".}
 adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to
 \code{"en"}.}
 
+\item{equivalence_property}{An optional PID of a property already defined in
+the same Wikibase instance that records the equivalence of this new
+item with a property defined elsewhere, for example, on Wikidata or
+CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
+equivalence relations is will be claimed.}
+
+\item{equivalence_id}{The identifier that uniquely identifies this item among
+another system's definitions. Defaults to
+\code{NA_character_}; if left missing, no equivalence relations is will be
+claimed.}
+
+\item{classification_property}{The instance of, or subclass of, or superclass
+of property. Defaults to \code{NA_character} when not used.}
+
+\item{classification_id}{The QID of the class. Defaults to
+\code{NA_character} when not used.}
+
+\item{action}{A name for the action performed by a function for the
+log file, defaults to \code{"create_property"}.}
+
+\item{log_file_name}{An explicitly stated full path to a possible CSV log
+file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+will be created.}
+
+\item{data_curator}{The name of the data curator who runs the function and
+creates the log file, created with \link[utils]{person}.
+It is either given as a parameter or resolved from
+\code{wikibase_session}. If no curator}
+
 \item{wikibase_api_url}{The full URL of the Wikibase API. Defaults to
 \code{'https://www.wikidata.org/w/api.php'}, which is Wikidata's API endpoint.}
 

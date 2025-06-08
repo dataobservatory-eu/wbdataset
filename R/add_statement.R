@@ -1,7 +1,7 @@
 #' @title Add statements to an item
 #' @description Adds a claim (statement) to a Wikibase item via `wbcreateclaim`.
 #' See
-#' \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
 #' API help}
 #' @param qid The QID of the item in the Wikibase instance.
 #' @param pid The PID of the property to be added.
@@ -14,7 +14,7 @@
 #' @export
 add_statement <- function(
     qid, pid, o,
-    wikibase_type = c("item", "string", "numeric", "external-id"),
+    wikibase_type = c("item", "string", "numeric", "external-id", "url"),
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
 
@@ -26,11 +26,12 @@ add_statement <- function(
   wikibase_type <- match.arg(wikibase_type,
     choices = c(
       "item", "string",
-      "numeric", "external-id"
+      "numeric", "external-id", "url"
     )
   )
 
   if (wikibase_type == "external-id") wikibase_type <- "string"
+  if (wikibase_type == "url") wikibase_type <- "string"
 
   if (wikibase_type == "string") {
     add_id_statement(

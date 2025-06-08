@@ -37,7 +37,7 @@ is_pid <- function(x) {
 
 #' @title Extract a QID from an entity result
 #' @description Coerces `id_on_target` to a character and ensures it starts with "Q".
-#' @param result A result object (e.g., from `check_existing_item()`).
+#' @param x A result object (e.g., from `check_existing_item()`).
 #' @return A QID as a character string, or NA if not found or invalid.
 #' @keywords internal
 get_qid <- function(x) {
@@ -53,17 +53,11 @@ get_qid <- function(x) {
     warning("Expected QID (starting with 'Q'), got: ", x)
     return(NA_character_)
   }
-
   x
 }
 
-
-
 #' @title Extract a PID from a property result
 #' @description Coerces `id_on_target` to a character and ensures it starts with "P".
-#' @param result A result object (e.g., from `check_existing_property()`).
-#' @return A PID as a character string, or NA if not found or invalid.
-#' @keywords internal
 #' @title Extract a PID (property ID)
 #' @description Accepts a result object or a scalar ID and ensures it starts with "P".
 #' @param x Either a result object (with \code{id_on_target}) or a scalar ID.

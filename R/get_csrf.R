@@ -144,7 +144,8 @@ get_csrf <- function(username, password, wikibase_api_url) {
 #' @importFrom httr handle GET POST content
 #' @export
 get_csrf_token <- function(csrf) {
-  csrf_data <- httr::content(csrf, as = "parsed", type = "application/json")
+  csrf_data <- httr::content(csrf, as = "parsed",
+                             type = "application/json")
   csrf_data
   csrf_token <- csrf_data$query$tokens$csrftoken
   if (nchar(csrf_token) < 10) stop("Error: get_csrf_token(csrf): Did not receive a valid token.")

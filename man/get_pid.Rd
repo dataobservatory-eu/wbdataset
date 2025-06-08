@@ -8,12 +8,8 @@ get_pid(x)
 }
 \arguments{
 \item{x}{Either a result object (with \code{id_on_target}) or a scalar ID.}
-
-\item{result}{A result object (e.g., from \code{check_existing_property()}).}
 }
 \value{
-A PID as a character string, or NA if not found or invalid.
-
 A PID as a character string or NA_character_.
 }
 \description{

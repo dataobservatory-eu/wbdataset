@@ -6,9 +6,24 @@
 #'   action=wbsearchentities}.
 #' @param search_term A character string specifying the label to search for. For
 #'   example, "instance of".
+#' @param action A name for the action performed by a function for the
+#' log file, defaults to \code{"create_property"}.
 #' @param language A character string specifying the language code of the label,
 #'   adhering to BCP 47 standards (e.g., `"en"` for English). Defaults to
 #'   `"en"`.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
+#' @param equivalence_property An optional PID of a property already defined in
+#'   the same Wikibase instance that records the equivalence of this new
+#'   item with a property defined elsewhere, for example, on Wikidata or
+#'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
+#'   equivalence relations is will be claimed.
+#' @param equivalence_id The identifier that uniquely identifies this item among
+#' another system's definitions. Defaults to
+#'   \code{NA_character_}; if left missing, no equivalence relations is will be
+#'   claimed.
 #' @param wikibase_api_url The full URL of the Wikibase API. Defaults to
 #'   `'https://www.wikidata.org/w/api.php'`, which is Wikidata's API endpoint.
 #' @param csrf The CSRF token of your session, obtained with
@@ -19,6 +34,13 @@
 #'   where multiple properties match the search term. Options are
 #'   \code{"return_first"} (default) to return the first match, or
 #'   \code{"return_null"} to return \code{NULL} when multiple matches are found.
+#' @param log_file_name An explicitly stated full path to a possible CSV log
+#'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
+#'   will be created.
+#' @param data_curator The name of the data curator who runs the function and
+#'   creates the log file, created with \link[utils]{person}.
+#'   It is either given as a parameter or resolved from
+#'   \code{wikibase_session}. If no curator
 #' @return A data frame containing details of the matching property, or
 #'   \code{NULL} if no match is found or if multiple matches are found and
 #'   \code{ambiguity_handling} is set to \code{"return_null"}.

@@ -17,6 +17,19 @@
 #'   adhering to BCP 47 standards (e.g., `"en"` for English). Defaults to
 #'   `"en"`. For more details, see \href{https://tools.ietf.org/html/bcp47}{BCP
 #'   47}.
+#' @param classification_property The instance of, or subclass of, or superclass
+#'   of property. Defaults to \code{NA_character} when not used.
+#' @param classification_id The QID of the class. Defaults to
+#'   \code{NA_character} when not used.
+#' @param equivalence_property An optional PID of a property already defined in
+#'   the same Wikibase instance that records the equivalence of this new
+#'   item with a property defined elsewhere, for example, on Wikidata or
+#'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
+#'   equivalence relations is will be claimed.
+#' @param equivalence_id The identifier that uniquely identifies this item among
+#' another system's definitions. Defaults to
+#'   \code{NA_character_}; if left missing, no equivalence relations is will be
+#'   claimed.
 #' @param action A character string indicating the action being performed.
 #'   Defaults to `"create_item"`.
 #' @param log_file_name A character string specifying the name of the log file.
@@ -42,18 +55,19 @@
 #' )
 #' @export
 
-check_existing_item <- function(search_term,
-                                language = "en",
-                                equivalence_property = NA_character_,
-                                equivalence_id = NA_character_,
-                                classification_property = NA_character_,
-                                classification_id = NA_character_,
-                                action = "create_item",
-                                log_file_name = NA_character_,
-                                data_curator = person("Unknown", "Person"),
-                                wikibase_api_url = "https://www.wikidata.org/w/api.php",
-                                csrf = NULL,
-                                ambiguity_handling = "return_null") {
+check_existing_item <- function(
+    search_term,
+    language = "en",
+    equivalence_property = NA_character_,
+    equivalence_id = NA_character_,
+    classification_property = NA_character_,
+    classification_id = NA_character_,
+    action = "create_item",
+    log_file_name = NA_character_,
+    data_curator = person("Unknown", "Person"),
+    wikibase_api_url = "https://www.wikidata.org/w/api.php",
+    csrf = NULL,
+    ambiguity_handling = "return_null") {
   # Validate inputs
   if (!is.character(search_term) ||
       length(search_term) != 1 ||

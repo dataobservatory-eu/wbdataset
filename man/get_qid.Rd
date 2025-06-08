@@ -7,7 +7,7 @@
 get_qid(x)
 }
 \arguments{
-\item{result}{A result object (e.g., from \code{check_existing_item()}).}
+\item{x}{A result object (e.g., from \code{check_existing_item()}).}
 }
 \value{
 A QID as a character string, or NA if not found or invalid.

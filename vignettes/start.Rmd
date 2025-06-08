@@ -104,7 +104,7 @@ If, however, there is already such a node, then you will get an error message si
 wikibase-validator-label-with-description-conflictParisen[[Item:Q9|Q9]]Item <a href="/jekyll/index.php?title=Item:Q9" title="Item:Q9">Q9</a> already has label "Paris" associated with language code en, using the same description text.
 ```
 
-The `equivalence_property`, as you will see later, can help you connect your new node to a  node on Wikidata, which later allows federation, and of course, data validation, or keeping your data refreshable. 
+The `equivalence_property`, as you will see later, can help you connect your new node to a  node on Wikidata, which later allows federation, and of course, data validation, or keeping your data easy to maintain clean. 
 
 If your Wikibase instance has defined a property where you can store this equivalence, say, `P35`="Equivalent item on Wikidata" then we can add to your newly created item this crucial information:
 
@@ -136,7 +136,7 @@ print(e_20)
 ```
 
 You will get a message on the screen, and a logfile that records the newly created item. The contents of the logfile are also returned, so you can save them. In this case, 
-it is saved in `e20`. If the action was successul, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
+it is saved in `e20`. If the action was successful, which you can check with `e20$success`, `e20$id_on_target` contains the new QID on the target Wikibase for this node. Of course, you can give a more meaningful name to the `e20` object depending on what item (node) you create.
 
 ```{r mass-item-copy, eval=FALSE}
 capital_cities <- copy_wikidata_property(

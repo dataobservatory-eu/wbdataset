@@ -23,6 +23,15 @@
 #'   of property. Defaults to \code{NA_character} when not used.
 #' @param classification_id The QID of the class. Defaults to
 #'   \code{NA_character} when not used.
+#' @param equivalence_property An optional PID of a property already defined in
+#'   the same Wikibase instance that records the equivalence of this new
+#'   item with a property defined elsewhere, for example, on Wikidata or
+#'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
+#'   equivalence relations is will be claimed.
+#' @param equivalence_id The identifier that uniquely identifies this item among
+#' another system's definitions. Defaults to
+#'   \code{NA_character_}; if left missing, no equivalence relations is will be
+#'   claimed.
 #' @param language Defaults to \code{c("en")}. A character string of
 #'   the languages in which the users wants to receive the labels and
 #'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP

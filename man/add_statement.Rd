@@ -29,7 +29,7 @@ add_statement(
   qid,
   pid,
   o,
-  wikibase_type = c("item", "string", "numeric", "external-id"),
+  wikibase_type = c("item", "string", "numeric", "external-id", "url"),
   wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
   csrf
 )
@@ -53,11 +53,11 @@ A data.frame describing the created statement.
 }
 \description{
 See
-\link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
 API help}
 
 Adds a claim (statement) to a Wikibase item via \code{wbcreateclaim}.
 See
-\link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
 API help}
 }

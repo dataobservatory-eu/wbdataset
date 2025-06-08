@@ -1,6 +1,6 @@
 #' @rdname add_statement
 #' @description See
-#' \link[https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim]{MediaWiki
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
 #' API help}
 #' @param qid The QID of the item in the Wikibase instance that you use.
 #' @param pid The PID of the equivalent Wikidata (or reference Wikibase) URI.
@@ -9,8 +9,8 @@
 #' @param wikibase_api_url The full URL of the Wikibase API, which is the
 #'   address that the \code{wbdataset} R client sends requests to when
 #'   interacting with the knowledge base. For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-#'   api.php.
+#'   \code{'https://reprexbase.eu/demowiki/api.php'}.
+#'   The URL must end with api.php.
 #' @param csrf The CSRF token of your session, received with
 #'   \code{\link{get_csrf}}.
 #' @importFrom httr POST content
@@ -25,8 +25,14 @@ add_id_statement <- function(
     wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
     csrf) {
 
-  datavalue <- paste0('"', o, '"')
-  datavalue
+  format_claim_value <- function(value, datatype) {
+    if (datatype %in% c("external-id", "string", "url")) {
+      return(paste0('"', value, '"'))
+    }
+    stop("Unsupported datatype")
+  }
+
+  datavalue <- format_claim_value(o, wikibase_type)
 
   this_csrf_token <- get_csrf_token(csrf = csrf)
 
@@ -67,8 +73,8 @@ add_id_statement <- function(
     return(data.frame(
       id = NA_character_,
       s = qid,
-      o = NA_character_,
-      p = NA_character_
+      p = NA_character_,
+      o = NA_character_
     ))
   }
 
@@ -76,12 +82,8 @@ add_id_statement <- function(
     data.frame(
       id = response$claim$id,
       s = qid,
-      o = pid,
-      p = response$claim$mainsnak$datavalue$value
+      p = pid,
+      o = response$claim$mainsnak$datavalue$value
     )
   }
 }
-
-
-#' datavalue\":{\"value\":\"https://www.wikidata.org/wiki/Q43878\",\"type\":\"string\"},\"datatype\":\"external-id\"}'
-# api.php?action=wbcreateclaim&entity=Q4115189&property=P9003&snaktype=value&value={"entity-type":"item","numeric-id":1}
