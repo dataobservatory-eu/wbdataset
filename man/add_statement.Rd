@@ -5,7 +5,7 @@
 \alias{add_id_statement}
 \alias{add_item_statement}
 \alias{add_statement}
-\title{Add statements to an item}
+\title{Add a statement to a Wikibase item}
 \usage{
 add_id_statement(
   qid,
@@ -35,29 +35,78 @@ add_statement(
 )
 }
 \arguments{
-\item{qid}{The QID of the item in the Wikibase instance.}
+\item{qid}{Character string. Identifier of the Wikibase item
+receiving the statement, such as \code{"Q213"}.}
 
-\item{pid}{The PID of the property to be added.}
+\item{pid}{Character string. Identifier of the Wikibase property,
+such as \code{"P37"}.}
 
-\item{o}{The object of the statement (either a QID, string, or number).}
+\item{o}{Object value of the statement. Its interpretation depends
+on \code{wikibase_type}.}
 
-\item{wikibase_type}{One of \code{"item"}, \code{"string"} (or \code{"external-id"}), or \code{"numeric"}.}
+\item{wikibase_type}{Character string. One of \code{"item"}, \code{"string"},
+\code{"external-id"}, \code{"url"}, or \code{"numeric"}. Must be specified
+explicitly. Numeric statements are not yet implemented.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API (must end with \code{api.php}).}
+\item{wikibase_api_url}{Character string. Full URL of the MediaWiki
+API endpoint, ending in \code{api.php}. Defaults to
+\verb{https://reprexbase.eu/demowiki/api.php}.}
 
-\item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}.}
+\item{csrf}{Authenticated HTTP response returned by \code{\link[=get_csrf]{get_csrf()}}.
+The session must have permission to edit the target item.}
 }
 \value{
-A data.frame describing the created statement.
+A data frame containing the created statement:
+\describe{
+\item{\code{id}}{Identifier of the newly created statement.}
+\item{\code{s}}{Subject: the Wikibase item QID.}
+\item{\code{p}}{Predicate: the Wikibase property PID.}
+\item{\code{o}}{Object: the statement value.}
+}
 }
 \description{
 See
 \href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
 API help}
 
-Adds a claim (statement) to a Wikibase item via \code{wbcreateclaim}.
-See
-\href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{MediaWiki
-API help}
+Create a statement (claim) on an existing Wikibase item using the
+MediaWiki \code{wbcreateclaim} API module. A statement connects a Wikibase
+item to a property and an object value.
+}
+\details{
+A statement consists of three components: a subject (\code{qid}), a
+predicate (\code{pid}), and an object (\code{o}). The object representation
+depends on the datatype of the Wikibase property.
+
+The following values of \code{wikibase_type} are recognised:
+\describe{
+\item{\code{"item"}}{A reference to another Wikibase item, identified
+by its QID.}
+\item{\code{"string"}}{A character string, including values for
+string-based properties and local media filenames.}
+\item{\code{"external-id"}}{An external identifier. Internally handled
+using the same method as \code{"string"}.}
+\item{\code{"url"}}{A URL value. Internally handled using the same
+method as \code{"string"}.}
+\item{\code{"numeric"}}{Recognised but not yet implemented.}
+}
+
+The function delegates statement creation to \code{\link[=add_item_statement]{add_item_statement()}}
+for item references and \code{\link[=add_id_statement]{add_id_statement()}} for string-based values.
+
+The property must exist in the target Wikibase instance and accept
+the supplied value. The function creates a new statement and does
+not check whether an identical statement already exists.
+
+For statements referencing files in the local MediaWiki repository,
+see \code{\link[=add_local_media]{add_local_media()}}. Files can be uploaded separately using
+\code{\link[=upload_local_media]{upload_local_media()}}.
+
+See the
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbcreateclaim}{
+MediaWiki API documentation for wbcreateclaim}.
+}
+\seealso{
+\code{\link[=get_csrf]{get_csrf()}}, \code{\link[=get_claim]{get_claim()}}, \code{\link[=add_local_media]{add_local_media()}},
+\code{\link[=upload_local_media]{upload_local_media()}}
 }
