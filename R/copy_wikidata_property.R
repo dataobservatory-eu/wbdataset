@@ -1,91 +1,81 @@
-#' @title Copy a Wikidata property or properties
-#' @description This code will copy one or multiple property label(s) and
-#'   description(s) from Wikidata to a new instance. It should work between
-#'   instances, but the authentication to copy from a password protected
-#'   instance is not yet coded. The function is more specific than
-#'   \code{\link{create_property}}, because this one creates properties that
-#'   exist in a similarly structured Wikibase instance, such as Wikidata.
-#' @details This function is slightly different from
-#'   \code{\link{create_property}}. That function creates a new property that
-#'   may not have an equivalent property on another Wikibase instance, but it
-#'   may well have an equivalent property in another graph system. \cr In this
-#'   function, we use \code{pid_equivalence_property} for equivalence. In the
-#'   more general create function we use \code{equivalence_property}, because we
-#'   may use different identifiers. Similarly, the \code{pid_on_wikidata}
-#'   replaces the more general \code{equivalence_id}, because we must use PID
-#'   for identification in an other Wikibase instance.
-#' @param pid_on_wikidata The PID of the property on Wikidata to be copied to
-#'   your Wikibase.It can be one or more valid PIDs. (Only works with
-#'   non-authenticated sources, this should be changed.)
-#' @param pid_equivalence_property The PID in Wikibase that records the
-#'   equivalent Wikidata PID as an external ID.
-#' @param classification_property The instance of, or subclass of, or superclass
-#'   of property. Defaults to \code{NA_character} when not used.
-#' @param classification_id The QID of the class. Defaults to
-#'   \code{NA_character} when not used.
-#' @param equivalence_property An optional PID of a property already defined in
-#'   the same Wikibase instance that records the equivalence of this new
-#'   item with a property defined elsewhere, for example, on Wikidata or
-#'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
-#'   equivalence relations is will be claimed.
-#' @param equivalence_id The identifier that uniquely identifies this item among
-#' another system's definitions. Defaults to
-#'   \code{NA_character_}; if left missing, no equivalence relations is will be
-#'   claimed.
-#' @param language Defaults to \code{c("en")}. A character string of
-#'   the languages in which the users wants to receive the labels and
-#'   descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
-#'   47}-compliant language tags (e.g., "en" for English, and "hu"
-#'   for Hungarian.)
-#' @param wikibase_api_url The full URL of the Wikibase API, which is the
-#'   address that the \code{wbdataset} R client sends requests to when
-#'   interacting with the knowledge base. For example,
-#'   \code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
-#'   api.php. It is either given as a parameter or resolved from
-#'   \code{wikibase_session}.
-#' @param data_curator The name of the data curator who runs the function and
-#'   creates the log file, created with \link[utils]{person}.
-#'   It is either given as a parameter or resolved from
-#'   \code{wikibase_session}. If no curator is given, then filled with
-#'   \code{person("Unknown", "Curator")}.
-#' @param log_file_name An explicitly stated full path to a possible CSV log
-#'   file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
-#'   will be created.
-#' @param csrf The CSRF token of your session, received with
-#'   \code{\link{get_csrf}}. It is either given as a parameter or resolved
-#'   from \code{wikibase_session}.
-#' @param wikibase_session An optional named list of default values to reuse
-#'   across multiple function calls. If any of the main parameters (such as
-#'   \code{language}, \code{data_curator}, \code{log_file_name},
-#'   \code{equivalence_propeert}, \code{classification_property}
-#'   \code{wikibase_api_url}, or \code{csrf}) are missing from the function
-#'   call, their values will be taken from this list if available. This is
-#'   useful in interactive workflows or scripts where the same context is
-#'   reused.
+#' Copy Wikidata properties to a Wikibase instance
+#'
+#' @description
+#' Copy one or more Wikidata properties, including their datatypes, labels,
+#' and descriptions, to a target Wikibase instance. A single call can request
+#' several languages for each property.
+#'
+#' @details
+#' Unlike [create_property()], this function uses Wikidata property IDs to
+#' retrieve the source definitions. The source is the public Wikidata API;
+#' authentication for private source instances is not implemented.
+#'
+#' For each requested language, the function copies the available label and
+#' description. If a label is unavailable, it uses the English label (or the
+#' English Wikipedia sitelink title when no English label exists). Missing
+#' descriptions become empty strings.
+#'
+#' All requested translations are submitted together when a new property is
+#' created. If the target property already exists, the function returns it
+#' without adding or updating translations.
+#'
+#' @param pid_on_wikidata One or more Wikidata property IDs, such as `"P31"`
+#'   or `c("P31", "P279")`.
+#' @param pid_equivalence_property Target Wikibase property ID used to record
+#'   the corresponding Wikidata PID as an external identifier.
+#' @param language Character vector of BCP 47 language tags identifying the
+#'   languages whose labels and descriptions should be copied. Defaults to
+#'   `"en"`. Use, for example, a character vector`c("en", "hu", "de")` to copy
+#'   three languages in a single call.
+#'   Missing labels fall back to the default English label;
+#'   missing descriptions are stored as empty strings. This argument does not
+#'   add translations to properties that already exist on the target.
+#' @param wikibase_api_url Full target Wikibase API URL ending in `api.php`.
+#'   Can be supplied through `wikibase_session`.
+#' @param classification_property Optional classification PID. Defaults to
+#'   `NA_character_`; no classification statement is created by this function.
+#' @param classification_id Optional classification QID. Defaults to
+#'   `NA_character_`; no classification statement is created by this function.
+#' @param equivalence_property Optional equivalence PID, defaulting to
+#'   `NA_character_`. Wikidata PID equivalence is recorded using
+#'   `pid_equivalence_property` instead.
+#' @param equivalence_id Optional external identifier, defaulting to
+#'   `NA_character_`. The source is identified by `pid_on_wikidata`.
+#' @param data_curator Curator responsible for the operation, represented by
+#'   [utils::person()]. If omitted, an unknown curator is used. Can be
+#'   supplied through `wikibase_session`.
+#' @param log_file_name Optional CSV log path. `NULL` (the default) disables
+#'   file logging.
+#' @param csrf Authenticated session handle obtained with [get_csrf()]. Can
+#'   be supplied through `wikibase_session`.
+#' @param wikibase_session Optional named list of shared session defaults,
+#'   including language, curator, API URL, equivalence settings, and CSRF
+#'   handle. Explicit arguments and session values are resolved by the
+#'   existing implementation.
+#'
+#' @returns
+#' A `dataset_df` recording the copy operation. Its columns are:
+#'
+#' - `rowid`: Row identifier.
+#' - `action`: Copy operation name.
+#' - `id_on_target`: PID on the target Wikibase.
+#' - `label`, `description`, `language`: One reported label, description,
+#'   and language for the copied property.
+#' - `datatype`: Wikibase property datatype.
+#' - `wikibase_api_url`: Target API URL.
+#' - `equivalence_property`, `equivalence_id`: Equivalence metadata.
+#' - `classification_property`, `classification_id`: Classification fields.
+#' - `success`, `comment`: Operation status and diagnostic message.
+#' - `time`, `logfile`: Operation timestamp and optional log path.
+#'
+#' For multiple source PIDs, results are combined across properties. The
+#' returned log is **not** expanded to one row per language, even though
+#' multiple translations can be created for each new property.
+#'
 #' @importFrom assertthat assert_that
 #' @importFrom utils person write.table
-#' @return Returns a \code{\link[dataset]{dataset_df}} object. The columns
-#'   are:\cr
-#' \describe{
-#'  \item{\code{rowid}}{A row identifier.}
-#'  \item{\code{action}}{The \code{copy_wikidata_property} function name.}
-#'  \item{\code{id_on_target}}{The new Property Identifier (PID) on the targeted Wikibase.}
-#'  \item{\code{label}}{The property label.}
-#'  \item{\code{description}}{The description label.}
-#'  \item{\code{language}}{The language code of the label.}
-#'  \item{\code{datatype}}{The datatype of the property, for example, `string`}
-#'  \item{\code{wikibase_api_url}}{The MediaWiki API URL where the new property is created.}
-#'  \item{\code{equivalence_property}}{The PID that connects an equivalence ID to the property.}
-#'  \item{\code{equivalence_id}}{The ID of an equivalent property defined elsewhere.}
-#'  \item{\code{classification_property}}{Not applicable for properties.}
-#'  \item{\code{classification_id}}{Not applicable for properties.}
-#'  \item{\code{success}}{TRUE if successfully created, FALSE if there was an error.}
-#'  \item{\code{comment}}{A summary of the error messages(s), if success is FALSE.}
-#'  \item{\code{time}}{The time when the action started.}
-#'  \item{\code{logfile}}{The name of the CSV logfile.}
-#' }
-#'   The number of rows corresponds to the length of the qid_on_wikidata vector.
 #' @export
+
 
 copy_wikidata_property <- function(
   pid_on_wikidata,
