@@ -22,26 +22,36 @@ export(is_qid)
 export(is_valid_wikibase_datatype)
 export(left_join_column)
 export(new_wikibase_session)
+export(upload_local_media)
 importFrom(assertthat,assert_that)
-importFrom(dataset,dataset_df)
-importFrom(dataset,defined)
-importFrom(dataset,dublincore)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,everything)
-importFrom(dplyr,filter)
-importFrom(dplyr,left_join)
-importFrom(dplyr,mutate)
-importFrom(dplyr,relocate)
-importFrom(dplyr,select)
+importFrom(dataset,
+  dataset_df,
+  defined,
+  dublincore
+)
+importFrom(dplyr,
+  bind_rows,
+  everything,
+  filter,
+  left_join,
+  mutate,
+  relocate,
+  select
+)
 importFrom(glue,glue)
 importFrom(here,here)
-importFrom(httr,GET)
-importFrom(httr,POST)
-importFrom(httr,content)
-importFrom(httr,handle)
+importFrom(httr,
+  GET,
+  POST,
+  content,
+  handle
+)
 importFrom(jsonlite,toJSON)
 importFrom(magrittr,"%>%")
 importFrom(purrr,safely)
+importFrom(rlang,"%||%")
 importFrom(tibble,tibble)
-importFrom(utils,person)
-importFrom(utils,write.table)
+importFrom(utils,
+  person,
+  write.table
+)
