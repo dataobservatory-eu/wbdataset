@@ -1,51 +1,37 @@
-#' @title Retrieve a claim from a Wikidata item
+#' Retrieve statements from a Wikibase item
 #'
-#' @description Retrieve the value(s) of a specified property (claim) from a
-#' Wikidata item using the `wbgetclaims` API. Supports multiple data types and
-#' can return either the preferred claim or all claims for the property.
+#' @description
+#' Retrieve the values of a specified property from a Wikibase item using
+#' the Wikibase API
+#' [`wbgetclaims` ](https://www.mediawiki.org/wiki/Wikibase/API#wbgetclaims).
 #'
-#' @details This function provides read-only access to claims (statements) for a
-#' given item from a Wikibase instance (such as Wikidata). It supports common
-#' data types including string, URL, time, quantity, coordinate, external ID,
-#' Commons media, and monolingual text.
+#' @details
+#' Supports Wikidata and other Wikibase instances, including local media
+#' properties (`localMedia`). Supported data types include item references,
+#' strings, external identifiers, URLs, time, quantity, coordinates,
+#' monolingual text, and Commons or local media filenames.
 #'
-#' If \code{first = TRUE}, the function returns the claim ranked as
-#' \code{"preferred"} if available, otherwise the first normal claim. If
-#' \code{first = FALSE}, all available claims are returned in a tidy data frame,
-#' one row per value.
+#' When `first = TRUE`, the preferred statement is returned if available;
+#' otherwise, the first normal statement is returned. When `first = FALSE`,
+#' all statements for the property are returned, one row per value.
 #'
-#' This function replaces \code{\link{get_claims}}, which is now deprecated.
+#' This function supersedes the deprecated [get_claims()].
 #'
-#' The function wraps the
-#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
-#' module of the Wikibase API.
+#' @param qid Character. Item identifier, such as `"Q42"`.
+#' @param pid Character. Property identifier, such as `"P569"`.
+#' @param wikibase_api_url Character. Full Wikibase API endpoint URL,
+#'   ending in `api.php`. Defaults to the Wikidata API.
+#' @param csrf Optional. Authentication session or CSRF object.
+#'   Used by the existing API wrapper, but not required for public reads.
+#' @param first Logical. If `TRUE` (default), return the preferred or
+#'   first normal statement. If `FALSE`, return all statements.
 #'
-#' @param qid A character string giving the QID of the item (e.g.,
-#'   \code{"Q42"}).
-#' @param pid A character string giving the property ID (e.g.,
-#'   \code{"P569"}).
-#' @param wikibase_api_url The full URL to the Wikibase API endpoint. Must end
-#'   with \code{api.php}. Defaults to the Wikidata API.
-#' @param csrf (Optional) A CSRF token for write operations (not used in this
-#'   read-only function).
-#' @param first Logical; if \code{TRUE} (default), return only the preferred or
-#'   first available claim. If \code{FALSE}, return all claims for the given
-#'   property as one row per value.
+#' @return
+#' A data frame containing the item identifier, statement values, and
+#' detected data types. With `first = FALSE`, each statement occupies
+#' one row.
 #'
-#' @return A data frame with one or more rows, containing the item QID, the
-#'   value(s), and the detected data type for the claim.
-#'
-#' @details Claims are retrieved using the
-#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
-#' module of the Wikibase API. This function supports common Wikidata data
-#' types, including string, URL, quantity, time, coordinate, external ID, media,
-#' and monolingual text.
-#'
-#' If \code{first = TRUE}, the function returns only the claim ranked as
-#' \code{"preferred"} if present, otherwise the first normal claim. If
-#' \code{first = FALSE}, all claims are returned in a tidy format.
-#'
-#' @seealso \code{\link{get_claims}} (deprecated)
+#' @seealso [get_claims()] (deprecated)
 #'
 #' @export
 
@@ -109,6 +95,7 @@ get_claim <- function(
       "quantity" = snak$datavalue$value$amount,
       "monolingualtext" = snak$datavalue$value$text,
       "commonsMedia" = snak$datavalue$value,
+      "localMedia" = snak$datavalue$value,
       "globe-coordinate" = {
         val <- snak$datavalue$value
         altitude <- ifelse(is.null(val$altitude), "", val$altitude)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_claim.R
 \name{get_claim}
 \alias{get_claim}
-\title{Retrieve a claim from a Wikidata item}
+\title{Retrieve statements from a Wikibase item}
 \usage{
 get_claim(
   qid = "Q528626",
@@ -13,58 +13,41 @@ get_claim(
 )
 }
 \arguments{
-\item{qid}{A character string giving the QID of the item (e.g.,
-\code{"Q42"}).}
+\item{qid}{Character. Item identifier, such as \code{"Q42"}.}
 
-\item{pid}{A character string giving the property ID (e.g.,
-\code{"P569"}).}
+\item{pid}{Character. Property identifier, such as \code{"P569"}.}
 
-\item{wikibase_api_url}{The full URL to the Wikibase API endpoint. Must end
-with \code{api.php}. Defaults to the Wikidata API.}
+\item{wikibase_api_url}{Character. Full Wikibase API endpoint URL,
+ending in \code{api.php}. Defaults to the Wikidata API.}
 
-\item{csrf}{(Optional) A CSRF token for write operations (not used in this
-read-only function).}
+\item{csrf}{Optional. Authentication session or CSRF object.
+Used by the existing API wrapper, but not required for public reads.}
 
-\item{first}{Logical; if \code{TRUE} (default), return only the preferred or
-first available claim. If \code{FALSE}, return all claims for the given
-property as one row per value.}
+\item{first}{Logical. If \code{TRUE} (default), return the preferred or
+first normal statement. If \code{FALSE}, return all statements.}
 }
 \value{
-A data frame with one or more rows, containing the item QID, the
-value(s), and the detected data type for the claim.
+A data frame containing the item identifier, statement values, and
+detected data types. With \code{first = FALSE}, each statement occupies
+one row.
 }
 \description{
-Retrieve the value(s) of a specified property (claim) from a
-Wikidata item using the \code{wbgetclaims} API. Supports multiple data types and
-can return either the preferred claim or all claims for the property.
+Retrieve the values of a specified property from a Wikibase item using
+the Wikibase API
+\href{https://www.mediawiki.org/wiki/Wikibase/API#wbgetclaims}{\code{wbgetclaims} }.
 }
 \details{
-This function provides read-only access to claims (statements) for a
-given item from a Wikibase instance (such as Wikidata). It supports common
-data types including string, URL, time, quantity, coordinate, external ID,
-Commons media, and monolingual text.
+Supports Wikidata and other Wikibase instances, including local media
+properties (\code{localMedia}). Supported data types include item references,
+strings, external identifiers, URLs, time, quantity, coordinates,
+monolingual text, and Commons or local media filenames.
 
-If \code{first = TRUE}, the function returns the claim ranked as
-\code{"preferred"} if available, otherwise the first normal claim. If
-\code{first = FALSE}, all available claims are returned in a tidy data frame,
-one row per value.
+When \code{first = TRUE}, the preferred statement is returned if available;
+otherwise, the first normal statement is returned. When \code{first = FALSE},
+all statements for the property are returned, one row per value.
 
-This function replaces \code{\link{get_claims}}, which is now deprecated.
-
-The function wraps the
-\href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
-module of the Wikibase API.
-
-Claims are retrieved using the
-\href{https://www.wikidata.org/w/api.php?action=help&modules=wbgetclaims}{wbgetclaims}
-module of the Wikibase API. This function supports common Wikidata data
-types, including string, URL, quantity, time, coordinate, external ID, media,
-and monolingual text.
-
-If \code{first = TRUE}, the function returns only the claim ranked as
-\code{"preferred"} if present, otherwise the first normal claim. If
-\code{first = FALSE}, all claims are returned in a tidy format.
+This function supersedes the deprecated \code{\link[=get_claims]{get_claims()}}.
 }
 \seealso{
-\code{\link{get_claims}} (deprecated)
+\code{\link[=get_claims]{get_claims()}} (deprecated)
 }
