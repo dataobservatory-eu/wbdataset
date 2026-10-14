@@ -5,7 +5,7 @@
 \alias{copy_wikidata_item}
 \alias{copy_wikidata_items}
 \alias{copy_wikidata_properties}
-\title{Copy a Wikidata item(s)}
+\title{Copy Wikidata items to a Wikibase instance}
 \usage{
 copy_wikidata_item(
   qid_on_wikidata,
@@ -43,92 +43,125 @@ copy_wikidata_properties(
 )
 }
 \arguments{
-\item{qid_on_wikidata}{The QID of the item to be copied to your Wikibase. A
-single valid QID or a vector of several QIDs.}
+\item{qid_on_wikidata}{Character vector. One or more Wikidata item
+identifiers (QIDs), such as \code{"Q42"}.}
 
-\item{qid_equivalence_property}{The QID in Wikibase that records the
-equivalent Wikidata QID as an external ID.}
+\item{qid_equivalence_property}{Character string. Property identifier
+(PID) on the target Wikibase instance used to record the
+corresponding Wikidata QID as an external identifier.
+May be \code{NULL} if no equivalence statement is required.}
 
-\item{language}{Defaults to \code{c("en", "nl", "hu")}. A character string of
-the languages in which the users wants to receive the labels and
-descriptions of the property. The vector of languages must use \href{https://en.wikipedia.org/wiki/IETF_language_tag}{BCP
-47}-compliant language tags (e.g., "en" for English, "nl" for Dutch and "hu"
-for Hungarian.)}
+\item{language}{Character vector of requested languages for labels
+and descriptions. Defaults to \code{"en"}. Languages must be expressed
+using \href{https://www.rfc-editor.org/rfc/bcp/bcp47.txt}{
+BCP 47 language tags}, such as \code{"en"}, \code{"nl"}, or \code{"hu"}.}
 
-\item{classification_property}{The instance of, or subclass of, or superclass
-of property. Defaults to \code{NA_character} when not used.}
+\item{classification_property}{Character string. Property identifier
+(PID) used to express a classification relationship, such as
+instance of or subclass of. Defaults to \code{NA_character_}.}
 
-\item{classification_id}{The QID of the class. Defaults to
-\code{NA_character} when not used.}
+\item{classification_id}{Character string. QID of the class or
+superclass to which the new item should be linked.
+Defaults to \code{NA_character_}.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
-api.php. It is either given as a parameter or resolved from
-\code{wikibase_session}.}
+\item{wikibase_api_url}{Character string. Full URL of the target
+MediaWiki API endpoint, ending in \code{api.php}. May be supplied
+directly or through \code{wikibase_session}.}
 
-\item{data_curator}{The name of the data curator who runs the function and
-creates the log file, created with \link[utils]{person}. It is either given
-as a parameter or resolved from \code{wikibase_session}. If no curator is
-given, then filled with \code{person("Unknown", "Curator")}.}
+\item{data_curator}{A \code{\link[utils:person]{utils::person()}} object identifying the
+curator responsible for the operation. May be supplied directly
+or through \code{wikibase_session}. If omitted, defaults to
+\code{person("Unknown", "Curator", role = "dtm")}.}
 
-\item{log_file_name}{An explicitly stated full path to a possible CSV log
-file, defaults to \code{NULL}. If the value is \code{NULL}, no log file
-will be created.}
+\item{log_file_name}{Character string or \code{NULL}. Path to a CSV log
+file. When specified, operation results are appended to the file.
+Defaults to \code{NULL}, which disables file logging.}
 
-\item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}. It is either given as a parameter or resolved from
-\code{wikibase_session}.}
+\item{csrf}{Authenticated HTTP response returned by \code{\link[=get_csrf]{get_csrf()}}.
+Used to authorize edits on the target Wikibase instance.
+May be supplied directly or through \code{wikibase_session}.}
 
-\item{wikibase_session}{An optional named list of default values to reuse
-across multiple function calls. If any of the main parameters (such as
-\code{language}, \code{data_curator}, \code{log_file_name},
-\code{equivalence_propeert}, \code{classification_property}
-\code{wikibase_api_url}, or \code{csrf}) are missing from the function
-call, their values will be taken from this list if available. This is
-useful in interactive workflows or scripts where the same context is
-reused.}
+\item{wikibase_session}{Optional named list of reusable session
+parameters, including language preferences, authentication,
+target API URL, curator information, and property identifiers.
+Values are resolved using the package's session-resolution
+mechanism.}
 }
 \value{
-Returns a \code{\link[dataset]{dataset_df}} object. The columns
-are:\cr
+A \code{\link[dataset:dataset_df]{dataset::dataset_df()}} containing the results of the copying
+operation. Its columns include:
 \describe{
-\item{\code{rowid}}{A row identifier. }
-\item{\code{action}}{\code{copy_wikidata_item}}
-\item{\code{id_on_target}}{The new item identifier (QID) on the targeted Wikibase.}
-\item{\code{label}}{The property label}
-\item{\code{description}}{The description label}
-\item{\code{language}}{The language code of the label.}
-\item{\code{datatype}}{The datatype of the property, for example, \code{string}}
-\item{\code{wikibase_api_url}}{The MediaWiki API URL where the new property is created.}
-\item{\code{equivalence_property}}{The PID that connects an equivalence ID to the property.}
-\item{\code{equivalence_id}}{The ID of an equivalent property defined elsewhere.}
-\item{\code{classification_property}}{The PID that connects the item to a superclass, or class.}
-\item{\code{classification_id}}{The QID of a class, subclass or superclass.}
-\item{\code{success}}{TRUE if successfully created, FALSE if there was an error.}
-\item{\code{comment}}{A summary of the error messages(s), if success is FALSE.}
-\item{\code{time}}{The time when the action started.}
-\item{\code{logfile}}{The name of the CSV logfile.}
+\item{\code{rowid}}{Row identifier associated with the target item.}
+\item{\code{action}}{Operation identifier, \code{"copy_item"}.}
+\item{\code{id_on_target}}{QID of the item on the target Wikibase.}
+\item{\code{label}}{Label of the target item.}
+\item{\code{description}}{Description of the target item.}
+\item{\code{language}}{Language code of the returned label.}
+\item{\code{datatype}}{Entity datatype, typically \code{"wikibase-item"}.}
+\item{\code{wikibase_api_url}}{API endpoint of the target Wikibase.}
+\item{\code{equivalence_property}}{PID used to record equivalence.}
+\item{\code{equivalence_id}}{Wikidata QID of the source item.}
+\item{\code{classification_property}}{PID of the classification relation.}
+\item{\code{classification_id}}{QID of the class or superclass.}
+\item{\code{success}}{Logical success indicator.}
+\item{\code{comment}}{Error or status information.}
+\item{\code{time}}{Timestamp of the operation.}
+\item{\code{logfile}}{Name of the CSV log file, if specified.}
 }
-The number of rows corresponds to the length of the qid_on_wikidata vector.
+
+For a vector of source QIDs, the function returns the combined
+results of the individual copying operations.
 }
 \description{
-This code will copy (an) item label(s) and description(s) from
-Wikidata to a new instance. It should work between instances, but the
-authentication to copy from a password protected instance is not yet coded.
-The function is more specific than create_item, because this one creates
-items that exist in a similarly structured Wikibase instance, such as
-Wikidata.
+Copy the labels and descriptions of one or more Wikidata items to
+a target Wikibase instance, creating corresponding local items.
+Optionally record their Wikidata identifiers and classification
+relationships.
 }
 \details{
-This function is slightly different from create_item. That function
-creates a new item that may not have an equivalent item on another Wikibase
-instance, but it may well have an equivalent item in another database. \cr
-In this function, we use \code{qid_equivalence_property} for equivalence.
-In the more general create function we use \code{equivalence_item}, because
-we may use different identifiers. Similarly, the \code{qid_on_wikidata}
-replaces the more general \code{equivalence_id}, because we must use QID
-for identification in an other Wikibase instance.
+\code{copy_wikidata_item()} retrieves item metadata from Wikidata and
+creates corresponding items in the target Wikibase instance.
+The source items are identified by their Wikidata QIDs.
+
+Unlike \code{\link[=create_item]{create_item()}}, which creates items from locally supplied
+metadata, this function uses existing Wikidata items as the source
+of labels, descriptions, and identifiers.
+
+The function supports individual QIDs and vectors of QIDs. When
+multiple QIDs are supplied, the items are processed individually.
+
+For each source item, the function:
+\enumerate{
+\item Retrieves labels and descriptions from Wikidata.
+\item Checks whether an equivalent item already exists in the
+target Wikibase instance.
+\item Creates a new item if no existing equivalent is found.
+\item Optionally adds a statement recording the Wikidata QID.
+\item Optionally adds a classification statement.
+\item Returns a structured record of the operation.
+}
+
+The \code{qid_equivalence_property} identifies the property on the
+target Wikibase instance used to record the source Wikidata QID
+as an external identifier. This differs from the more general
+equivalence identifiers supported by \code{\link[=create_item]{create_item()}}.
+
+Labels are requested in the languages specified by \code{language}.
+When a requested label is unavailable, the function substitutes
+the source item's English label, or its English Wikipedia sitelink
+title if no English label exists. Missing descriptions are
+represented by empty strings.
+
+The function retrieves source metadata from the public Wikidata
+API. Authentication is required for writing to the target Wikibase
+instance. Reading from password-protected source instances is
+not currently supported.
+
+A CSV log can optionally be written to record the results of
+individual operations. Existing log files are appended to.
+}
+\seealso{
+\code{\link[=create_item]{create_item()}}, \code{\link[=get_csrf]{get_csrf()}}, \code{\link[=add_id_statement]{add_id_statement()}},
+\code{\link[=add_item_statement]{add_item_statement()}}
 }
 \keyword{internal}

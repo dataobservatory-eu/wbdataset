@@ -5,8 +5,10 @@ test_that("get_csrf_token() extracts token from csrf object", {
     query = list(tokens = list(csrftoken = "123abcFAKETOKENxyz"))
   )
 
-  stub(get_csrf_token, "httr::content",
-       function(...) fake_csrf_response)
+  stub(
+    get_csrf_token, "httr::content",
+    function(...) fake_csrf_response
+  )
 
   csrf_token <- get_csrf_token(csrf = "fake_response_object")
   expect_type(csrf_token, "character")
@@ -77,8 +79,12 @@ test_that("get_csrf() returns a csrf object from mocked API calls", {
 
   stub(get_csrf, "httr::content", function(...) {
     call_counter <<- call_counter + 1
-    if (call_counter == 1) return(fake_login_token_content)
-    if (call_counter == 2) return(fake_login_result_content)
+    if (call_counter == 1) {
+      return(fake_login_token_content)
+    }
+    if (call_counter == 2) {
+      return(fake_login_result_content)
+    }
     return(fake_csrf_content)
   })
 
@@ -94,10 +100,16 @@ test_that("check_api_url() passes for valid URLs", {
 })
 
 test_that("check_api_url() fails for invalid URLs", {
-  expect_error(check_api_url("https://example.org/w/index.php"),
-               "must end with api.php")
-  expect_error(check_api_url("https://example.org/"),
-               "must end with api.php")
-  expect_error(check_api_url("api.json"),
-               "must end with api.php")
+  expect_error(
+    check_api_url("https://example.org/w/index.php"),
+    "must end with api.php"
+  )
+  expect_error(
+    check_api_url("https://example.org/"),
+    "must end with api.php"
+  )
+  expect_error(
+    check_api_url("api.json"),
+    "must end with api.php"
+  )
 })

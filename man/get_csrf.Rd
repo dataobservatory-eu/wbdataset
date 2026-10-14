@@ -3,62 +3,85 @@
 \name{get_csrf}
 \alias{get_csrf}
 \alias{get_csrf_token}
-\title{Get CSRF object with security token}
+\title{Authenticate with a Wikibase instance}
 \usage{
 get_csrf(username, password, wikibase_api_url)
 
 get_csrf_token(csrf)
 }
 \arguments{
-\item{username}{Your bot username on the Wikibase instance at
-\code{wikibase_api_url}.}
+\item{username}{Character string. Bot username on the Wikibase instance.}
 
-\item{password}{Your bot password on the Wikibase instance at
-\code{wikibase_api_url}.}
+\item{password}{Character string. Password associated with the bot account.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-api.php.}
+\item{wikibase_api_url}{Character string. Full URL of the MediaWiki API
+endpoint, ending in \code{api.php}, for example
+\verb{https://reprexbase.eu/rubik/api.php}.}
 
-\item{csrf}{The csrf object returned by \code{\link{get_csrf}}.}
+\item{csrf}{An HTTP \code{response} object returned by \code{\link[=get_csrf]{get_csrf()}}.}
 }
 \value{
-\code{\link{get_csrf}} returns a list that contains the CSRF token
-among other data.
+\code{get_csrf()} returns an object of class \code{response} from \code{\link[httr:GET]{httr::GET()}}.
+Its JSON response body contains the CSRF token in
+\code{query$tokens$csrftoken}.
 
-\code{\link{get_csrf_token}} returns a character string of length 1
-with the user's CSRF token from the list returned by \code{\link{get_csrf}}.
+\code{get_csrf_token()} returns a character string of length one containing
+the CSRF token.
 }
 \description{
-Get a Cross-Site Request Forgery (CSRF) object containing your
-CSRF token.
+Authenticate a bot account with a MediaWiki/Wikibase API and obtain
+a response containing a Cross-Site Request Forgery (CSRF) token.
+The authenticated HTTP session can subsequently be used for editing,
+uploading local media, and modifying Wikibase statements.
+
+\code{get_csrf_token()} extracts the CSRF token from the HTTP response
+returned by \code{\link[=get_csrf]{get_csrf()}}.
 }
 \details{
-CSRF is a way for a malicious website to exploit your logged-in
-session on another website to perform actions as you without your consent.
-The MediaWiki API (the API of Wikibase instances) employs CSRF tokens (also
-often called "edit tokens" in the MediaWiki context) as a crucial defense
-mechanism against Cross-Site Request Forgery attacks.\cr \cr To receive
-such a CSRF security token (connected to your current editing session on a
-Wikibase instance) you have to run first \code{\link{get_csrf}} to
-establish your session and your credentials. As a result, you will receive
-a \code{csrf} object which contains among other data, your CSRF token. Then, now
-running the \code{\link{get_csrf_token}} function will unwrap from returned
-\code{csrf} object the token itself, which is often, but not necessarily, a
-character string of length 42.\cr \cr The MediaWiki API's CSRF tokens are
-not designed to be long-lived.  Their lifespan is intentionally kept short,
-typically tied to the user's current editing session or a reasonable
-timeframe for a single action.  This is a crucial security measure.
+MediaWiki uses CSRF tokens (also called \emph{edit tokens}) to protect
+state-changing API operations against unauthorized requests.
 
-CSRF tokens act like a secret handshake between the your R script
-and the MediaWiki server. Only requests that have the correct "handshake"
-(the matching token) are considered legitimate. They are returned by
-\code{\link{get_csrf}}.
+Authentication involves three steps:
+\enumerate{
+\item Request a login token from the MediaWiki API.
+\item Authenticate using the bot username, password, and login token.
+\item Request a CSRF token for the authenticated session.
+}
+
+The function returns the HTTP response from the final request.
+Use \code{\link[=get_csrf_token]{get_csrf_token()}} to extract the CSRF token as a character string.
+
+Both authentication cookies and CSRF tokens are session-dependent.
+Tokens should not be stored permanently or reused across sessions.
+When an editing operation reports an invalid token, obtain a fresh
+authenticated session.
+
+The returned response is used as \code{csrf} by other functions in
+\code{wbdataset}, including \code{\link[=upload_local_media]{upload_local_media()}} and \code{\link[=add_local_media]{add_local_media()}}.
+
+The token is required for MediaWiki API operations that modify
+server-side data, including file uploads and Wikibase edits.
+
+The token is associated with the authenticated session and is not
+a substitute for authentication cookies.
+
+MediaWiki does not guarantee a fixed token length. Applications
+should not assume that CSRF tokens always contain 42 characters.
 }
 \examples{
 \dontrun{
-get_csrf("user", "pass", "https://example.org/api.php")
+api <- "https://reprexbase.eu/rubik/api.php"
+
+csrf <- get_csrf(
+  username = Sys.getenv("WIKIBASE_USERNAME"),
+  password = Sys.getenv("WIKIBASE_PASSWORD"),
+  wikibase_api_url = api
+)
+
+token <- get_csrf_token(csrf)
 }
+}
+\seealso{
+\code{\link[=get_csrf_token]{get_csrf_token()}}, \code{\link[=upload_local_media]{upload_local_media()}}, \code{\link[=add_local_media]{add_local_media()}},
+\code{\link[=add_statement]{add_statement()}}
 }

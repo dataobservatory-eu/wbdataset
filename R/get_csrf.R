@@ -1,39 +1,63 @@
-#' @title Get CSRF object with security token
-#' @description Get a Cross-Site Request Forgery (CSRF) object containing your
-#'   CSRF token.
-#' @details CSRF is a way for a malicious website to exploit your logged-in
-#'   session on another website to perform actions as you without your consent.
-#'   The MediaWiki API (the API of Wikibase instances) employs CSRF tokens (also
-#'   often called "edit tokens" in the MediaWiki context) as a crucial defense
-#'   mechanism against Cross-Site Request Forgery attacks.\cr \cr To receive
-#'   such a CSRF security token (connected to your current editing session on a
-#'   Wikibase instance) you have to run first \code{\link{get_csrf}} to
-#'   establish your session and your credentials. As a result, you will receive
-#'   a `csrf` object which contains among other data, your CSRF token. Then, now
-#'   running the \code{\link{get_csrf_token}} function will unwrap from returned
-#'   `csrf` object the token itself, which is often, but not necessarily, a
-#'   character string of length 42.\cr \cr The MediaWiki API's CSRF tokens are
-#'   not designed to be long-lived.  Their lifespan is intentionally kept short,
-#'   typically tied to the user's current editing session or a reasonable
-#'   timeframe for a single action.  This is a crucial security measure.
-#' @param username Your bot username on the Wikibase instance at
-#'   \code{wikibase_api_url}.
-#' @param password Your bot password on the Wikibase instance at
-#'   \code{wikibase_api_url}.
-#' @param wikibase_api_url The full URL of the Wikibase API, which is the
-#'   address that the \code{wbdataset} R client sends requests to when
-#'   interacting with the knowledge base. For example,
-#'   \code{'https://reprexbase.eu/demowiki/api.php'}. The URL must end with
-#'   api.php.
-#' @return \code{\link{get_csrf}} returns a list that contains the CSRF token
-#'   among other data.
+#' Authenticate with a Wikibase instance
+#'
+#' @description
+#' Authenticate a bot account with a MediaWiki/Wikibase API and obtain
+#' a response containing a Cross-Site Request Forgery (CSRF) token.
+#' The authenticated HTTP session can subsequently be used for editing,
+#' uploading local media, and modifying Wikibase statements.
+#'
+#' @details
+#' MediaWiki uses CSRF tokens (also called *edit tokens*) to protect
+#' state-changing API operations against unauthorized requests.
+#'
+#' Authentication involves three steps:
+#' \enumerate{
+#'   \item Request a login token from the MediaWiki API.
+#'   \item Authenticate using the bot username, password, and login token.
+#'   \item Request a CSRF token for the authenticated session.
+#' }
+#'
+#' The function returns the HTTP response from the final request.
+#' Use [get_csrf_token()] to extract the CSRF token as a character string.
+#'
+#' Both authentication cookies and CSRF tokens are session-dependent.
+#' Tokens should not be stored permanently or reused across sessions.
+#' When an editing operation reports an invalid token, obtain a fresh
+#' authenticated session.
+#'
+#' The returned response is used as `csrf` by other functions in
+#' `wbdataset`, including [upload_local_media()] and [add_local_media()].
+#'
+#' @param username Character string. Bot username on the Wikibase instance.
+#' @param password Character string. Password associated with the bot account.
+#' @param wikibase_api_url Character string. Full URL of the MediaWiki API
+#'   endpoint, ending in `api.php`, for example
+#'   `https://reprexbase.eu/rubik/api.php`.
+#'
+#' @return
+#' `get_csrf()` returns an object of class `response` from [httr::GET()].
+#' Its JSON response body contains the CSRF token in
+#' `query$tokens$csrftoken`.
+#'
+#' @seealso
+#' [get_csrf_token()], [upload_local_media()], [add_local_media()],
+#' [add_statement()]
+#'
 #' @importFrom httr handle GET POST content
 #' @export
+#'
 #' @examples
 #' \dontrun{
-#' get_csrf("user", "pass", "https://example.org/api.php")
+#' api <- "https://reprexbase.eu/rubik/api.php"
+#'
+#' csrf <- get_csrf(
+#'   username = Sys.getenv("WIKIBASE_USERNAME"),
+#'   password = Sys.getenv("WIKIBASE_PASSWORD"),
+#'   wikibase_api_url = api
+#' )
+#'
+#' token <- get_csrf_token(csrf)
 #' }
-
 get_csrf <- function(username, password, wikibase_api_url) {
   check_api_url(wikibase_api_url = wikibase_api_url) # check if ends with api.php
 
@@ -134,18 +158,33 @@ get_csrf <- function(username, password, wikibase_api_url) {
 }
 
 #' @rdname get_csrf
-#' @param csrf The csrf object returned by \code{\link{get_csrf}}.
-#' @details CSRF tokens act like a secret handshake between the your R script
-#' and the MediaWiki server. Only requests that have the correct "handshake"
-#' (the matching token) are considered legitimate. They are returned by
-#' \code{\link{get_csrf}}.
-#' @return \code{\link{get_csrf_token}} returns a character string of length 1
-#' with the user's CSRF token from the list returned by \code{\link{get_csrf}}.
-#' @importFrom httr handle GET POST content
+#'
+#' @description
+#' `get_csrf_token()` extracts the CSRF token from the HTTP response
+#' returned by [get_csrf()].
+#'
+#' @details
+#' The token is required for MediaWiki API operations that modify
+#' server-side data, including file uploads and Wikibase edits.
+#'
+#' The token is associated with the authenticated session and is not
+#' a substitute for authentication cookies.
+#'
+#' MediaWiki does not guarantee a fixed token length. Applications
+#' should not assume that CSRF tokens always contain 42 characters.
+#'
+#' @param csrf An HTTP `response` object returned by [get_csrf()].
+#'
+#' @return
+#' `get_csrf_token()` returns a character string of length one containing
+#' the CSRF token.
+#'
 #' @export
 get_csrf_token <- function(csrf) {
-  csrf_data <- httr::content(csrf, as = "parsed",
-                             type = "application/json")
+  csrf_data <- httr::content(csrf,
+    as = "parsed",
+    type = "application/json"
+  )
   csrf_data
   csrf_token <- csrf_data$query$tokens$csrftoken
   if (nchar(csrf_token) < 10) stop("Error: get_csrf_token(csrf): Did not receive a valid token.")
