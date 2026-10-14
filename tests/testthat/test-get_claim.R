@@ -88,9 +88,11 @@ test_that("get_claim() returns correct height for the Eiffel Tower", {
 })
 
 test_that("get_claim() correctly retrieves coordinate location for the Eiffel Tower", {
-  result <- get_claim(qid = "Q243",
-                      pid = "P625",
-                      first = TRUE)
+  result <- get_claim(
+    qid = "Q243",
+    pid = "P625",
+    first = TRUE
+  )
   expect_equal(result$datatype, "globe-coordinate")
 
   # Parse coordinate string

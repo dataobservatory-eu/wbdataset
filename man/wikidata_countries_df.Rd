@@ -20,9 +20,9 @@ An object of class \code{wbdataset} (inherits from \code{dataset_df}, \code{tbl_
 \url{https://www.wikidata.org/wiki/Wikidata:Main_Page}
 }
 \usage{
-wikidata_countries_df
+data(wikidata_countries_df)
 
-wikidata_countries_df
+data(wikidata_countries_df)
 }
 \description{
 A small dataset of countries, including sovereign states and autonomous

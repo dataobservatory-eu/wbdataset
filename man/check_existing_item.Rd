@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_existing_item.R
 \name{check_existing_item}
 \alias{check_existing_item}
-\title{Check for Existing Items in Wikibase}
+\title{Check for existing items in Wikibase}
 \usage{
 check_existing_item(
   search_term,
@@ -20,74 +20,115 @@ check_existing_item(
 )
 }
 \arguments{
-\item{search_term}{A character string representing the label to search for in
-the Wikibase. For example, \code{"Estonian National Museum"}.}
+\item{search_term}{Character string. Label or search expression
+used to find an existing Wikibase item, for example
+\code{"Estonian National Museum"}.}
 
-\item{language}{A character string specifying the language code of the label,
-adhering to BCP 47 standards (e.g., \code{"en"} for English). Defaults to
-\code{"en"}. For more details, see \href{https://tools.ietf.org/html/bcp47}{BCP
-47}.}
+\item{language}{Character string. Language code used for the
+search. Defaults to \code{"en"}. Must follow
+\href{https://www.rfc-editor.org/rfc/bcp/bcp47.txt}{
+BCP 47 language-tag conventions}.}
 
-\item{equivalence_property}{An optional PID of a property already defined in
-the same Wikibase instance that records the equivalence of this new
-item with a property defined elsewhere, for example, on Wikidata or
-CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
-equivalence relations is will be claimed.}
-
-\item{equivalence_id}{The identifier that uniquely identifies this item among
-another system's definitions. Defaults to
-\code{NA_character_}; if left missing, no equivalence relations is will be
-claimed.}
-
-\item{classification_property}{The instance of, or subclass of, or superclass
-of property. Defaults to \code{NA_character} when not used.}
-
-\item{classification_id}{The QID of the class. Defaults to
-\code{NA_character} when not used.}
-
-\item{action}{A character string indicating the action being performed.
-Defaults to \code{"create_item"}.}
-
-\item{log_file_name}{A character string specifying the name of the log file.
+\item{equivalence_property}{Character string. Optional property
+identifier (PID) representing an equivalence relationship
+between the item and an entity defined in another system.
 Defaults to \code{NA_character_}.}
 
-\item{data_curator}{An object of class \code{person} representing the data
-curator. Defaults to \code{person("Unknown", "Person")}.}
+\item{equivalence_id}{Character string. Identifier of the
+equivalent entity in another system, such as Wikidata.
+Defaults to \code{NA_character_}.}
 
-\item{wikibase_api_url}{The full URL of the Wikibase API, which is the
-address that the \code{wbdataset} R client sends requests to when
-interacting with the knowledge base. For example,
-\code{'https://reprexbase.eu/jekyll/api.php'}. The URL must end with
-api.php. It is either given as a parameter or resolved from
-\code{wikibase_session}.}
+\item{classification_property}{Character string. Property
+identifier (PID) used for a classification relationship,
+such as instance of or subclass of.
+Defaults to \code{NA_character_}.}
 
-\item{csrf}{The CSRF token of your session, received with
-\code{\link{get_csrf}}. It is either given as a parameter or resolved
-from \code{wikibase_session}.}
+\item{classification_id}{Character string. QID of the class
+or superclass associated with the item.
+Defaults to \code{NA_character_}.}
 
-\item{ambiguity_handling}{A character string indicating how to handle
-ambiguous results: "return_null" or "return_first". Defaults to
-"return_null".}
+\item{action}{Character string. Name of the operation for which
+the existence check is performed. Defaults to \code{"create_item"}.
+The value is retained in the returned metadata.}
+
+\item{log_file_name}{Character string. Name or path of the log
+file associated with the operation. Defaults to \code{NA_character_}.
+This function records the value but does not write a log file.}
+
+\item{data_curator}{A \code{\link[utils:person]{utils::person()}} object identifying the
+curator responsible for the operation. Defaults to
+\code{person("Unknown", "Person")}.}
+
+\item{wikibase_api_url}{Character string. Full URL of the target
+MediaWiki API endpoint. Defaults to
+\verb{https://www.wikidata.org/w/api.php}.}
+
+\item{csrf}{Optional authenticated session object returned by
+\code{\link[=get_csrf]{get_csrf()}}. Defaults to \code{NULL} for public API searches.}
+
+\item{ambiguity_handling}{Character string. Strategy for resolving
+multiple search results: \code{"return_null"} or \code{"return_first"}.
+Defaults to \code{"return_null"}.}
 }
 \value{
-A \code{dataset_df} object containing information about the matching
-item(s), including action performed, item ID, label, description, language,
-and other metadata. Returns \code{NULL} if no matching items are found.
-
-A data.frame or NULL.
+A \code{\link[dataset:dataset_df]{dataset::dataset_df()}} describing the existing item, or \code{NULL}
+if no item is resolved. The returned dataset contains:
+\describe{
+\item{\code{rowid}}{Row identifier associated with the existing item.}
+\item{\code{action}}{Name of the attempted operation.}
+\item{\code{id_on_target}}{QID of the existing Wikibase item.}
+\item{\code{label}}{Label of the existing item.}
+\item{\code{description}}{Description of the existing item, or an
+empty string if unavailable.}
+\item{\code{language}}{Language code used for the search.}
+\item{\code{datatype}}{Entity datatype, \code{"wikibase-item"}.}
+\item{\code{wikibase_api_url}}{API endpoint of the Wikibase instance.}
+\item{\code{equivalence_property}}{PID of the equivalence property.}
+\item{\code{equivalence_id}}{Identifier of the equivalent entity.}
+\item{\code{classification_property}}{PID of the classification property.}
+\item{\code{classification_id}}{QID of the associated class.}
+\item{\code{success}}{\code{FALSE}, because no new item was created.}
+\item{\code{comment}}{Message indicating that an existing item was found.}
+\item{\code{time}}{Timestamp of the operation.}
+\item{\code{logfile}}{Name of the associated log file.}
+}
 }
 \description{
-This function searches for existing items in a specified
-Wikibase instance that match a given label in a specified language. It
-helps prevent duplicate item creation by identifying existing matches.
+Search a Wikibase instance for an existing item matching a specified
+label and language. This function supports duplicate prevention in
+item creation workflows by identifying and returning existing items.
 }
 \details{
-The function interfaces with the Wikibase API's \code{wbsearchentities}
-action to perform a search based on the provided label (\code{search_term}) and
-language. It returns information about matching items, facilitating the
-management of data consistency within the Wikibase. See:
-\href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
-action=wbsearchentities}.
+\code{check_existing_item()} searches for items using the MediaWiki
+\code{wbsearchentities} API action. The search is performed using
+\code{search_term} and \code{language} on the specified Wikibase instance.
+
+Search results are passed to \code{\link[=handle_search_term_ambiguity]{handle_search_term_ambiguity()}} to
+resolve cases in which multiple items match the search term.
+The \code{ambiguity_handling} argument determines how these results
+are handled:
+\describe{
+\item{\code{"return_null"}}{Return \code{NULL} when an ambiguous match
+cannot be resolved. This is the default.}
+\item{\code{"return_first"}}{Select the first matching item when
+multiple candidates are found.}
+}
+
+If no item is resolved, the function returns \code{NULL}.
+Otherwise, it returns a structured record describing the existing
+item and the attempted operation.
+
+The returned \code{success} field is \code{FALSE}, indicating that no new
+item was created because an existing item was identified. It does
+not indicate that the search itself failed.
+
+The equivalence and classification parameters provide contextual
+metadata for the returned record. This function does not create
+new items or add statements to existing items.
+
+See the
+\href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{
+MediaWiki API documentation for wbsearchentities}.
 }
 \examples{
 check_existing_item(
@@ -96,4 +137,8 @@ check_existing_item(
   wikibase_api_url = "https://www.wikidata.org/w/api.php",
   csrf = NULL
 )
+}
+\seealso{
+\code{\link[=create_item]{create_item()}}, \code{\link[=copy_wikidata_item]{copy_wikidata_item()}},
+\code{\link[=search_wikibase_entities]{search_wikibase_entities()}}
 }

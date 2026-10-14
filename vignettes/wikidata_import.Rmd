@@ -78,7 +78,7 @@ ds <- wikidata_countries_df %>%
   ) %>%
   left_join_column(
     property = "P1566"
-  ) 
+  )
 ```
 
 You can set the workflow to SILENT to avoid the progress report above, i.e.,  

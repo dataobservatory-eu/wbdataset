@@ -4,7 +4,7 @@ test_that("add_id_statement() throws error", {
       qid = "Q4441",
       pid = "P417",
       o = "12345",
-      wikibase_type = "time",  # invalid type
+      wikibase_type = "time", # invalid type
       wikibase_api_url = "https://reprexbase.eu/fu/api.php",
       csrf = "dummy"
     ),

@@ -43,11 +43,12 @@ is_valid_wikibase_datatype <- function(x) {
     "wikibase-sense"
   )
 
-  if (is.null(x)) return(logical(1))  # empty logical for NULL input
+  if (is.null(x)) {
+    return(logical(1))
+  } # empty logical for NULL input
 
   x <- as.character(x)
   is_valid <- x %in% valid_datatypes
-  is_valid[is.na(x)] <- FALSE  # explicitly set NA inputs to FALSE
+  is_valid[is.na(x)] <- FALSE # explicitly set NA inputs to FALSE
   return(is_valid)
-
 }

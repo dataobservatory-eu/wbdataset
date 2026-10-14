@@ -27,7 +27,7 @@ label in the specified language, for example, \code{"duration"}.}
 entity (such as an item, property, or Lexeme). Descriptions help
 disambiguate entities with similar labels and are not required to be unique
 but are typically distinct within the same language. For example, \code{"Length in
-  time."}.}
+time."}.}
 
 \item{language}{A single language code that indicates the language of the
 label and description, using BCP 47-compliant language tags (e.g., "en" for

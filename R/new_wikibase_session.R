@@ -49,16 +49,16 @@
 #' @export
 
 new_wikibase_session <- function(
-    language = "en",
-    csrf = NULL,
-    data_curator = NULL,
-    wikibase_api_url = NULL,
-    log_file_name = NULL,
-    pid_equivalence_property = NA_character_,
-    qid_equivalence_property = NA_character_,
-    classification_property = NA_character_,
-    equivalence_property = NA_character_) {
-
+  language = "en",
+  csrf = NULL,
+  data_curator = NULL,
+  wikibase_api_url = NULL,
+  log_file_name = NULL,
+  pid_equivalence_property = NA_character_,
+  qid_equivalence_property = NA_character_,
+  classification_property = NA_character_,
+  equivalence_property = NA_character_
+) {
   list(
     language = language,
     csrf = csrf,

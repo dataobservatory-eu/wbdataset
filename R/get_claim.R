@@ -36,12 +36,12 @@
 #' @export
 
 get_claim <- function(
-    qid = "Q528626",
-    pid = "P625",
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    csrf = NULL,
-    first = TRUE) {
-
+  qid = "Q528626",
+  pid = "P625",
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf = NULL,
+  first = TRUE
+) {
   if (!is_qid(qid)) {
     stop(sprintf("Invalid QID: '%s'. QIDs must begin with 'Q' followed by digits (e.g., 'Q42').", qid))
   }
@@ -67,12 +67,13 @@ get_claim <- function(
   )
 
   if (is.null(get_claim$result)) {
-    message("get_claim (", qid, ", ", pid, ", '", wikibase_api_url , "') resulted in: ", get_claim$error)
+    message("get_claim (", qid, ", ", pid, ", '", wikibase_api_url, "') resulted in: ", get_claim$error)
     return(NULL)
   } else {
     content <- httr::content(get_claim$result,
-                             as = "parsed",
-                             type = "application/json")
+      as = "parsed",
+      type = "application/json"
+    )
   }
 
   if (!is.null(content$error)) {
@@ -120,11 +121,13 @@ get_claim <- function(
     value <- extract_value(snak)
     datatype <- snak$datatype
 
-    df <- data.frame(qid = qid,
-                     pid = pid,
-                     value = value,
-                     datatype = datatype,
-                     stringsAsFactors = FALSE)
+    df <- data.frame(
+      qid = qid,
+      pid = pid,
+      value = value,
+      datatype = datatype,
+      stringsAsFactors = FALSE
+    )
     return(df)
   } else {
     # All claims as rows

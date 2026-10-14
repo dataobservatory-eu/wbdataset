@@ -1,9 +1,11 @@
 test_that("check_existing_property() works", {
   skip_on_cran()
-  skip_if_offline()  # skip if no internet
+  skip_if_offline() # skip if no internet
 
-  test <- check_existing_property(search_term = "instance of",
-                                  language = "en")
+  test <- check_existing_property(
+    search_term = "instance of",
+    language = "en"
+  )
   expect_equal(
     as.character(test$rowid),
     "wd:P31"
@@ -39,17 +41,21 @@ test_that("check_existing_property() handles invalid inputs appropriately", {
 
   # Test for empty language
   expect_error(
-    check_existing_property(search_term = "Estonian National Museum",
-                            language = ""),
+    check_existing_property(
+      search_term = "Estonian National Museum",
+      language = ""
+    ),
     "Invalid input in check_existing_property(): 'language' must be a non-empty character string.",
     fixed = TRUE
   )
 
   # Test for invalid wikibase_api_url
   expect_error(
-    check_existing_property(search_term = "Estonian National Museum",
-                            language = "en",
-                            wikibase_api_url = "invalid_url"),
+    check_existing_property(
+      search_term = "Estonian National Museum",
+      language = "en",
+      wikibase_api_url = "invalid_url"
+    ),
     "Invalid input in check_existing_property(): 'wikibase_api_url' must be a valid URL string.",
     fixed = TRUE
   )
@@ -88,4 +94,3 @@ test_that("check_existing_property() returns expected structure for known term",
   expect_equal(result$datatype, "wikibase-item")
   expect_false(result$success)
 })
-

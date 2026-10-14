@@ -33,11 +33,11 @@
 #' @export
 
 left_join_column <- function(
-    ds,
-    property,
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    csrf = NULL) {
-
+  ds,
+  property,
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf = NULL
+) {
   safely_get_claim <- purrr::safely(get_claim, NULL)
 
   result_df <- vector("list", length = nrow(ds))

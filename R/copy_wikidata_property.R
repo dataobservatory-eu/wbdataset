@@ -88,19 +88,19 @@
 #' @export
 
 copy_wikidata_property <- function(
-    pid_on_wikidata,
-    pid_equivalence_property,
-    language = "en",
-    wikibase_api_url = NULL,
-    classification_property = NA_character_,
-    classification_id = NA_character_,
-    equivalence_property = NA_character_,
-    equivalence_id = NA_character_,
-    data_curator = NULL,
-    log_file_name = NULL,
-    csrf = NULL,
-    wikibase_session = NULL) {
-
+  pid_on_wikidata,
+  pid_equivalence_property,
+  language = "en",
+  wikibase_api_url = NULL,
+  classification_property = NA_character_,
+  classification_id = NA_character_,
+  equivalence_property = NA_character_,
+  equivalence_id = NA_character_,
+  data_curator = NULL,
+  log_file_name = NULL,
+  csrf = NULL,
+  wikibase_session = NULL
+) {
   # Resolve inputs from explicit parameters or session parameter list ---
 
   language <- resolve_from_session("language", language, wikibase_session)
@@ -136,7 +136,6 @@ copy_wikidata_property <- function(
   # If many PIDs are given, loop the interaction --------
 
   if (length(pid_on_wikidata) > 1) {
-
     return_log_file <- copy_wikidata_properties(
       pid_on_wikidata = pid_on_wikidata,
       pid_equivalence_property = pid_equivalence_property,
@@ -576,13 +575,14 @@ copy_wikidata_property <- function(
 #' @rdname  copy_wikidata_item
 #' @keywords internal
 copy_wikidata_properties <- function(
-    pid_on_wikidata,
-    pid_equivalence_property,
-    language,
-    wikibase_api_url,
-    data_curator,
-    csrf,
-    wikibase_session = NULL) {
+  pid_on_wikidata,
+  pid_equivalence_property,
+  language,
+  wikibase_api_url,
+  data_curator,
+  csrf,
+  wikibase_session = NULL
+) {
   # Ensure that PIDs are used in the loop ----------------------------
   is_pid <- vapply(pid_on_wikidata, is_pid, logical(1))
   not_pid <- paste(names(which(!is_pid)), collapse = "|")

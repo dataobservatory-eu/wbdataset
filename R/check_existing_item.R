@@ -1,51 +1,110 @@
-#' @title Check for Existing Items in Wikibase
+#' Check for existing items in Wikibase
 #'
-#' @description This function searches for existing items in a specified
-#'   Wikibase instance that match a given label in a specified language. It
-#'   helps prevent duplicate item creation by identifying existing matches.
+#' @description
+#' Search a Wikibase instance for an existing item matching a specified
+#' label and language. This function supports duplicate prevention in
+#' item creation workflows by identifying and returning existing items.
 #'
-#' @details The function interfaces with the Wikibase API's `wbsearchentities`
-#'   action to perform a search based on the provided label (`search_term`) and
-#'   language. It returns information about matching items, facilitating the
-#'   management of data consistency within the Wikibase. See:
-#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{MediaWiki
-#' action=wbsearchentities}.
+#' @details
+#' `check_existing_item()` searches for items using the MediaWiki
+#' `wbsearchentities` API action. The search is performed using
+#' `search_term` and `language` on the specified Wikibase instance.
 #'
-#' @param search_term A character string representing the label to search for in
-#'   the Wikibase. For example, `"Estonian National Museum"`.
-#' @param language A character string specifying the language code of the label,
-#'   adhering to BCP 47 standards (e.g., `"en"` for English). Defaults to
-#'   `"en"`. For more details, see \href{https://tools.ietf.org/html/bcp47}{BCP
-#'   47}.
-#' @param classification_property The instance of, or subclass of, or superclass
-#'   of property. Defaults to \code{NA_character} when not used.
-#' @param classification_id The QID of the class. Defaults to
-#'   \code{NA_character} when not used.
-#' @param equivalence_property An optional PID of a property already defined in
-#'   the same Wikibase instance that records the equivalence of this new
-#'   item with a property defined elsewhere, for example, on Wikidata or
-#'   CIDOC-CRM. Defaults to \code{NA_character_}; if left missing, no
-#'   equivalence relations is will be claimed.
-#' @param equivalence_id The identifier that uniquely identifies this item among
-#' another system's definitions. Defaults to
-#'   \code{NA_character_}; if left missing, no equivalence relations is will be
-#'   claimed.
-#' @param action A character string indicating the action being performed.
-#'   Defaults to `"create_item"`.
-#' @param log_file_name A character string specifying the name of the log file.
+#' Search results are passed to [handle_search_term_ambiguity()] to
+#' resolve cases in which multiple items match the search term.
+#' The `ambiguity_handling` argument determines how these results
+#' are handled:
+#' \describe{
+#'   \item{`"return_null"`}{Return `NULL` when an ambiguous match
+#'     cannot be resolved. This is the default.}
+#'   \item{`"return_first"`}{Select the first matching item when
+#'     multiple candidates are found.}
+#' }
+#'
+#' If no item is resolved, the function returns `NULL`.
+#' Otherwise, it returns a structured record describing the existing
+#' item and the attempted operation.
+#'
+#' The returned `success` field is `FALSE`, indicating that no new
+#' item was created because an existing item was identified. It does
+#' not indicate that the search itself failed.
+#'
+#' The equivalence and classification parameters provide contextual
+#' metadata for the returned record. This function does not create
+#' new items or add statements to existing items.
+#'
+#' See the
+#' \href{https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities}{
+#' MediaWiki API documentation for wbsearchentities}.
+#'
+#' @param search_term Character string. Label or search expression
+#'   used to find an existing Wikibase item, for example
+#'   `"Estonian National Museum"`.
+#' @param language Character string. Language code used for the
+#'   search. Defaults to `"en"`. Must follow
+#'   \href{https://www.rfc-editor.org/rfc/bcp/bcp47.txt}{
+#'   BCP 47 language-tag conventions}.
+#' @param equivalence_property Character string. Optional property
+#'   identifier (PID) representing an equivalence relationship
+#'   between the item and an entity defined in another system.
 #'   Defaults to `NA_character_`.
-#' @param data_curator An object of class `person` representing the data
-#'   curator. Defaults to `person("Unknown", "Person")`.
-#' @param ambiguity_handling A character string indicating how to handle
-#'   ambiguous results: "return_null" or "return_first". Defaults to
-#'   "return_null".
-#' @return A `dataset_df` object containing information about the matching
-#'   item(s), including action performed, item ID, label, description, language,
-#'   and other metadata. Returns `NULL` if no matching items are found.
-#' @inheritParams create_item
+#' @param equivalence_id Character string. Identifier of the
+#'   equivalent entity in another system, such as Wikidata.
+#'   Defaults to `NA_character_`.
+#' @param classification_property Character string. Property
+#'   identifier (PID) used for a classification relationship,
+#'   such as instance of or subclass of.
+#'   Defaults to `NA_character_`.
+#' @param classification_id Character string. QID of the class
+#'   or superclass associated with the item.
+#'   Defaults to `NA_character_`.
+#' @param action Character string. Name of the operation for which
+#'   the existence check is performed. Defaults to `"create_item"`.
+#'   The value is retained in the returned metadata.
+#' @param log_file_name Character string. Name or path of the log
+#'   file associated with the operation. Defaults to `NA_character_`.
+#'   This function records the value but does not write a log file.
+#' @param data_curator A [utils::person()] object identifying the
+#'   curator responsible for the operation. Defaults to
+#'   `person("Unknown", "Person")`.
+#' @param wikibase_api_url Character string. Full URL of the target
+#'   MediaWiki API endpoint. Defaults to
+#'   `https://www.wikidata.org/w/api.php`.
+#' @param csrf Optional authenticated session object returned by
+#'   [get_csrf()]. Defaults to `NULL` for public API searches.
+#' @param ambiguity_handling Character string. Strategy for resolving
+#'   multiple search results: `"return_null"` or `"return_first"`.
+#'   Defaults to `"return_null"`.
+#'
+#' @return
+#' A [dataset::dataset_df()] describing the existing item, or `NULL`
+#' if no item is resolved. The returned dataset contains:
+#' \describe{
+#'   \item{`rowid`}{Row identifier associated with the existing item.}
+#'   \item{`action`}{Name of the attempted operation.}
+#'   \item{`id_on_target`}{QID of the existing Wikibase item.}
+#'   \item{`label`}{Label of the existing item.}
+#'   \item{`description`}{Description of the existing item, or an
+#'     empty string if unavailable.}
+#'   \item{`language`}{Language code used for the search.}
+#'   \item{`datatype`}{Entity datatype, `"wikibase-item"`.}
+#'   \item{`wikibase_api_url`}{API endpoint of the Wikibase instance.}
+#'   \item{`equivalence_property`}{PID of the equivalence property.}
+#'   \item{`equivalence_id`}{Identifier of the equivalent entity.}
+#'   \item{`classification_property`}{PID of the classification property.}
+#'   \item{`classification_id`}{QID of the associated class.}
+#'   \item{`success`}{`FALSE`, because no new item was created.}
+#'   \item{`comment`}{Message indicating that an existing item was found.}
+#'   \item{`time`}{Timestamp of the operation.}
+#'   \item{`logfile`}{Name of the associated log file.}
+#' }
+#'
+#' @seealso
+#' [create_item()], [copy_wikidata_item()],
+#' [search_wikibase_entities()]
+#'
 #' @importFrom glue glue
 #' @importFrom dataset dataset_df defined
-#' @return A data.frame or NULL.
 #' @examples
 #' check_existing_item(
 #'   search_term = "Estonian National Museum",
@@ -56,32 +115,33 @@
 #' @export
 
 check_existing_item <- function(
-    search_term,
-    language = "en",
-    equivalence_property = NA_character_,
-    equivalence_id = NA_character_,
-    classification_property = NA_character_,
-    classification_id = NA_character_,
-    action = "create_item",
-    log_file_name = NA_character_,
-    data_curator = person("Unknown", "Person"),
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    csrf = NULL,
-    ambiguity_handling = "return_null") {
+  search_term,
+  language = "en",
+  equivalence_property = NA_character_,
+  equivalence_id = NA_character_,
+  classification_property = NA_character_,
+  classification_id = NA_character_,
+  action = "create_item",
+  log_file_name = NA_character_,
+  data_curator = person("Unknown", "Person"),
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf = NULL,
+  ambiguity_handling = "return_null"
+) {
   # Validate inputs
   if (!is.character(search_term) ||
-      length(search_term) != 1 ||
-      nchar(search_term) == 0) {
+    length(search_term) != 1 ||
+    nchar(search_term) == 0) {
     stop("Invalid input: 'search_term' must be a non-empty character string.")
   }
   if (!is.character(language) ||
-      length(language) != 1 ||
-      nchar(language) == 0) {
+    length(language) != 1 ||
+    nchar(language) == 0) {
     stop("Invalid input: 'language' must be a non-empty character string.")
   }
   if (!is.character(wikibase_api_url) ||
-      length(wikibase_api_url) != 1 ||
-      !grepl("^https?://", wikibase_api_url)) {
+    length(wikibase_api_url) != 1 ||
+    !grepl("^https?://", wikibase_api_url)) {
     stop("Invalid input: 'wikibase_api_url' must be a valid URL string.")
   }
 

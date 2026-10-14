@@ -41,7 +41,9 @@ is_pid <- function(x) {
 #' @return A QID as a character string, or NA if not found or invalid.
 #' @keywords internal
 get_qid <- function(x) {
-  if (is.null(x)) return(NA_character_)
+  if (is.null(x)) {
+    return(NA_character_)
+  }
 
   if (!is.atomic(x) && !is.character(x)) {
     x <- x$id_on_target %||% NA_character_
@@ -64,7 +66,9 @@ get_qid <- function(x) {
 #' @return A PID as a character string or NA_character_.
 #' @keywords internal
 get_pid <- function(x) {
-  if (is.null(x)) return(NA_character_)
+  if (is.null(x)) {
+    return(NA_character_)
+  }
 
   # If it's a result object, extract id_on_target
   if (!is.atomic(x) && !is.character(x)) {
@@ -80,4 +84,3 @@ get_pid <- function(x) {
 
   x
 }
-

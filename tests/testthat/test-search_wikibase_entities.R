@@ -70,7 +70,7 @@ library(httptest2)
 
 test_that("search_wikibase_entities returns results on success", {
   # Use with_mock_api to simulate a successful HTTP response
-    skip_if_not_installed("httptest2")
+  skip_if_not_installed("httptest2")
 
   with_mock_api({
     result <- search_wikibase_entities(

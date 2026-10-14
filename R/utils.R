@@ -42,7 +42,7 @@ is_valid_csrf_token <- function(csrf_token) {
   if (!is.character(csrf_token) || length(csrf_token) != 1 || is.na(csrf_token)) {
     return(FALSE)
   }
-  ifelse(nchar(csrf_token)>10, TRUE, FALSE)
+  ifelse(nchar(csrf_token) > 10, TRUE, FALSE)
 }
 #' @title Extract a QID from an entity result
 #' @description Coerces `id_on_target` to a character and ensures it starts with "Q".
@@ -50,7 +50,9 @@ is_valid_csrf_token <- function(csrf_token) {
 #' @return A QID as a character string, or NA if not found or invalid.
 #' @keywords internal
 get_qid <- function(x) {
-  if (is.null(x)) return(NA_character_)
+  if (is.null(x)) {
+    return(NA_character_)
+  }
 
   if (!is.atomic(x) && !is.character(x)) {
     x <- x$id_on_target %||% NA_character_
@@ -73,7 +75,9 @@ get_qid <- function(x) {
 #' @return A PID as a character string or NA_character_.
 #' @keywords internal
 get_pid <- function(x) {
-  if (is.null(x)) return(NA_character_)
+  if (is.null(x)) {
+    return(NA_character_)
+  }
 
   # If it's a result object, extract id_on_target
   if (!is.atomic(x) && !is.character(x)) {

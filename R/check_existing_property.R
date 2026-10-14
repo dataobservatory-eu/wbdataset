@@ -54,18 +54,19 @@
 #' @export
 
 check_existing_property <- function(
-    search_term,
-    language,
-    equivalence_property = NA_character_,
-    equivalence_id = NA_character_,
-    classification_property = NA_character_,
-    classification_id = NA_character_,
-    action = "create_property",
-    log_file_name = NA_character_,
-    data_curator = person("Unknown", "Person"),
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    ambiguity_handling = "return_first",
-    csrf = NULL) {
+  search_term,
+  language,
+  equivalence_property = NA_character_,
+  equivalence_id = NA_character_,
+  classification_property = NA_character_,
+  classification_id = NA_character_,
+  action = "create_property",
+  log_file_name = NA_character_,
+  data_curator = person("Unknown", "Person"),
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  ambiguity_handling = "return_first",
+  csrf = NULL
+) {
   action_timestamp <- action_timestamp_create()
   action_time <- Sys.time()
 

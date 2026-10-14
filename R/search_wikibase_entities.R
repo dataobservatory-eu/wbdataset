@@ -12,11 +12,12 @@
 #' @keywords internal
 
 search_wikibase_entities <- function(
-    search_term,
-    language = "en",
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    type,
-    csrf = NULL) {
+  search_term,
+  language = "en",
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  type,
+  csrf = NULL
+) {
   # Validate the 'type' parameter
   if (!type %in% c("item", "property")) {
     stop("Invalid 'type' parameter. Must be either 'item' or 'property'.")

@@ -1,4 +1,3 @@
-
 # Tests for upload_local_media() that require no API access
 
 test_that("file must be a single character string", {
@@ -49,8 +48,10 @@ test_that("filename must be a single character string", {
   )
 
   expect_error(
-    upload_local_media(file, filename = c("a.jpg", "b.jpg"),
-                       csrf = NULL),
+    upload_local_media(file,
+      filename = c("a.jpg", "b.jpg"),
+      csrf = NULL
+    ),
     "`filename` must be a single character string"
   )
 })

@@ -51,13 +51,14 @@
 #' @export
 
 get_wikidata_item <- function(
-    qid_on_wikidata,
-    language,
-    prefix = "http://www.wikidata.org/entity/",
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    data_curator = NULL,
-    title = "Dataset title",
-    fallback_language = "en") {
+  qid_on_wikidata,
+  language,
+  prefix = "http://www.wikidata.org/entity/",
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  data_curator = NULL,
+  title = "Dataset title",
+  fallback_language = "en"
+) {
   if (!is.character(language) || length(language) == 0 || anyNA(language)) {
     stop("get_wikidata_item(): 'language' must be a non-empty character vector.")
   }

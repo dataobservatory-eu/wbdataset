@@ -18,13 +18,13 @@
 #' @export
 
 add_id_statement <- function(
-    qid,
-    pid,
-    o,
-    wikibase_type = "external-id",
-    wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
-    csrf) {
-
+  qid,
+  pid,
+  o,
+  wikibase_type = "external-id",
+  wikibase_api_url = "https://reprexbase.eu/demowiki/api.php",
+  csrf
+) {
   format_claim_value <- function(value, datatype) {
     if (datatype %in% c("external-id", "string", "url")) {
       return(paste0('"', value, '"'))
@@ -64,8 +64,9 @@ add_id_statement <- function(
   )
 
   response <- httr::content(new_claim,
-                            as = "parsed",
-                            type = "application/json")
+    as = "parsed",
+    type = "application/json"
+  )
 
   if ("error" %in% names(response)) {
     warning_message <- glue::glue("Error in 'wbcreateclaim' wrapper add_id_statement():\n", response$error$code, ": ", response$error$info)

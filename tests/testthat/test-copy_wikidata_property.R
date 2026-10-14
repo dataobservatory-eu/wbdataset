@@ -5,7 +5,7 @@ test_that("copy_wikidata_property() fails when CSRF token is missing or invalid"
     wikibase_api_url = "https://reprexbase.eu/jekyll/api.php",
     data_curator = person("Jane", "Doe")
   ), " csrf must be created with get_csrf()")
-  })
+})
 
 
 test_that("copy_wikidata_property() fails when data curator is not a person", {
