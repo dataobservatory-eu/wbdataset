@@ -67,19 +67,18 @@
 #' @importFrom rlang %||%
 #' @export
 upload_local_media <- function(
-    file,
-    filename = basename(file),
-    wikibase_api_url = "https://www.wikidata.org/w/api.php",
-    csrf
+  file,
+  filename = basename(file),
+  wikibase_api_url = "https://www.wikidata.org/w/api.php",
+  csrf
 ) {
-
   if (!is.character(file) || length(file) != 1L ||
-      is.na(file) || !nzchar(file)) {
+    is.na(file) || !nzchar(file)) {
     stop("`file` must be a single character string.")
   }
 
   if (!is.character(filename) || length(filename) != 1L ||
-      is.na(filename) || !nzchar(filename)) {
+    is.na(filename) || !nzchar(filename)) {
     stop("`filename` must be a single character string.")
   }
 
@@ -114,7 +113,6 @@ upload_local_media <- function(
   )
 
   if (!is.null(result$error)) {
-
     if (identical(result$error$code, "fileexists-no-change")) {
       warning("File already uploaded: ", filename, call. = FALSE)
 

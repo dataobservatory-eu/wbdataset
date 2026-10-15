@@ -76,7 +76,6 @@
 #' @importFrom utils person write.table
 #' @export
 
-
 copy_wikidata_property <- function(
   pid_on_wikidata,
   pid_equivalence_property,
